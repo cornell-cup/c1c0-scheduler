@@ -1,5 +1,4 @@
-# pythread example
-# sample functionality for a multithreaded program
+# Locomotion Multithreading Proof of Concept
 
 import threading
 from threading import Lock
@@ -7,11 +6,7 @@ import time
 import random
 import sys
 
-'''
-1. Have main thread 
-'''
-
-lock = Lock()
+lock = Lock()  # prevent multiple processesing from accessing locomotion resource
 
 
 def chat_funct():
@@ -39,9 +34,6 @@ def child_thread(sleep_time):
     print('Child thread finished.')
     lock.release()
 
-# no-argument function that sleeps for a random amount of time
-# between 2 and 5 seconds before finishing, printing each second
-
 
 def main_thread():
     '''
@@ -51,20 +43,15 @@ def main_thread():
     child thread runs to completion. 
     '''
     lock.acquire()
-    #sleep_time = int(5*random.random()+2)
     i = 0
     while(1):
         print('Main thread iteration number:' + str(i))
         i += 1
-        #locomotion, value = chat_funct()
-        chat_thread = threading.Thread(target=chat_funct)
-        chat_thread.start()
-        locomotion, value = chat_thread.join()
-
+        locomotion, value = chat_funct()
         if (locomotion):
             lock.release()
             blocking_thread = threading.Thread(
-                target=child_thread, args=(value,))
+                target=child_thread, args=(value,))  # create child thread
             blocking_thread.start()
             blocking_thread.join()
             lock.acquire()
@@ -74,41 +61,8 @@ def main_thread():
     lock.release()
 
 
-# the above two functions will run in parallel in two threads. Keep in mind
-# that threads exist in the same process, with the same memory space and stack,
-# but run in parallel based on Python's threading API (which itself is based on
-# POSIX threads in C)
-# the next step is to initialize thread objects for each function - this lets the system
-# keep track of where each function exists so it can switch between them
-
 if __name__ == '__main__':
 
-    #main_t = threading.Thread(target=main_thread_function)
-    # main_t.start()
-
-    # this one just needs the function name,
     t1 = threading.Thread(target=main_thread)
-    # since it has no arguments
 
-    # the argument `args` are the
-    #t2 = threading.Thread(target=sleepy_time, args=(3,))
-    # arguments you would pass into the
-    # function if you were calling it normally
-
-    # with each of the threads created, now we can start running them
-
-    t1.start()
-    # t2.start()
-
-    # t2.join()
-    # when you run this program (i've been doing it from a linux command line),
-    # you'll see output coming from each thread concurrently. This program outlines
-    # the fundamentals of a multithreaded program - two functions, which can take
-    # arguments, run in parallel to completion, and disappear when they're done
-
-    # because neither thread has any shared memory, concurrency isn't an issue - so there
-    # is no need for locks or semaphores or condition variables or anything.
-
-    # the threading API has a lot more functionality - threads can exit, block each other, join
-    # back to other threads - all things that you might find useful when writing. Explore the
-    # documentation when you can.
+    t1.start()  # start main thread
