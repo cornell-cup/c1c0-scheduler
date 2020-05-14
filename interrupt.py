@@ -5,7 +5,6 @@
 
 #Add external interrupt on Jetson pin 18
 import Jetson.GPIO as GPIO
-import time
 
 def interrupted(channel):
     print("interrupt")
