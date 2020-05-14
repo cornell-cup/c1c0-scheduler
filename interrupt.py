@@ -1,6 +1,9 @@
 #Test of Jetson External Interrupts
-#Add external interrupt on Jetson pin 18
+#incorporates NVIDIA Jetson GPIO library
+#https://github.com/NVIDIA/jetson-gpio
 
+
+#Add external interrupt on Jetson pin 18
 import Jetson.GPIO as GPIO
 import time
 
