@@ -42,9 +42,8 @@ def chatbot_thread():
 def main_thread():
     '''
     Runs main thread infinitely.
-    Calls chat_funct() every iteration. If chat_funct() generates a locomotion 
-    command, create child thread. Prevent the main thread from running until
-    child thread runs to completion. 
+    Constantly takes xbox controller input and calls a motor command using controller input
+    within a critical section
     '''
     while True:
 
