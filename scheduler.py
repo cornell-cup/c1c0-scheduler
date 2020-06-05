@@ -32,7 +32,7 @@ def chatbot_thread():
     Starts a parallel chatbot specifically for getting locomotion commands
     '''
     while True: # restart chatbot once locomotion is finished
-        cmd = r2_chatterbot.main.main() # runs until a chatbot command happens
+        cmd = r2_chatterbot.main.main(isloc=True) # runs until a chatbot command happens
         if cmd[1] != -500 and cmd[2] != -500: # (-500,-500) is the chatbot locomotion default - essentially means no command
             lock.acquire() # begin critical section
             locomotion_cmd.chatbot_move(cmd) # actuate locomotion motors
