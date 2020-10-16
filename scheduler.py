@@ -21,6 +21,8 @@ from multiprocessing import Process
 import r2_chatterbot # pull from the scheduling branch of the chatbot repo and pip3 install
                      # python3 setup.py sdist
                      # pip3 install ./dist/r2_chatterbot-1.0.tar.gz
+from r2_chatterbot.main.py import main
+
 import locomotion_cmd
 from c1c0_locomotion import locomotion # pull from the scheduling branch of demolocomotion repo
                                        # use same commands as above, but replace r2_chatterbot with c1c0_locomotion
@@ -57,7 +59,8 @@ def main_thread():
 
 if __name__ == '__main__':
     
-    p = Process(target=r2_chatterbot.main.main()) # start child process to handle chatbot input for non-locomotion systems
+    target = r2_chatterbot.main.main()
+    p = Process(target) # start child process to handle chatbot input for non-locomotion systems
     p.start() # process will run in parallel, and will not interfere with locomotion
     t1 = threading.Thread(target=main_thread)
     t2 = threading.Thread(target=chatbot_thread)
