@@ -4,7 +4,7 @@ input
 '''
 
 import sys
-sys.path.insert(1, "util")
+sys.path.insert(1, "r2_chatterbot/util")
 
 # util.
 from api import weather

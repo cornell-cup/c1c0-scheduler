@@ -1,12 +1,9 @@
-from r2_chatterbot.util import live_streaming
-from util import nlp_util
-from util import keywords
-from util import make_response
-from util import playtrack
-from util import path_planning
-from util import object_detection
-from util import face_recognition
-from util import utils
+from r2_chatterbot.util import make_response
+from r2_chatterbot.util import playtrack
+from r2_chatterbot.util import path_planning
+from r2_chatterbot.util import object_detection
+from r2_chatterbot.util import face_recognition
+from r2_chatterbot.util import utils
 #from util.api import weather
 #from util.api import restaurant
 from playsound import playsound
@@ -41,10 +38,7 @@ utils.set_classpath()
 def main(isloc=False):
     while True:
         #gets a tuple of phrase and confidence
-        answer = live_streaming.main()
-        speech = live_streaming.get_string(answer)
-        confidence = live_streaming.get_confidence(answer)
-        print(speech)
+        speech = input("Enter chatbot command: ")
         if "quit" in speech or "stop" in speech:
             break
         
@@ -52,16 +46,7 @@ def main(isloc=False):
             # filter out cico since it messes with location detection
             speech = utils.filter_cico(speech)
             
-            if face_recognition.isFaceRecognition(speech):
-                if not isloc: # only run if given the argument that this is not a locomotion command
-                    face_cmd = face_recognition.faceRecog(speech)
-                    print(face_cmd) 
-                # task is to transfer over to facial recognition client program
-                # TODO: once facial recognition package is ready and the chatbot command
-                # is compatible, uncomment/correct the following line:
-                # p = Process(target=c1c0_facialrecognition.run, args=(face_cmd,)
-                # p.start()
-            elif path_planning.isLocCommand(speech.lower()):
+            if path_planning.isLocCommand(speech.lower()):
                 if isloc: # run the locomotion command if the argument for locomotion was set to true
                     cmd = path_planning.pathPlanning(speech.lower())
                     # locomotion_cmd.chatbot_move(cmd)                     
