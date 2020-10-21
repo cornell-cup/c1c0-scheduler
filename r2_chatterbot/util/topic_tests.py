@@ -2,10 +2,10 @@
 This file contains functions to test a sentence for certain topics
 '''
 
-from util import utils
+from r2_chatterbot.util import utils
 # import nlp_util
 import re
-from util import nlp_util
+from r2_chatterbot.util import nlp_util
 
 '''
 return format for all functions in this module

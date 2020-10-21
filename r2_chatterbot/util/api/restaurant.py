@@ -71,7 +71,7 @@ def city_to_coord(city_string):
     g = geocoder.geonames(city_string, key=GEONAMES_USERNAME)
     return (g.lat, g.lng)
 
-import_keys()
+#import_keys()
 
 if __name__ == "__main__":
     coords = city_to_coord("ithaca new york")
