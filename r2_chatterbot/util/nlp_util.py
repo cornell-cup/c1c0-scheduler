@@ -3,7 +3,7 @@ import re   #regex module
 import nltk
 
 # import utils
-from util import utils
+from r2_chatterbot.util import utils
 
 def parse(line, expression):
     '''
