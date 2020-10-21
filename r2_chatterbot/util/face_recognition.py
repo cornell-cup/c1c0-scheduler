@@ -1,7 +1,7 @@
 import utils
 import re
 import nlp_util
-import live_streaming
+#import live_streaming
 import os
 
 def isFaceRecognition(text):
@@ -34,11 +34,11 @@ def faceRecog(text):
     if isFaceRecognition(text):
         deleteFiles()
         if "attendance" in text:
-            live_streaming.append_to_file("attendance.txt", "attendance")
+            append_to_file("attendance.txt", "attendance")
             print("created new attendance file");
         for greeting in greetings_keywords:
             if greeting in text:
-                live_streaming.append_to_file("greeting.txt", "greeting")
+                append_to_file("greeting.txt", "greeting")
                 print("created new greetings file");
 
         if("call me") in text or "Call me" in text:
@@ -50,7 +50,7 @@ def faceRecog(text):
             nameList = namePhrase[0][0]
             for noun in nameList:
                 name = name + noun[0] + " "
-            live_streaming.append_to_file("friends.txt", name)
+            append_to_file("friends.txt", name)
             print("created new attendance file with " + name);
 def deleteFiles():
     if os.path.exists("friends.txt"):
@@ -72,3 +72,12 @@ if __name__ == "__main__":
     #         print(pathPlanning(line))
     # print(pathPlanning(phrase))
     # print(isLocCommand(phrase))
+    
+def append_to_file(filePath,message):
+    """
+    Adds a message [message] to the file specified in the file path [filePath]
+    Used to keep track of the history of what has been said and the confidence
+    """
+    f = open(filePath,"a")
+    f.write(message+"\n")
+
