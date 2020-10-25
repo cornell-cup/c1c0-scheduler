@@ -3,7 +3,7 @@ from chatterbot.trainers import ChatterBotCorpusTrainer
 import chatterbot.comparisons
 import chatterbot.response_selection
 
-from util import utils
+from r2_chatterbot.util import utils
 utils.set_classpath()
 
 # Uncomment the following lines to enable verbose logging

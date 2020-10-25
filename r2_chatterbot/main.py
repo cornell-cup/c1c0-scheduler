@@ -10,7 +10,7 @@ from playsound import playsound
 import re
 import sys
 import os
-import corpus_and_adapter
+from r2_chatterbot import corpus_and_adapter
 import re
 
 # for flask setup
