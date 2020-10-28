@@ -1,8 +1,8 @@
 from chatterbot.logic import LogicAdapter
 from chatterbot.conversation import Statement
-from util import keywords
-from util import make_response
-from util.api import weather
+from r2_chatterbot.util import keywords
+from r2_chatterbot.util import make_response
+from r2_chatterbot.util.api import weather
 
 class WeatherAdapter(LogicAdapter):
     def __init__(self, chatbot, **kwargs):
