@@ -29,7 +29,7 @@ bot = ChatBot(
 )
 
 corpus_trainer = ChatterBotCorpusTrainer(bot)
-corpus_trainer.train('chatterbot.corpus.english.greetings', "./custom_corpus.yaml")
+corpus_trainer.train('chatterbot.corpus.english.greetings', "./r2_chatterbot/custom_corpus.yaml")
 
 print('Type something to begin...')
 
