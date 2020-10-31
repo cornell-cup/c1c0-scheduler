@@ -21,7 +21,7 @@ from multiprocessing import Process
 import r2_chatterbot # pull from the scheduling branch of the chatbot repo and pip3 install
                      # python3 setup.py sdist
                      # pip3 install ./dist/r2_chatterbot-1.0.tar.gz
-from r2_chatterbot.main.py import main
+from r2_chatterbot.main import main
 
 import locomotion_cmd
 from c1c0_locomotion import locomotion # pull from the scheduling branch of demolocomotion repo

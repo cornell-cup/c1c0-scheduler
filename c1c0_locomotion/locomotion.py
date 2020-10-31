@@ -39,7 +39,7 @@ def showIf(boolean, ifTrue, ifFalse=" "):
 def key_press(key):
     print(key.name)
     
-sys.path.insert(0, "/c1c0_locomotion/protocol/reference")
+sys.path.insert(0, "./c1c0_locomotion/protocol/reference")
 import R2Protocol2 as R2Protocol
 
 #TCP_IP = '0.0.0.0'
