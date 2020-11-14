@@ -1,6 +1,7 @@
 import os
 import re   #regex module
 import nltk
+nltk.download('maxent_ne_chunker')
 
 # import utils
 from r2_chatterbot.util import utils

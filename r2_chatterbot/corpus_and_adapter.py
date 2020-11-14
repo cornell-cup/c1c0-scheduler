@@ -5,12 +5,14 @@ import chatterbot.response_selection
 
 from r2_chatterbot.util import utils
 utils.set_classpath()
+import os
 
 # Uncomment the following lines to enable verbose logging
 #import logging
 #logging.basicConfig(level=logging.INFO)
 
 # Create a new instance of a ChatBot
+os.environ['JAVA_HOME'] = "/home/sgp62/jdk-8u271-linux-aarch64/jdk1.8.0_271/"
 bot = ChatBot(
     'Terminal',
     storage_adapter='chatterbot.storage.SQLStorageAdapter',
@@ -47,4 +49,5 @@ print('Type something to begin...')
 def response_from_chatbot(question):
     user_input = question
     bot_response = bot.get_response(question)
+    #bot_response = "Eat a dick"
     return bot_response
