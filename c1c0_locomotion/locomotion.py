@@ -178,6 +178,30 @@ def run(distance):
 """
 #Replacement keyboard input code
 
+def get_xbox():
+    
+    # Get xbox input for a single command
+    
+    joy = keyboard.on_press(key_press) # init xbox controller
+    degree = 0 # init motor arguments
+    x = 0
+    y = 0 
+    # get head angle
+    if keyboard.is_pressed('right'):
+        degree = 1
+    elif keyboard.is_pressed('left'):
+        degree = -1
+    if keyboard.is_pressed('a'):
+        x -= 1
+    elif keyboard.is_pressed('d'):
+        x += 1
+    if keyboard.is_pressed('w'):
+        y += 1
+    elif keyboard.is_pressed('s'):
+        y -= 1
+
+    return x, y, degree
+
 def run(distance):
     keyboard.on_press(key_press)
     while not keyboard.is_pressed('down'):
@@ -196,7 +220,7 @@ def run(distance):
             x += 1
         if keyboard.is_pressed('w'):
             y += 1
-        if keyboard.is_pressed('d'):
+        if keyboard.is_pressed('s'):
             y -= 1
         #motorcommand(x,y)
         #headcommand(degree)
