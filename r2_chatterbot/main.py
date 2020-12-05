@@ -35,7 +35,7 @@ url = "http://18.216.143.187/"
 
 utils.set_classpath()
 
-def main(isloc=False):
+def main():
     while True:
         #gets a tuple of phrase and confidence
         speech = input("Enter chatbot command: ")
@@ -45,14 +45,12 @@ def main(isloc=False):
         if("cico" in speech.lower() or "kiko" in speech.lower() or "c1c0" in speech.lower()):
             # filter out cico since it messes with location detection
             speech = utils.filter_cico(speech)
-            
             if path_planning.isLocCommand(speech.lower()):
-                if isloc: # run the locomotion command if the argument for locomotion was set to true
-                    cmd = path_planning.pathPlanning(speech.lower())
-                    # locomotion_cmd.chatbot_move(cmd)                     
-                    print("Move command (itemMove, direction, moveAmmount): ")
-                    print(path_planning.pathPlanning(speech.lower()))
-                    return cmd # don't worry, this only returns/exits the loop in the process handling locomotion
+                cmd = path_planning.pathPlanning(speech.lower())
+                # locomotion_cmd.chatbot_move(cmd)                     
+                print("Move command (itemMove, direction, moveAmmount): ")
+                print(path_planning.pathPlanning(speech.lower()))
+                return cmd # don't worry, this only returns/exits the loop in the process handling locomotion
                                # chatbot main will get re-scheduled as soon as locomotion is handled
                 # task is to transfer over to path planning on the system
             elif object_detection.isObjCommand(speech.lower()):

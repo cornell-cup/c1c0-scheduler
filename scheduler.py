@@ -34,7 +34,7 @@ def chatbot_thread():
     Starts a parallel chatbot specifically for getting locomotion commands
     '''
     while True: # restart chatbot once locomotion is finished
-        cmd = r2_chatterbot.main.main(isloc=True) # runs until a chatbot command happens
+        cmd = r2_chatterbot.main.main() # runs until a chatbot command happens
         if cmd[1] != -500 and cmd[2] != -500: # (-500,-500) is the chatbot locomotion default - essentially means no command
             lock.acquire() # begin critical section
             locomotion_cmd.chatbot_move(cmd) # actuate locomotion motors
@@ -48,22 +48,26 @@ def main_thread():
     within a critical section
     '''
     while True:
-        print("Heeeeeeelllooo")
         time.sleep(0.1) # assure commands complete
         motor_cmd = locomotion.get_xbox() # get xbox input
 
         lock.acquire() # critical section begin
         # locomotion.run_single_command(motor_cmd) # actuate motors for movement
-        print("Running motor command at"+ str(motor_cmd))
+        if(motor_cmd != (0,0,0)):
+            print("Running motor command at "+ str(motor_cmd))
         lock.release() # critical section end
 
 
 if __name__ == '__main__':
-#    target = r2_chatterbot.main.main()
-#    p = Process(target) # start child process to handle chatbot input for non-locomotion systems
-   # p.start() # process will run in parallel, and will not interfere with locomotion
+    # target = r2_chatterbot.main.main()
+    # p = Process(target) # start child process to handle chatbot input for non-locomotion systems
+    # p.start() # process will run in parallel, and will not interfere with locomotion
     t1 = threading.Thread(target=main_thread)
-#    t2 = threading.Thread(target=chatbot_thread)
+    t2 = threading.Thread(target=chatbot_thread)
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
 
-    t1.start()  # start main thread
+#    t1.start()  # start main thread
 #    t2.start()  # start chatbot thread

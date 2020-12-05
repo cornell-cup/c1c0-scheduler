@@ -182,22 +182,22 @@ def get_xbox():
     
     # Get xbox input for a single command
     
-    joy = keyboard.on_press(key_press) # init xbox controller
+    #joy = keyboard.on_press(key_press) # init xbox controller
     degree = 0 # init motor arguments
     x = 0
     y = 0 
     # get head angle
-    if keyboard.is_pressed('right'):
+    if keyboard.is_pressed('ctrl+comma'):
         degree = 1
-    elif keyboard.is_pressed('left'):
+    elif keyboard.is_pressed('ctrl+period'):
         degree = -1
-    if keyboard.is_pressed('a'):
+    if keyboard.is_pressed('left'):
         x -= 1
-    elif keyboard.is_pressed('d'):
+    elif keyboard.is_pressed('right'):
         x += 1
-    if keyboard.is_pressed('w'):
+    if keyboard.is_pressed('up'):
         y += 1
-    elif keyboard.is_pressed('s'):
+    elif keyboard.is_pressed('down'):
         y -= 1
 
     return x, y, degree

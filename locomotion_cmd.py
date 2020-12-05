@@ -36,6 +36,9 @@ def chatbot_move(cmd):
         x = 0.0
         y = -1.0
 
+    if x != 0.0:
+        print("Moving c1c0 according to chatbot command")
+    """
     # move C1C0
     if x != 0.0:
         # turn left or right using turn_amt
@@ -48,4 +51,4 @@ def chatbot_move(cmd):
         locomotion.motor_command(0,y)
     locomotion.motor_command(0,0) # stop moving
     time.sleep(0.25) # wait a quarter of a second to ensure movement is finished
-
+    """
