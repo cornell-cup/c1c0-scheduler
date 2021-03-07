@@ -53,13 +53,29 @@ def xboxcontroller():
 
 def threaded_client(connection):
     t = threading.currentThread()
-    connection.send(str.encode('Welcome to the Servern'))
-    while getattr(t, "do_run", True):
+    connection.send(str.encode('Welcome to the Server'))
+    detectClient = True
+    #Handshake Protocol
+    while(getattr(t, "do_run", True) and detectClient):
+        data = connection.recv(2048)
+        if(data.decode('utf-8') == "I am Chatbot"):
+            reply = "Chatbot is recognized"
+            client = "Chatbot"
+            detectClient = False
+        else:
+            reply = 'Server Says: ' + data.decode('utf-8')
+        if not data:
+            break
+        connection.sendall(str.encode(reply))
+        
+    #Commence Communication
+    while(getattr(t, "do_run", True) and (not detectClient)):
         data = connection.recv(2048)
         reply = 'Server Says: ' + data.decode('utf-8')
         if not data:
             break
         connection.sendall(str.encode(reply))
+    
     connection.close()
 
 t_xbox = threading.Thread(target=xboxcontroller, args=())

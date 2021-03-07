@@ -11,16 +11,15 @@ except socket.error as e:
     print(str(e))
 
 Response = ClientSocket.recv(1024)
-handshakeComplete = False
 while True:
-    while (not handshakeComplete):
-        ClientSocket.send(str.encode("I am Chatbot"))
+    #Input = input('Say Something: ')
+    Response = ""
+    while(Response != "Consumer is recognized"):
+        ClientSocket.send(str.encode("I am Consumer"))
         ResponseSocket = ClientSocket.recv(1024)
         Response = ResponseSocket.decode('utf-8')
         print(Response)
-        if (Response == "Chatbot is recognized"):
-            handshakeComplete = True
-    while handshakeComplete:
+    while True:
         Input = input('Say Something: ')
         ClientSocket.send(str.encode(Input))
         ResponseSocket = ClientSocket.recv(1024)
