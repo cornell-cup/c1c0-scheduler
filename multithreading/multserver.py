@@ -57,24 +57,40 @@ def threaded_client(connection):
     detectClient = True
     #Handshake Protocol
     while(getattr(t, "do_run", True) and detectClient):
+        reply = ""
         data = connection.recv(2048)
         if(data.decode('utf-8') == "I am Chatbot"):
             reply = "Chatbot is recognized"
             client = "Chatbot"
             detectClient = False
-        else:
-            reply = 'Server Says: ' + data.decode('utf-8')
+            connection.sendall(str.encode(reply))
+        elif(data.decode('utf-8') == "I am Producer"):
+            reply = "Producer is recognized"
+            client = "Producer"
+            detectClient = False
+            connection.sendall(str.encode(reply))
+        elif(data.decode('utf-8') == "I am Consumer"):
+            reply = "Consumer is recognized"
+            client = "Consumer"
+            detectClient = False
+            connection.sendall(str.encode(reply))
         if not data:
             break
-        connection.sendall(str.encode(reply))
         
     #Commence Communication
     while(getattr(t, "do_run", True) and (not detectClient)):
         data = connection.recv(2048)
-        reply = 'Server Says: ' + data.decode('utf-8')
+        if (client == "Chatbot"):
+            reply = 'Server Says: ' + data.decode('utf-8')
+            connection.sendall(str.encode(reply))
+        elif (client == "Producer"):
+            reply = 'Server Says: ' + data.decode('utf-8')
+            connection.sendall(str.encode(reply))
+        elif (client == "Consumer"):
+            reply = 'Server Says: ' + data.decode('utf-8')
+            connection.sendall(str.encode(reply))
         if not data:
             break
-        connection.sendall(str.encode(reply))
     
     connection.close()
 
