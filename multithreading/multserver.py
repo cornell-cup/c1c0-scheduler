@@ -4,6 +4,9 @@ import threading
 import signal
 from xbox360controller import Xbox360Controller
 
+#concurrency primitives 
+barrier = threading.Barrier(2) 
+
 ServerSocket = socket.socket()
 host = '127.0.0.1'
 port = 1233
@@ -68,11 +71,13 @@ def threaded_client(connection):
             reply = "Producer is recognized"
             client = "Producer"
             detectClient = False
+            barrier.wait()
             connection.sendall(str.encode(reply))
         elif(data.decode('utf-8') == "I am Consumer"):
             reply = "Consumer is recognized"
             client = "Consumer"
             detectClient = False
+            barrier.wait()
             connection.sendall(str.encode(reply))
         if not data:
             break
