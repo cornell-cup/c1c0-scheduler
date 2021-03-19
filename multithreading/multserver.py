@@ -122,6 +122,7 @@ def threaded_client(connection):
 
 t_xbox = threading.Thread(target=xboxcontroller, args=())
 t_xbox.start()
+#Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
 while True:
     Client, address = ServerSocket.accept()
     print('Connected to: ' + address[0] + ':' + str(address[1]))
