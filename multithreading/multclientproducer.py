@@ -31,5 +31,7 @@ for seed in range(10):
     ResponseSocket = ClientSocket.recv(1024)
     Response = ResponseSocket.decode('utf-8')
     print(Response)
+ClientSocket.send(str.encode("Done sending data"))
+ResponseSocket = ClientSocket.recv(1024)
 ClientSocket.close()
 

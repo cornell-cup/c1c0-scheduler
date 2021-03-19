@@ -7,6 +7,13 @@ from xbox360controller import Xbox360Controller
 #concurrency primitives 
 barrier = threading.Barrier(2) 
 
+empty = threading.Semaphore(1)
+full = threading.Semaphore(0)
+#might not be necessary with just two threads will probably take it out
+mutex = threading.Semaphore(1) 
+producerData = ""
+consumerResponse = ""
+
 ServerSocket = socket.socket()
 host = '127.0.0.1'
 port = 1233
@@ -55,6 +62,7 @@ def xboxcontroller():
 
 
 def threaded_client(connection):
+    global consumerResponse, producerData
     t = threading.currentThread()
     connection.send(str.encode('Welcome to the Server'))
     detectClient = True
@@ -89,10 +97,23 @@ def threaded_client(connection):
             reply = 'Server Says: ' + data.decode('utf-8')
             connection.sendall(str.encode(reply))
         elif (client == "Producer"):
-            reply = 'Server Says: ' + data.decode('utf-8')
+            empty.acquire()
+            mutex.acquire()
+            producerData = data.decode('utf-8')
+            if (consumerResponse == ""):
+                reply = "Consumer has not responded yet"
+            else:
+                reply = consumerResponse
+            mutex.release()  
+            full.release()
             connection.sendall(str.encode(reply))
         elif (client == "Consumer"):
-            reply = 'Server Says: ' + data.decode('utf-8')
+            full.acquire()
+            mutex.acquire()
+            consumerResponse = data.decode('utf-8')
+            reply = producerData
+            mutex.release()
+            empty.release()
             connection.sendall(str.encode(reply))
         if not data:
             break

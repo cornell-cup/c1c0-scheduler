@@ -13,15 +13,14 @@ except socket.error as e:
 Response = ClientSocket.recv(1024)
 handshakeComplete = False
 while(not handshakeComplete):
-    ClientSocket.send(str.encode("I am Producer"))
+    ClientSocket.send(str.encode("I am Consumer"))
     ResponseSocket = ClientSocket.recv(1024)
     Response = ResponseSocket.decode('utf-8')
     print(Response)
-    if (Response == "Producer is recognized"):
+    if (Response == "Consumer is recognized"):
             handshakeComplete = True
 while handshakeComplete:
-    Input = input('Say Something: ')
-    ClientSocket.send(str.encode(Input))
+    ClientSocket.send(str.encode("Send me data"))
     ResponseSocket = ClientSocket.recv(1024)
     Response = ResponseSocket.decode('utf-8')
     print(Response)
