@@ -14,12 +14,17 @@ class Client(object):
     def __init__(process_type):
         """
         Parameter: process_type
-        Invariant: process_type is a string in [path-planning", "object-detection", "locomotion"]
-        """
-        server_connect(process_type)
+        Invariant: process_type is a string in ["path-planning", "object-detection", "locomotion"]
 
-    def server_connect(client):
+        Attribute: process_type
+        Invariant: process_type is a string in ["path-planning", "object-detection", "locomotion"]
+        """
+        process_type = process_type
+        handshakeComplete = False
         ClientSocket = socket.socket()
+
+
+    def handshake():
         host = '127.0.0.1'
         port = 1233
 
@@ -30,24 +35,23 @@ class Client(object):
             print(str(e))
 
         Response = ClientSocket.recv(1024)
-        handshakeComplete = False
         while (not handshakeComplete):
-            ClientSocket.send(str.encode("I am "+ client))
+            ClientSocket.send(str.encode("I am "+ process_type))
             ResponseSocket = ClientSocket.recv(1024)
             Response = ResponseSocket.decode('utf-8')
             print(Response)
-            if (Response == client + " is recognized"):
+            if (Response == process_type + " is recognized"):
                 handshakeComplete = True
-        while handshakeComplete:
-            Input = input('Say Something: ')
-            ClientSocket.send(str.encode(Input))
+
+    def communicate(request):
+        if handshakeComplete:
+            ClientSocket.send(str.encode(request))
             ResponseSocket = ClientSocket.recv(1024)
             Response = ResponseSocket.decode('utf-8')
-            print(Response)
-            #Response to close socket
-            if(Response == "Close"):
-                handshakeComplete = False
+            return Response
+
+    def close():
         ClientSocket.close()
     
-    def close_socket():
+    
 

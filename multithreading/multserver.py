@@ -14,6 +14,14 @@ mutex = threading.Semaphore(1)
 producerData = ""
 consumerResponse = ""
 
+#DATA TYPES SUBJECT TO CHANGE
+pathplanningData = ""
+objectdetectionData = ""
+locomotionData = "" #Possibly for feedback control
+chatbotData = []
+
+
+
 ServerSocket = socket.socket()
 host = '127.0.0.1'
 port = 1233
