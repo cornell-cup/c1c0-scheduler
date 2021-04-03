@@ -6,12 +6,12 @@ March 19, 2021
 Purposes of the API:
 
 """
-import multserver
+# import multserver
 import socket
 
 class Client(object):
 
-    def __init__(process_type):
+    def __init__(self, process_type):
         """
         Parameter: process_type
         Invariant: process_type is a string in ["path-planning", "object-detection", "locomotion"]
@@ -19,39 +19,47 @@ class Client(object):
         Attribute: process_type
         Invariant: process_type is a string in ["path-planning", "object-detection", "locomotion"]
         """
-        process_type = process_type
-        handshakeComplete = False
-        ClientSocket = socket.socket()
+        self.process_type = process_type
+        self.handshakeComplete = False
+        self.ClientSocket = socket.socket()
 
 
-    def handshake():
+    def handshake(self):
         host = '127.0.0.1'
         port = 1233
 
         print('Waiting for connection')
         try:
-            ClientSocket.connect((host, port))
+            self.ClientSocket.connect((host, port))
+            print("connecting")
         except socket.error as e:
             print(str(e))
 
-        Response = ClientSocket.recv(1024)
-        while (not handshakeComplete):
-            ClientSocket.send(str.encode("I am "+ process_type))
-            ResponseSocket = ClientSocket.recv(1024)
+        Response = self.ClientSocket.recv(1024)
+        # print("hello there")
+        while (not self.handshakeComplete):
+            self.ClientSocket.send(str.encode("I am "+ self.process_type))
+            # print("General Kenobi!")
+            ResponseSocket = self.ClientSocket.recv(1024)
+            # print("Stef was here")
+            Response = ResponseSocket.decode('utf-8')
+            # print("I am a genius")
+            if (Response == self.process_type + " is recognized"):
+                print(Response)
+                self.handshakeComplete = True
+
+    def communicate(self, request):
+        if self.handshakeComplete:
+            self.ClientSocket.send(str.encode(request))
+            ResponseSocket = self.ClientSocket.recv(1024)
             Response = ResponseSocket.decode('utf-8')
             print(Response)
-            if (Response == process_type + " is recognized"):
-                handshakeComplete = True
-
-    def communicate(request):
-        if handshakeComplete:
-            ClientSocket.send(str.encode(request))
-            ResponseSocket = ClientSocket.recv(1024)
-            Response = ResponseSocket.decode('utf-8')
             return Response
 
-    def close():
-        ClientSocket.close()
+    def close(self):
+        self.communicate("kill")
+        self.ClientSocket.close()
+        print("closed connection")
     
     
 

@@ -14,11 +14,12 @@ mutex = threading.Semaphore(1)
 producerData = ""
 consumerResponse = ""
 
-#DATA TYPES SUBJECT TO CHANGE
-pathplanningData = ""
-objectdetectionData = ""
-locomotionData = "" #Possibly for feedback control
-chatbotData = []
+Data = {
+    "path-planning" : "",
+    "object-detection" : "",
+    "locomotion" : "",
+    "chatbot" : "",
+}
 
 
 
@@ -68,6 +69,18 @@ def xboxcontroller():
 	except KeyboardInterrupt:
 		pass
 
+def kill_thread(client):
+    """
+    Function for halting a process thread when its work is done
+    Used in conjunction with socket closing inside the client API
+    """
+    global threadlist
+    global ThreadCount
+    for thread in threadlist:
+        if thread.getName() == client:
+            thread.do_run = False
+            threadlist.remove(thread)
+            ThreadCount -= 1
 
 def threaded_client(connection):
     global consumerResponse, producerData
@@ -95,13 +108,24 @@ def threaded_client(connection):
             detectClient = False
             barrier.wait()
             connection.sendall(str.encode(reply))
+        elif(data.decode('utf-8') == "I am path-planning"):
+            reply = "path-planning is recognized"
+            client = "path-planning"
+            detectClient = False
+            connection.sendall(str.encode(reply))
         if not data:
             break
         
+    t.setName(client)
     #Commence Communication
     while(getattr(t, "do_run", True) and (not detectClient)):
         data = connection.recv(2048)
+        if(data.decode('utf-8') == "kill"):
+            kill_thread(client)
         if (client == "Chatbot"):
+            reply = 'Server Says: ' + data.decode('utf-8')
+            connection.sendall(str.encode(reply))
+        elif (client == "path-planning"):
             reply = 'Server Says: ' + data.decode('utf-8')
             connection.sendall(str.encode(reply))
         elif (client == "Producer"):
@@ -127,6 +151,8 @@ def threaded_client(connection):
             break
     
     connection.close()
+
+
 
 t_xbox = threading.Thread(target=xboxcontroller, args=())
 t_xbox.start()
