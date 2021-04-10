@@ -4,6 +4,15 @@ import threading
 import signal
 from xbox360controller import Xbox360Controller
 
+sys.path.append('../../c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
+import R2Protocol2 as r2p
+
+ser = serial.Serial(
+	port = '/dev/ttyTHS1',
+	baudrate = 115200,
+)
+
+
 #concurrency primitives 
 barrier = threading.Barrier(2) 
 
@@ -15,10 +24,14 @@ producerData = ""
 consumerResponse = ""
 
 Data = {
-    "path-planning" : "",
-    "object-detection" : "",
-    "locomotion" : "",
-    "chatbot" : "",
+    "terabee1" : "",
+    "terabee2" : "",
+    "terabee3" : "",
+    "lidar" : "",
+    "imu" : "",
+    "gps" : "",
+    "microphone" : "",
+    "camera" : "",
 }
 
 
@@ -68,6 +81,22 @@ def xboxcontroller():
 			signal.pause()
 	except KeyboardInterrupt:
 		pass
+
+def serialdata():
+    try:
+        while True:
+            s = ser.read(32)
+            mtype, msg, status = r2p.decode(s)
+            print(mtype, msg, status)
+            #print(s)
+            #time.sleep(3)
+            """
+            To implement:
+            Read constantly, check mtype
+            Put in appropriate Data[key] bucket for the correct sensor
+            """
+    except KeyboardInterrupt:
+        ser.close()
 
 def kill_thread(client):
     """
@@ -152,6 +181,10 @@ def threaded_client(connection):
     
     connection.close()
 
+
+#Serial Data thread that collects data and updates global dictionaries
+t_serialdata = threading.Thread(target=serialdata, args=())
+t_serialdata.start()
 
 
 t_xbox = threading.Thread(target=xboxcontroller, args=())
