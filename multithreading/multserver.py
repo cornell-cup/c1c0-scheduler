@@ -85,8 +85,13 @@ def xboxcontroller():
 def serialdata():
     try:
         while True:
-            s = ser.read(32)
-            mtype, msg, status = r2p.decode(s)
+            s = ser.read(32) #reads serial buffer for terabee
+            Data['terabee1'] = "" #clears previous values
+            mtype, msg, status = r2p.decode(s) #decodes serial message (see R2Protocol2.py)
+            if(status == '1'):
+                for i in range(len(msg)): #loop through length of data
+                    if i % 2 == 0:
+                        Data['terabee1'] += str(ord(msg[i])) + str(ord(msg[i+1])) + "," #assemble char values into int16s and put them in Data dictionary as a string
             print(mtype, msg, status)
             #print(s)
             #time.sleep(3)
@@ -183,8 +188,8 @@ def threaded_client(connection):
 
 
 #Serial Data thread that collects data and updates global dictionaries
-t_serialdata = threading.Thread(target=serialdata, args=())
-t_serialdata.start()
+# t_serialdata = threading.Thread(target=serialdata, args=())
+# t_serialdata.start()
 
 
 t_xbox = threading.Thread(target=xboxcontroller, args=())
