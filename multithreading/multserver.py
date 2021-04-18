@@ -3,6 +3,9 @@ import os
 import threading
 import signal
 from xbox360controller import Xbox360Controller
+import serial
+import sys
+from contextlib import contextmanager
 
 sys.path.append('../../c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
 import R2Protocol2 as r2p
@@ -11,7 +14,8 @@ ser = serial.Serial(
 	port = '/dev/ttyTHS1',
 	baudrate = 115200,
 )
-
+ser.close()
+ser.open()
 
 #concurrency primitives 
 barrier = threading.Barrier(2) 
@@ -34,7 +38,25 @@ Data = {
     "camera" : "",
 }
 
+Data_lock = {
+    "terabee1" : threading.Lock(),
+    "terabee2" : threading.Lock(),
+    "terabee3" : threading.Lock(),
+    "lidar" : threading.Lock(),
+    "imu" : threading.Lock(),
+    "gps" : threading.Lock(),
+    "microphone" : threading.Lock(),
+    "camera" : threading.Lock(),
+}
 
+@contextmanager
+def non_blocking_lock(lock=threading.Lock()):
+    if not lock.acquire(blocking=False):
+        raise WouldBlockError
+    try:
+        yield lock
+    finally:
+        lock.release()
 
 ServerSocket = socket.socket()
 host = '127.0.0.1'
@@ -46,7 +68,7 @@ try:
 except socket.error as e:
     print(str(e))
 
-print('Waitiing for a Connection..')
+print('Waiting for a Connection..')
 ServerSocket.listen(5)
 
 def on_button_pressed(button):
@@ -88,18 +110,10 @@ def serialdata():
             s = ser.read(32) #reads serial buffer for terabee
             Data['terabee1'] = "" #clears previous values
             mtype, msg, status = r2p.decode(s) #decodes serial message (see R2Protocol2.py)
-            if(status == '1'):
+            if(status == 1):
                 for i in range(len(msg)): #loop through length of data
                     if i % 2 == 0:
-                        Data['terabee1'] += str(ord(msg[i])) + str(ord(msg[i+1])) + "," #assemble char values into int16s and put them in Data dictionary as a string
-            print(mtype, msg, status)
-            #print(s)
-            #time.sleep(3)
-            """
-            To implement:
-            Read constantly, check mtype
-            Put in appropriate Data[key] bucket for the correct sensor
-            """
+                        Data['terabee1'] += str(msg[i]) + str(msg[i+1]) + "," #assemble char values into int16s and put them in Data dictionary as a string
     except KeyboardInterrupt:
         ser.close()
 
@@ -160,8 +174,12 @@ def threaded_client(connection):
             reply = 'Server Says: ' + data.decode('utf-8')
             connection.sendall(str.encode(reply))
         elif (client == "path-planning"):
-            reply = 'Server Says: ' + data.decode('utf-8')
-            connection.sendall(str.encode(reply))
+            if (data.decode('utf-8') == "get data"):
+                reply = "Server data request: " + Data["terabee1"]
+                connection.sendall(str.encode(reply))
+            else:
+                reply = 'Server Says: ' + data.decode('utf-8')
+                connection.sendall(str.encode(reply))
         elif (client == "Producer"):
             empty.acquire()
             mutex.acquire()
@@ -188,12 +206,13 @@ def threaded_client(connection):
 
 
 #Serial Data thread that collects data and updates global dictionaries
-# t_serialdata = threading.Thread(target=serialdata, args=())
-# t_serialdata.start()
+t_serialdata = threading.Thread(target=serialdata, args=())
+t_serialdata.start()
 
 
 t_xbox = threading.Thread(target=xboxcontroller, args=())
 t_xbox.start()
+
 #Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
 while True:
     Client, address = ServerSocket.accept()
