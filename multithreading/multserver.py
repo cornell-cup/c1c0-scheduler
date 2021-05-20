@@ -168,6 +168,11 @@ def threaded_client(connection):
             client = "path-planning"
             detectClient = False
             connection.sendall(str.encode(reply))
+        elif(data.decode('utf-8') == "I am object-detection"):
+            reply = "object-detection is recognized"
+            client = "object-detection"
+            detectClient = False
+            connection.sendall(str.encode(reply))
         if not data:
             break
         
@@ -182,11 +187,28 @@ def threaded_client(connection):
                 reply = "path-planning started"
                 connection.sendall(str.encode(reply))
                 pid = subprocess.Popen([sys.executable, "client_test3.py"])
+            elif (data.decode('utf-8') == "object-detection"):
+                reply = "object-detection started"
+                connection.sendall(str.encode(reply))
+                pid = subprocess.Popen([sys.executable, "client_test4.py"]) 
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
             
         elif (client == "path-planning"):
+            if (data.decode('utf-8') == "get data"):
+                reply = ""
+                if (Data_lock["terabee1"].acquire(blocking=False)):
+                    print(str(t.ident) + " got the lock!!!!")
+                    reply = "Server data request: " + Data["terabee1"]
+                    Data_lock["terabee1"].release()
+                else:
+                    reply = "Could not acquire lock"
+                connection.sendall(str.encode(reply))
+            else:
+                reply = 'Server Says: ' + data.decode('utf-8')
+                connection.sendall(str.encode(reply))
+        elif (client == "object-detection"):
             if (data.decode('utf-8') == "get data"):
                 reply = ""
                 if (Data_lock["terabee1"].acquire(blocking=False)):
