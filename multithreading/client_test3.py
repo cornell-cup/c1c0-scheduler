@@ -7,7 +7,7 @@ import time
 
 proc1 = client.Client("path-planning")
 proc1.handshake()
-for i in range(0,10):
+while(True):
     proc1.communicate("get data")
     time.sleep(3)
 proc1.close()

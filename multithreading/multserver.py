@@ -6,6 +6,8 @@ from xbox360controller import Xbox360Controller
 import serial
 import sys
 from contextlib import contextmanager
+import subprocess
+import sys
 
 sys.path.append('../../c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
 import R2Protocol2 as r2p
@@ -63,6 +65,7 @@ host = '127.0.0.1'
 port = 1233
 ThreadCount = 0
 threadlist = []
+chatbotThread = None
 try:
     ServerSocket.bind((host, port))
 except socket.error as e:
@@ -72,15 +75,17 @@ print('Waiting for a Connection..')
 ServerSocket.listen(5)
 
 def on_button_pressed(button):
-	global threadlist
-	global ThreadCount    
-	print('Button {0} was pressed'.format(button.name))
-	list_size = len(threadlist)
-	for i in range(list_size):
-		thread = threadlist.pop()		
-		thread.do_run = False
-		print("Thread was killed")
-		ThreadCount -= 1
+    global threadlist
+    global ThreadCount
+    global chatbotThread    
+    print('Button {0} was pressed'.format(button.name))
+    list_size = len(threadlist)
+    for i in range(list_size):
+        thread = threadlist.pop()
+        if (thread != chatbotThread):		
+            thread.do_run = False
+            print("Thread was killed")
+            ThreadCount -= 1
 
 def on_button_released(button):
     print('Button {0} was released'.format(button.name))
@@ -132,6 +137,7 @@ def kill_thread(client):
 
 def threaded_client(connection):
     global consumerResponse, producerData
+    global chatbotThread
     t = threading.currentThread()
     connection.send(str.encode('Welcome to the Server'))
     detectClient = True
@@ -140,6 +146,7 @@ def threaded_client(connection):
         reply = ""
         data = connection.recv(2048)
         if(data.decode('utf-8') == "I am Chatbot"):
+            chatbotThread = t
             reply = "Chatbot is recognized"
             client = "Chatbot"
             detectClient = False
@@ -171,11 +178,23 @@ def threaded_client(connection):
         if(data.decode('utf-8') == "kill"):
             kill_thread(client)
         if (client == "Chatbot"):
-            reply = 'Server Says: ' + data.decode('utf-8')
-            connection.sendall(str.encode(reply))
+            if (data.decode('utf-8') == "path-planning"):
+                reply = "path-planning started"
+                connection.sendall(str.encode(reply))
+                pid = subprocess.Popen([sys.executable, "client_test3.py"])
+            else:
+                reply = 'Server Says: ' + data.decode('utf-8')
+                connection.sendall(str.encode(reply))
+            
         elif (client == "path-planning"):
             if (data.decode('utf-8') == "get data"):
-                reply = "Server data request: " + Data["terabee1"]
+                reply = ""
+                if (Data_lock["terabee1"].acquire(blocking=False)):
+                    print(str(t.ident) + " got the lock!!!!")
+                    reply = "Server data request: " + Data["terabee1"]
+                    Data_lock["terabee1"].release()
+                else:
+                    reply = "Could not acquire lock"
                 connection.sendall(str.encode(reply))
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')

@@ -27,4 +27,3 @@ while handshakeComplete:
     print(Response)
 
 ClientSocket.close()
-
