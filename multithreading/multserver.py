@@ -9,6 +9,23 @@ from contextlib import contextmanager
 import subprocess
 import sys
 
+Data = {
+    "terabee1" : "",
+    "terabee2" : "",
+    "terabee3" : "",
+    "lidar" : "",
+    "imu" : "",
+}
+
+Data_lock = {
+    "terabee1" : threading.Lock(),
+    "terabee2" : threading.Lock(),
+    "terabee3" : threading.Lock(),
+    "lidar" : threading.Lock(),
+    "imu" : threading.Lock(),
+}
+
+
 sys.path.append('../../c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
 import R2Protocol2 as r2p
 
@@ -19,46 +36,25 @@ ser = serial.Serial(
 ser.close()
 ser.open()
 
-#concurrency primitives 
-barrier = threading.Barrier(2) 
+# #concurrency primitives 
+# barrier = threading.Barrier(2) 
 
-empty = threading.Semaphore(1)
-full = threading.Semaphore(0)
-#might not be necessary with just two threads will probably take it out
-mutex = threading.Semaphore(1) 
-producerData = ""
-consumerResponse = ""
+# empty = threading.Semaphore(1)
+# full = threading.Semaphore(0)
+# #might not be necessary with just two threads will probably take it out
+# mutex = threading.Semaphore(1) 
+# producerData = ""
+# consumerResponse = ""
 
-Data = {
-    "terabee1" : "",
-    "terabee2" : "",
-    "terabee3" : "",
-    "lidar" : "",
-    "imu" : "",
-    "gps" : "",
-    "microphone" : "",
-    "camera" : "",
-}
 
-Data_lock = {
-    "terabee1" : threading.Lock(),
-    "terabee2" : threading.Lock(),
-    "terabee3" : threading.Lock(),
-    "lidar" : threading.Lock(),
-    "imu" : threading.Lock(),
-    "gps" : threading.Lock(),
-    "microphone" : threading.Lock(),
-    "camera" : threading.Lock(),
-}
-
-@contextmanager
-def non_blocking_lock(lock=threading.Lock()):
-    if not lock.acquire(blocking=False):
-        raise WouldBlockError
-    try:
-        yield lock
-    finally:
-        lock.release()
+# @contextmanager
+# def non_blocking_lock(lock=threading.Lock()):
+#     if not lock.acquire(blocking=False):
+#         raise WouldBlockError
+#     try:
+#         yield lock
+#     finally:
+#         lock.release()
 
 ServerSocket = socket.socket()
 host = '127.0.0.1'
@@ -74,6 +70,7 @@ except socket.error as e:
 print('Waiting for a Connection..')
 ServerSocket.listen(5)
 
+# for xbox control: kill all thread except chatbot
 def on_button_pressed(button):
     global threadlist
     global ThreadCount
@@ -87,13 +84,16 @@ def on_button_pressed(button):
             print("Thread was killed")
             ThreadCount -= 1
 
+# for xbox control
 def on_button_released(button):
     print('Button {0} was released'.format(button.name))
 
-
+# for xbox control
 def on_axis_moved(axis):
+    # TODO send command to locomotion to control the head rotatioon
     print('Axis {0} moved to {1} {2}'.format(axis.name, axis.x, axis.y))
 
+# give function handlers to xbox controller package
 def xboxcontroller():
 	try:
 		with Xbox360Controller(0, axis_threshold=0.2) as controller:
@@ -109,6 +109,9 @@ def xboxcontroller():
 	except KeyboardInterrupt:
 		pass
 
+# read serial data, store in Data['terabee1']
+# TODO template for all sensor data reading
+# right now serves as the main function of a thread to collect data and update dictionary
 def serialdata():
     try:
         while True:
@@ -136,7 +139,7 @@ def kill_thread(client):
             ThreadCount -= 1
 
 def threaded_client(connection):
-    global consumerResponse, producerData
+    # global consumerResponse, producerData
     global chatbotThread
     t = threading.currentThread()
     connection.send(str.encode('Welcome to the Server'))
@@ -151,18 +154,6 @@ def threaded_client(connection):
             client = "Chatbot"
             detectClient = False
             connection.sendall(str.encode(reply))
-        elif(data.decode('utf-8') == "I am Producer"):
-            reply = "Producer is recognized"
-            client = "Producer"
-            detectClient = False
-            barrier.wait()
-            connection.sendall(str.encode(reply))
-        elif(data.decode('utf-8') == "I am Consumer"):
-            reply = "Consumer is recognized"
-            client = "Consumer"
-            detectClient = False
-            barrier.wait()
-            connection.sendall(str.encode(reply))
         elif(data.decode('utf-8') == "I am path-planning"):
             reply = "path-planning is recognized"
             client = "path-planning"
@@ -173,6 +164,18 @@ def threaded_client(connection):
             client = "object-detection"
             detectClient = False
             connection.sendall(str.encode(reply))
+        # elif(data.decode('utf-8') == "I am Producer"):
+        #     reply = "Producer is recognized"
+        #     client = "Producer"
+        #     detectClient = False
+        #     barrier.wait()
+        #     connection.sendall(str.encode(reply))
+        # elif(data.decode('utf-8') == "I am Consumer"):
+        #     reply = "Consumer is recognized"
+        #     client = "Consumer"
+        #     detectClient = False
+        #     barrier.wait()
+        #     connection.sendall(str.encode(reply))
         if not data:
             break
         
@@ -221,38 +224,42 @@ def threaded_client(connection):
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
-        elif (client == "Producer"):
-            empty.acquire()
-            mutex.acquire()
-            producerData = data.decode('utf-8')
-            if (consumerResponse == ""):
-                reply = "Consumer has not responded yet"
-            else:
-                reply = consumerResponse
-            mutex.release()  
-            full.release()
-            connection.sendall(str.encode(reply))
-        elif (client == "Consumer"):
-            full.acquire()
-            mutex.acquire()
-            consumerResponse = data.decode('utf-8')
-            reply = producerData
-            mutex.release()
-            empty.release()
-            connection.sendall(str.encode(reply))
+        # elif (client == "Producer"):
+        #     empty.acquire()
+        #     mutex.acquire()
+        #     producerData = data.decode('utf-8')
+        #     if (consumerResponse == ""):
+        #         reply = "Consumer has not responded yet"
+        #     else:
+        #         reply = consumerResponse
+        #     mutex.release()  
+        #     full.release()
+        #     connection.sendall(str.encode(reply))
+        # elif (client == "Consumer"):
+        #     full.acquire()
+        #     mutex.acquire()
+        #     consumerResponse = data.decode('utf-8')
+        #     reply = producerData
+        #     mutex.release()
+        #     empty.release()
+        #     connection.sendall(str.encode(reply))
         if not data:
             break
     
     connection.close()
 
 
-#Serial Data thread that collects data and updates global dictionaries
+# Serial Data thread that collects data and updates global dictionaries
+# Alternate method: have data updated locally on the sensor microcontroller;
+#                   the server actively polling the data when needed
 t_serialdata = threading.Thread(target=serialdata, args=())
 t_serialdata.start()
 
 
 t_xbox = threading.Thread(target=xboxcontroller, args=())
 t_xbox.start()
+
+# TODO start chatbot thread 
 
 #Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
 while True:
