@@ -1,13 +1,15 @@
-#Test of Jetson External Interrupts
-#incorporates NVIDIA Jetson GPIO library
-#https://github.com/NVIDIA/jetson-gpio
+# Test of Jetson External Interrupts
+# incorporates NVIDIA Jetson GPIO library
+# https://github.com/NVIDIA/jetson-gpio
 
 
-#Add external interrupt on Jetson pin 18
+# Add external interrupt on Jetson pin 18
 import Jetson.GPIO as GPIO
+
 
 def interrupted(channel):
     print("interrupt")
+
 
 def main():
     GPIO.setmode(GPIO.BOARD)
@@ -19,6 +21,7 @@ def main():
         for i in range(1000000):
             if i == 10:
                 print("running")
+
 
 if __name__ == '__main__':
     main()

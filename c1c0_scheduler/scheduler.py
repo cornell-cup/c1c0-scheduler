@@ -15,22 +15,21 @@
 import threading
 from threading import Lock
 import time
-import random
-import sys
 from multiprocessing import Process
 import r2_chatterbot # pull from the scheduling branch of the chatbot repo and pip3 install
                      # python3 setup.py sdist
                      # pip3 install ./dist/r2_chatterbot-1.0.tar.gz
 import locomotion_cmd
-from c1c0_locomotion import locomotion # pull from the scheduling branch of demolocomotion repo
+from c1c0_movement.Locomotion import locomotion # pull from the scheduling branch of demolocomotion repo
                                        # use same commands as above, but replace r2_chatterbot with c1c0_locomotion
 
 lock = Lock()  # prevent multiple processesing from accessing locomotion resource
 
+
 def chatbot_thread():
-    '''
+    """
     Starts a parallel chatbot specifically for getting locomotion commands
-    '''
+    """
     while True: # restart chatbot once locomotion is finished
         cmd = r2_chatterbot.main.main(isloc=True) # runs until a chatbot command happens
         if cmd[1] != -500 and cmd[2] != -500: # (-500,-500) is the chatbot locomotion default - essentially means no command
@@ -39,15 +38,18 @@ def chatbot_thread():
             print('finished chatbot movement')
             lock.release()
 
+
 def main_thread():
-    '''
+    """
     Runs main thread infinitely.
     Constantly takes xbox controller input and calls a motor command using controller input
     within a critical section
-    '''
+    """
     while True:
 
         time.sleep(0.1) # assure commands complete
+        # FIXME: My understanding is this is the old scheduler code, hence why the version of locomotion used here
+        #   does not have the function `get_xbox()`, and later `run_single_command`
         motor_cmd = locomotion.get_xbox() # get xbox input
 
         lock.acquire() # critical section begin
@@ -57,8 +59,8 @@ def main_thread():
 
 if __name__ == '__main__':
     
-    p = Process(target=r2_chatterbot.main.main()) # start child process to handle chatbot input for non-locomotion systems
-    p.start() # process will run in parallel, and will not interfere with locomotion
+    p = Process(target=r2_chatterbot.main.main())  # start child process to handle chatbot input for non-locomotion systems
+    p.start()  # process will run in parallel, and will not interfere with locomotion
     t1 = threading.Thread(target=main_thread)
     t2 = threading.Thread(target=chatbot_thread)
 

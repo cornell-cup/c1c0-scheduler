@@ -10,18 +10,15 @@
 
 #!/usr/bin/env python3
 
-import threading
 from threading import Lock
-import sys
 import socket
-import selectors
-import types
 
-lock = Lock() # for function thread
-flag = 0 # for xbox controller
+lock = Lock()  # for function thread
+flag = 0  # for xbox controller
 
 HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
 PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
+
 
 def main_thread():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -36,23 +33,27 @@ def main_thread():
                 # 	kill thread
                 # else if lock grabbed:
                 # 	conn.sendall("resource occupied")
-            	# else:
+                # else:
                 # 	spawn pathplanning or object detection as a thread
-    	        # 		thread will grab the lock, spawn the program, 
-                #       waiting for result to come back, release lock, 
+                # 		thread will grab the lock, spawn the program,
+                #       waiting for result to come back, release lock,
                 #       return result
 
+
 def function_thread(program, data):
-	lock.acquire()
-	result = program(data)
-	if result != termination:
-		# call pathplanning 
-		# result = pathplanning(result)
-	lock.release()
-	return result
+    lock.acquire()
+    result = program(data)
+    # FIXME: What is the value of `termination`?
+    # if result != termination:
+        # call pathplanning
+        # result = pathplanning(result)
+    lock.release()
+    return result
+
 
 def xbox_thread():
-	# waiting for interrupt
-	# kill function_thread (stop flag, release the lock if lock is grabbed)
-	# do whatever it is going to do
-	# flip the thread back to 0
+    pass
+    # waiting for interrupt
+    # kill function_thread (stop flag, release the lock if lock is grabbed)
+    # do whatever it is going to do
+    # flip the thread back to 0

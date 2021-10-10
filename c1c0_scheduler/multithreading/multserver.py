@@ -1,38 +1,33 @@
 import socket
-import os
 import threading
 import signal
-from xbox360controller import Xbox360Controller
-import serial
-import sys
-from contextlib import contextmanager
 import subprocess
 import sys
 
+import serial
+# noinspection PyUnresolvedReferences
+from xbox360controller import Xbox360Controller
+
+from c1c0_movement.Locomotion import R2Protocol2 as r2p
+
 Data = {
-    "terabee1" : "",
-    "terabee2" : "",
-    "terabee3" : "",
-    "lidar" : "",
-    "imu" : "",
+    "terabee1": "",
+    "terabee2": "",
+    "terabee3": "",
+    "lidar": "",
+    "imu": "",
 }
 
 Data_lock = {
-    "terabee1" : threading.Lock(),
-    "terabee2" : threading.Lock(),
-    "terabee3" : threading.Lock(),
-    "lidar" : threading.Lock(),
-    "imu" : threading.Lock(),
+    "terabee1": threading.Lock(),
+    "terabee2": threading.Lock(),
+    "terabee3": threading.Lock(),
+    "lidar": threading.Lock(),
+    "imu": threading.Lock(),
 }
 
-
-sys.path.append('../../c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
-import R2Protocol2 as r2p
-
-ser = serial.Serial(
-	port = '/dev/ttyTHS1',
-	baudrate = 115200,
-)
+# Why close then open?
+ser = serial.Serial(port='/dev/ttyTHS1', baudrate=115200)
 ser.close()
 ser.open()
 
@@ -70,6 +65,7 @@ except socket.error as e:
 print('Waiting for a Connection..')
 ServerSocket.listen(5)
 
+
 # for xbox control: kill all thread except chatbot
 def on_button_pressed(button):
     global threadlist
@@ -79,35 +75,39 @@ def on_button_pressed(button):
     list_size = len(threadlist)
     for i in range(list_size):
         thread = threadlist.pop()
-        if (thread != chatbotThread):		
+        if thread != chatbotThread:
             thread.do_run = False
             print("Thread was killed")
             ThreadCount -= 1
 
+
 # for xbox control
 def on_button_released(button):
     print('Button {0} was released'.format(button.name))
+
 
 # for xbox control
 def on_axis_moved(axis):
     # TODO send command to locomotion to control the head rotatioon
     print('Axis {0} moved to {1} {2}'.format(axis.name, axis.x, axis.y))
 
+
 # give function handlers to xbox controller package
 def xboxcontroller():
-	try:
-		with Xbox360Controller(0, axis_threshold=0.2) as controller:
-			# Button A events
-			controller.button_a.when_pressed = on_button_pressed
-			controller.button_a.when_released = on_button_released
+    try:
+        with Xbox360Controller(0, axis_threshold=0.2) as controller:
+            # Button A events
+            controller.button_a.when_pressed = on_button_pressed
+            controller.button_a.when_released = on_button_released
 
-			# Left and right axis move event
-			controller.axis_l.when_moved = on_axis_moved
-			controller.axis_r.when_moved = on_axis_moved
+            # Left and right axis move event
+            controller.axis_l.when_moved = on_axis_moved
+            controller.axis_r.when_moved = on_axis_moved
 
-			signal.pause()
-	except KeyboardInterrupt:
-		pass
+            signal.pause()
+    except KeyboardInterrupt:
+        pass
+
 
 # read serial data, store in Data['terabee1']
 # TODO template for all sensor data reading
@@ -115,15 +115,17 @@ def xboxcontroller():
 def serialdata():
     try:
         while True:
-            s = ser.read(32) #reads serial buffer for terabee
-            Data['terabee1'] = "" #clears previous values
-            mtype, msg, status = r2p.decode(s) #decodes serial message (see R2Protocol2.py)
-            if(status == 1):
-                for i in range(len(msg)): #loop through length of data
+            s = ser.read(32)  # reads serial buffer for terabee
+            Data['terabee1'] = ""  # clears previous values
+            mtype, msg, status = r2p.decode(s)  # decodes serial message (see R2Protocol2.py)
+            if status == 1:
+                for i in range(len(msg)):  # loop through length of data
                     if i % 2 == 0:
-                        Data['terabee1'] += str(msg[i]) + str(msg[i+1]) + "," #assemble char values into int16s and put them in Data dictionary as a string
+                        Data['terabee1'] += str(msg[i]) + str(msg[i+1]) + ","
+                        # assemble char values into int16s and put them in Data dictionary as a string
     except KeyboardInterrupt:
         ser.close()
+
 
 def kill_thread(client):
     """
@@ -138,28 +140,29 @@ def kill_thread(client):
             threadlist.remove(thread)
             ThreadCount -= 1
 
+
 def threaded_client(connection):
     # global consumerResponse, producerData
     global chatbotThread
     t = threading.currentThread()
     connection.send(str.encode('Welcome to the Server'))
     detectClient = True
-    #Handshake Protocol
-    while(getattr(t, "do_run", True) and detectClient):
+    # Handshake Protocol
+    while getattr(t, "do_run", True) and detectClient:
         reply = ""
         data = connection.recv(2048)
-        if(data.decode('utf-8') == "I am Chatbot"):
+        if data.decode('utf-8') == "I am Chatbot":
             chatbotThread = t
             reply = "Chatbot is recognized"
             client = "Chatbot"
             detectClient = False
             connection.sendall(str.encode(reply))
-        elif(data.decode('utf-8') == "I am path-planning"):
+        elif data.decode('utf-8') == "I am path-planning":
             reply = "path-planning is recognized"
             client = "path-planning"
             detectClient = False
             connection.sendall(str.encode(reply))
-        elif(data.decode('utf-8') == "I am object-detection"):
+        elif data.decode('utf-8') == "I am object-detection":
             reply = "object-detection is recognized"
             client = "object-detection"
             detectClient = False
@@ -178,19 +181,19 @@ def threaded_client(connection):
         #     connection.sendall(str.encode(reply))
         if not data:
             break
-        
+    # FIXME: Currently exception may be thrown if none of the above if/else if's are triggered bc client is unset.
     t.setName(client)
-    #Commence Communication
-    while(getattr(t, "do_run", True) and (not detectClient)):
+    # Commence Communication
+    while getattr(t, "do_run", True) and (not detectClient):
         data = connection.recv(2048)
-        if(data.decode('utf-8') == "kill"):
+        if data.decode('utf-8') == "kill":
             kill_thread(client)
-        if (client == "Chatbot"):
-            if (data.decode('utf-8') == "path-planning"):
+        if client == "Chatbot":
+            if data.decode('utf-8') == "path-planning":
                 reply = "path-planning started"
                 connection.sendall(str.encode(reply))
                 pid = subprocess.Popen([sys.executable, "client_test3.py"])
-            elif (data.decode('utf-8') == "object-detection"):
+            elif data.decode('utf-8') == "object-detection":
                 reply = "object-detection started"
                 connection.sendall(str.encode(reply))
                 pid = subprocess.Popen([sys.executable, "client_test4.py"]) 
@@ -198,10 +201,10 @@ def threaded_client(connection):
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
             
-        elif (client == "path-planning"):
-            if (data.decode('utf-8') == "get data"):
+        elif client == "path-planning":
+            if data.decode('utf-8') == "get data":
                 reply = ""
-                if (Data_lock["terabee1"].acquire(blocking=False)):
+                if Data_lock["terabee1"].acquire(blocking=False):
                     print(str(t.ident) + " got the lock!!!!")
                     reply = "Server data request: " + Data["terabee1"]
                     Data_lock["terabee1"].release()
@@ -211,10 +214,10 @@ def threaded_client(connection):
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
-        elif (client == "object-detection"):
-            if (data.decode('utf-8') == "get data"):
+        elif client == "object-detection":
+            if data.decode('utf-8') == "get data":
                 reply = ""
-                if (Data_lock["terabee1"].acquire(blocking=False)):
+                if Data_lock["terabee1"].acquire(blocking=False):
                     print(str(t.ident) + " got the lock!!!!")
                     reply = "Server data request: " + Data["terabee1"]
                     Data_lock["terabee1"].release()
@@ -259,15 +262,17 @@ t_serialdata.start()
 t_xbox = threading.Thread(target=xboxcontroller, args=())
 t_xbox.start()
 
-# TODO start chatbot thread 
+# TODO start chatbot thread
 
-#Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
-while True:
-    Client, address = ServerSocket.accept()
-    print('Connected to: ' + address[0] + ':' + str(address[1]))
-    t1 = threading.Thread(target=threaded_client, args=(Client, ))
-    t1.start()
-    threadlist.append(t1)
-    ThreadCount += 1
-    print('Thread Number: ' + str(ThreadCount))
-ServerSocket.close()
+# Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
+try:
+    while True:
+        Client, address = ServerSocket.accept()
+        print('Connected to: ' + address[0] + ':' + str(address[1]))
+        t1 = threading.Thread(target=threaded_client, args=(Client, ))
+        t1.start()
+        threadlist.append(t1)
+        ThreadCount += 1
+        print('Thread Number: ' + str(ThreadCount))
+finally:
+    ServerSocket.close()
