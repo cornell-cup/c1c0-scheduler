@@ -15,9 +15,6 @@ class Client(object):
         """
         Parameter: process_type
         Invariant: process_type is a string in ["path-planning", "object-detection", "locomotion"]
-
-        Attribute: process_type
-        Invariant: process_type is a string in ["path-planning", "object-detection", "locomotion"]
         """
         self.process_type = process_type
         self.handshakeComplete = False
@@ -35,15 +32,12 @@ class Client(object):
         except socket.error as e:
             print(str(e))
 
-        Response = self.ClientSocket.recv(1024)
-        # print("hello there")
+        Response = self.ClientSocket.recv(32)
         while (not self.handshakeComplete):
+            #TODO: handshake timeout mechanism
             self.ClientSocket.send(str.encode("I am "+ self.process_type))
-            # print("General Kenobi!")
-            ResponseSocket = self.ClientSocket.recv(1024)
-            # print("Stef was here")
+            ResponseSocket = self.ClientSocket.recv(32)
             Response = ResponseSocket.decode('utf-8')
-            # print("I am a genius")
             if (Response == self.process_type + " is recognized"):
                 print(Response)
                 self.handshakeComplete = True
@@ -51,7 +45,7 @@ class Client(object):
     def communicate(self, request):
         if self.handshakeComplete:
             self.ClientSocket.send(str.encode(request))
-            ResponseSocket = self.ClientSocket.recv(1024)
+            ResponseSocket = self.ClientSocket.recv(32)
             Response = ResponseSocket.decode('utf-8')
             print(Response)
             return Response

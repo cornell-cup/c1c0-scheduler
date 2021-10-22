@@ -19,6 +19,7 @@ while (not handshakeComplete):
     print(Response)
     if (Response == "Chatbot is recognized"):
         handshakeComplete = True
+        print("Handshake is completed")
 while handshakeComplete:
     Input = input('Say Something: ')
     ClientSocket.send(str.encode(Input))
