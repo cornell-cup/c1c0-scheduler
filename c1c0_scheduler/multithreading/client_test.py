@@ -12,8 +12,8 @@ import R2Protocol2 as r2p
 Data = {}
 
 ser = serial.Serial(
-	port = '/dev/ttyTHS1',
-	baudrate = 115200,
+    port = '/dev/ttyTHS1',
+    baudrate = 115200,
 )
 ser.close()
 ser.open()
@@ -25,7 +25,7 @@ for i in range(0,40):
     s = ser.read(32) #reads serial buffer for terabee
     Data['terabee1'] = "" #clears previous values
     mtype, msg, status = r2p.decode(s) #decodes serial message (see R2Protocol2.py)
-    if(status == 1):
+    if status == 1:
         # print(type(mtype))
         for i in range(len(msg)): #loop through length of data
             if i % 2 == 0:

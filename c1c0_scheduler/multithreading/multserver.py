@@ -189,14 +189,16 @@ def threaded_client(connection):
         if data.decode('utf-8') == "kill":
             kill_thread(client)
         if client == "Chatbot":
-            if data.decode('utf-8') == "path-planning":
-                reply = "path-planning started"
+            if "path-planning" in data.decode('utf-8'):
+                reply = "path-planning started with arguments"
+                argument = data.decode('utf-8')[14:]
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "client_test3.py"])
-            elif data.decode('utf-8') == "object-detection":
+                pid = subprocess.Popen([sys.executable, "client_pathplanning.py", argument])
+            elif "object-detection" in data.decode('utf-8'):
                 reply = "object-detection started"
+                argument = data.decode('utf-8')[17:]
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "client_test4.py"]) 
+                pid = subprocess.Popen([sys.executable, "client_objectdetection.py", argument]) 
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
@@ -262,9 +264,9 @@ t_serialdata.start()
 t_xbox = threading.Thread(target=xboxcontroller, args=())
 t_xbox.start()
 
-# TODO start chatbot thread
+# TODO start chatbot thread 
 
-# Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
+#Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
 try:
     while True:
         Client, address = ServerSocket.accept()
