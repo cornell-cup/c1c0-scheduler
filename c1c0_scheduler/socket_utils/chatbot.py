@@ -4,7 +4,7 @@ ENCODING = 'UTF-8'
 
 
 def to_object_detection(socket_, obj):
-    socket_.send(f'C_S_O(Obj({obj}))')
+    socket_.send(f'C_S_O(Obj({obj}))'.encode(ENCODING))
 
 
 def to_path_planning(socket_: socket.socket, coords_dir, dist=None):
