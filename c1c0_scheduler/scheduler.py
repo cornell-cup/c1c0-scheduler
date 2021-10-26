@@ -62,7 +62,7 @@ if __name__ == '__main__':
     p = Process(target=r2_chatterbot.main.main())  # start child process to handle chatbot input for non-locomotion systems
     p.start()  # process will run in parallel, and will not interfere with locomotion
     t1 = threading.Thread(target=main_thread)
-    t2 = threading.Thread(target=chatbot_thread)
+    t2 = threading.Thread(target=head_thread)
 
     t1.start()  # start main thread
     t2.start()  # start chatbot thread

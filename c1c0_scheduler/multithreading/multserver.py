@@ -2,7 +2,6 @@ import socket
 import threading
 import signal
 import subprocess
-import sys
 import os
 
 import serial
@@ -12,7 +11,7 @@ from xbox360controller import Xbox360Controller
 from c1c0_movement.Locomotion import R2Protocol2 as r2p
 
 from config import DEFAULT_HOST, DEFAULT_PORT, ENCODING, extract_process_type, ProcessTypes, letter_process_map, \
-    cmd_digest
+    cmd_digest, HEAD
 
 
 # Defining all the functions used first before running script
@@ -22,12 +21,12 @@ from config import DEFAULT_HOST, DEFAULT_PORT, ENCODING, extract_process_type, P
 def on_button_pressed(button):
     global thread_list
     global thread_count
-    global chatbot_thread
+    global head_thread
     print(f'Button {button.name} was pressed')
     list_size = len(thread_list)
     for i in range(list_size):
         thread = thread_list.pop()
-        if thread != chatbot_thread:
+        if thread != head_thread:
             thread.do_run = False
             print("Thread was killed")
             thread_count -= 1
@@ -96,7 +95,7 @@ def kill_thread(client):
 
 def threaded_client(connection: socket.socket):
     # global consumerResponse, producerData
-    global chatbot_thread
+    global head_thread
     t = threading.currentThread()
     connection.sendall('Welcome to the Server'.encode(ENCODING))
     # Handshake Protocol
@@ -107,8 +106,8 @@ def threaded_client(connection: socket.socket):
         data_decoded = data.decode(ENCODING)
         try:
             client = extract_process_type(data_decoded)
-            if client is ProcessTypes.CHATBOT:
-                chatbot_thread = t
+            if client is HEAD:
+                head_thread = t
             reply = f'{client} is recognized.'
             break
         except ValueError:
@@ -192,7 +191,7 @@ host = DEFAULT_HOST
 port = DEFAULT_PORT
 thread_count = 0
 thread_list = []
-chatbot_thread = None
+head_thread = None
 try:
     ServerSocket.bind((host, port))
 except socket.error as e:
