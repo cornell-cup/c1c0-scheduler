@@ -1,4 +1,4 @@
-import client
+from .. import client
 import socket
 import os 
 import time

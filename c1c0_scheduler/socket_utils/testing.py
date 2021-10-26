@@ -2,7 +2,6 @@ import socket
 from chatbot import to_object_detection
 from object_detection import from_chatbot
 import time
-import timeit
 
 # Establish scheduler server
 
@@ -21,6 +20,7 @@ print('Attempting to connect')
 
 # Establish clientele
 scheduler_server.listen(2)
+
 obj_det_client = socket.socket()
 obj_det_client.connect(host_port)
 

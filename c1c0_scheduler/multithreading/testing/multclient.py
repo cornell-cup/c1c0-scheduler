@@ -12,12 +12,12 @@ except socket.error as e:
 
 Response = ClientSocket.recv(1024)
 handshakeComplete = False
-while (not handshakeComplete):
+while not handshakeComplete:
     ClientSocket.send(str.encode("I am Chatbot"))
     ResponseSocket = ClientSocket.recv(1024)
     Response = ResponseSocket.decode('utf-8')
     print(Response)
-    if (Response == "Chatbot is recognized"):
+    if Response == "Chatbot is recognized":
         handshakeComplete = True
         print("Handshake is completed")
 while handshakeComplete:
