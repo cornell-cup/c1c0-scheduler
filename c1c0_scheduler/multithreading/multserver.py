@@ -5,13 +5,14 @@ import subprocess
 import os
 
 import serial
-# noinspection PyUnresolvedReferences
 from xbox360controller import Xbox360Controller
 
 from c1c0_movement.Locomotion import R2Protocol2 as r2p
 
-from config import DEFAULT_HOST, DEFAULT_PORT, ENCODING, extract_process_type, ProcessTypes, letter_process_map, \
-    cmd_digest, HEAD
+from config import (
+    DEFAULT_HOST, DEFAULT_PORT, ENCODING, extract_process_type, ProcessTypes,
+    letter_process_map, cmd_digest, HEAD
+)
 
 
 # Defining all the functions used first before running script
@@ -62,18 +63,21 @@ def xbox_controller():
 
 # read serial data, store in Data['terabee1']
 # TODO template for all sensor data reading
-# right now serves as the main function of a thread to collect data and update dictionary
+# right now serves as the main function of a thread to collect data and update
+#  dictionary
 def serial_data():
     try:
         while True:
             s = ser.read(32)  # reads serial buffer for terabee
             Data['terabee1'] = ""  # clears previous values
-            mtype, msg, status = r2p.decode(s)  # decodes serial message (see R2Protocol2.py)
+            # decodes serial message (see R2Protocol2.py)
+            mtype, msg, status = r2p.decode(s)
             if status == 1:
                 for i in range(len(msg)):  # loop through length of data
                     if i % 2 == 0:
                         Data['terabee1'] += str(msg[i]) + str(msg[i + 1]) + ","
-                        # assemble char values into int16s and put them in Data dictionary as a string
+                        # assemble char values into int16s and put them in
+                        #  Data dictionary as a string
     # FIXME: Shouldn't this just be a finally block?
     except KeyboardInterrupt:
         ser.close()
@@ -167,9 +171,13 @@ ser.close()
 ser.open()
 
 
+# TODO: Refactor these functions into files imported by `config.py`
+#  or something
 def start(conn, _, receiver):
     conn.sendall(f'{receiver} started with arguments'.encode(ENCODING))
-    return subprocess.Popen([os.path.join('.', 'shells', 'start.sh'), receiver])
+    return subprocess.Popen([
+        os.path.join('.', 'shells', 'start.sh'), receiver
+    ])
 
 
 def get_terabee_data(conn, _, __):
@@ -212,7 +220,8 @@ t_xbox.start()
 
 # TODO start chatbot thread 
 
-# Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
+# Chatbot needs to be created and not killed, or if it gets killed, it needs
+#  to be immediately restarted (or sleep it)
 try:
     while True:
         Client, address = ServerSocket.accept()

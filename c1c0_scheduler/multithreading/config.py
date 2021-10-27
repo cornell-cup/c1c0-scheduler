@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Union, Mapping
+from typing import Union, Mapping, Tuple, Optional
 import subprocess
 import os
 
@@ -9,7 +9,7 @@ DEFAULT_HOST = '127.0.0.1'
 DEFAULT_PORT = 1233
 
 
-def placeholder_fun(_, __):
+def placeholder_fun(_, __, ___):
     pass
 
 
@@ -40,20 +40,24 @@ PType = Union[str, ProcessTypes]
 
 
 def extract_process_type(p_type: PType) -> ProcessTypes:
-    # Attempt to cast process type regardless of whether it is a string or enum.
+    # Attempt to cast process type regardless of whether it is a
+    #  string or enum.
     try:
         return ProcessTypes[p_type]
     except KeyError:
         return ProcessTypes(p_type)
 
 
-def cmd_digest(cmd):
+def cmd_digest(cmd: str) -> Tuple[Optional[str], Optional[str], Optional[str],
+                                  Optional[str]]:
     try:
-        sender = cmd[0]  # Often C for chatbot
+        sender = cmd[0]  # eg) often C for chatbot
         middle = cmd[2]  # Should always be S since scheduler is middle
         receiver = cmd[4]
         body = cmd[5:-1]
-    except IndexError:
-        return None, None, None, None
+    except IndexError as e:
+        # Although IndexError is more precise, this particular issue hints at
+        #  a broader problem with the issued command.
+        raise ValueError(e, f'Malformed command: `{cmd}`')
     # Should only need sender and receiver
     return sender, middle, receiver, body
