@@ -11,7 +11,7 @@ from c1c0_movement.Locomotion import R2Protocol2 as r2p
 
 from config import (
     DEFAULT_HOST, DEFAULT_PORT, ENCODING, extract_process_type, ProcessTypes,
-    letter_process_map, cmd_digest, HEAD
+    letter_process_map, cmd_digest, PRIMARY_PROCESS
 )
 
 
@@ -22,12 +22,12 @@ from config import (
 def on_button_pressed(button):
     global thread_list
     global thread_count
-    global head_thread
+    global primary_thread
     print(f'Button {button.name} was pressed')
     list_size = len(thread_list)
     for i in range(list_size):
         thread = thread_list.pop()
-        if thread != head_thread:
+        if thread != primary_thread:
             thread.do_run = False
             print("Thread was killed")
             thread_count -= 1
@@ -99,7 +99,7 @@ def kill_thread(client):
 
 def threaded_client(connection: socket.socket):
     # global consumerResponse, producerData
-    global head_thread
+    global primary_thread
     t = threading.currentThread()
     connection.sendall('Welcome to the Server'.encode(ENCODING))
     # Handshake Protocol
@@ -110,8 +110,8 @@ def threaded_client(connection: socket.socket):
         data_decoded = data.decode(ENCODING)
         try:
             client = extract_process_type(data_decoded)
-            if client is HEAD:
-                head_thread = t
+            if client is PRIMARY_PROCESS:
+                primary_thread = t
             reply = f'{client} is recognized.'
             break
         except ValueError:
@@ -174,6 +174,7 @@ ser.open()
 # TODO: Refactor these functions into files imported by `config.py`
 #  or something
 def start(conn, _, receiver):
+
     conn.sendall(f'{receiver} started with arguments'.encode(ENCODING))
     return subprocess.Popen([
         os.path.join('.', 'shells', 'start.sh'), receiver
@@ -199,7 +200,7 @@ host = DEFAULT_HOST
 port = DEFAULT_PORT
 thread_count = 0
 thread_list = []
-head_thread = None
+primary_thread = None
 try:
     ServerSocket.bind((host, port))
 except socket.error as e:
@@ -223,9 +224,10 @@ t_xbox.start()
 # Chatbot needs to be created and not killed, or if it gets killed, it needs
 #  to be immediately restarted (or sleep it)
 try:
+
     while True:
         Client, address = ServerSocket.accept()
-        print('Connected to: ' + address[0] + ':' + str(address[1]))
+        print('Connected to: ' + address[0] + ': ' + str(address[1]))
         t1 = threading.Thread(target=threaded_client, args=(Client, ))
         t1.start()
         thread_list.append(t1)

@@ -34,7 +34,7 @@ process_letter_map: Mapping[ProcessTypes, str] = {
 }
 
 
-HEAD = ProcessTypes.CHATBOT
+PRIMARY_PROCESS = ProcessTypes.CHATBOT
 
 PType = Union[str, ProcessTypes]
 
