@@ -114,6 +114,7 @@ env.bak/
 venv.bak/
 # Lol special folder with evironments goes brRrRrR
 c1c0_scheduler/multithreading/shells/*venv/
+gRPC_venv/
 
 # Spyder project settings
 .spyderproject
