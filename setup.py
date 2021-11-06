@@ -1,13 +1,15 @@
 import os
 import json
 
+name = 'c1c0_scheduler'
+README_NAME = 'README.rst'
 
-# FIXME: Currently AUTHORS gets saved as the license automatically by setuptools. This isn't an issue, but can lead to
-#   future confusion.
+
+# FIXME: Currently AUTHORS gets saved as the license automatically by
+#  setuptools. This isn't an issue, but can lead to future confusion.
 
 
 _env_falsey_vals = ['n', 'no', 'false', '0']
-name = 'c1c0_scheduler'
 
 try:
     if os.environ.get('PYTHON_USE_SETUPTOOLS', '').lower() in _env_falsey_vals:
@@ -19,7 +21,7 @@ except ImportError:
     from distutils.core import setup
     SETUPTOOLS = False
 
-README_NAME = 'README.rst'
+
 description = ''
 
 

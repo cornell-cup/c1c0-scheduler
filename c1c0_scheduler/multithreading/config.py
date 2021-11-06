@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Union, Mapping, Tuple, Optional
+from typing import Union, Mapping, Tuple, Optional, Iterable
 import subprocess
 import os
 
@@ -16,7 +16,7 @@ def placeholder_fun(_, __, ___):
 # Letter: (ProcessType, cmds_noargs, cmds_args)
 class ProcessTypes(Enum):
     PATH_PLANNING = ('path-planning', {'get_data': placeholder_fun})
-    OBJECT_DETECTION = ('object-detection', {'path': placeholder_fun})
+    OBJECT_DETECTION = ('object-detection', {'path': lambda _, __, ___: print('Old')})
     CHATBOT = ('chatbot', {'start': placeholder_fun})
     FACIAL_RECOGNITION = ('facial-recognition', {'run': placeholder_fun})
 
@@ -50,10 +50,18 @@ def extract_process_type(p_type: PType) -> ProcessTypes:
 
 def cmd_digest(cmd: str) -> Tuple[Optional[str], Optional[str], Optional[str],
                                   Optional[str]]:
+    def interp_args(s: str) -> Iterable:
+        return map(lambda s_: s_.strip(), s.split(','))
+
+    def dictify(s: str) -> Mapping:
+        acc = {}
+        next_start = s.index('(')
+        while next_start != -1:
+            pass
+        return acc
+
     try:
-        sender = cmd[0]  # eg) often C for chatbot
-        middle = cmd[2]  # Should always be S since scheduler is middle
-        receiver = cmd[4]
+        receiver = cmd[0]
         body = cmd[5:-1]
     except IndexError as e:
         # Although IndexError is more precise, this particular issue hints at

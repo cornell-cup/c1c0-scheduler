@@ -1,3 +1,6 @@
-import pprint
+import sys
+
+# from c1c0_object_detection.full_integration import run
 # Just for testing purposes ;)
-pprint.pprint('pprint doing pprint things~~~')
+
+# run(sys.argv[1])

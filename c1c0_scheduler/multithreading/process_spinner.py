@@ -1,4 +1,5 @@
-from config import ProcessTypes, PType, extract_process_type
+from .config import ProcessTypes, PType, extract_process_type
+
 import sys
 import subprocess
 import socket
