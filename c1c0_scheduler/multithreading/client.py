@@ -9,7 +9,7 @@ Purposes of the API:
 # import multserver
 import socket
 
-from .config import DEFAULT_HOST, DEFAULT_PORT, ENCODING, extract_process_type, PType
+from ..config import DEFAULT_HOST, DEFAULT_PORT, ENCODING, extract_process_type, PType
 
 
 class Client(object):

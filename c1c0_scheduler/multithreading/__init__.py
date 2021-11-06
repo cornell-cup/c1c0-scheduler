@@ -1,1 +1,1 @@
-from . import client, config
+from . import client

@@ -1,3 +1,7 @@
+# Original by Angela Zou and Sujith Naapa Ramesh
+# Edits by Christopher De Jesus
+# Used to be multithreading/multserver.py
+# For details, see Github repo history
 import socket
 import threading
 import signal
@@ -7,16 +11,17 @@ import os
 import serial
 from xbox360controller import Xbox360Controller
 
+# TODO: Change c1c0_movement.Locomotion.R2Protocol2 to
+#   c1c0_movement.locomotion.r2protocol2 bc PEP standards
 from c1c0_movement.Locomotion import R2Protocol2 as r2p
 
 from ..config import (
     DEFAULT_HOST, DEFAULT_PORT, ENCODING, extract_process_type, ProcessTypes,
-    letter_process_map, cmd_digest, PRIMARY_PROCESS
+    letter_process_map, PRIMARY_PROCESS, cmd_digest
 )
 
 
 # Defining all the functions used first before running script
-
 
 # for xbox control: kill all thread except chatbot
 def on_button_pressed(button):
@@ -61,21 +66,21 @@ def xbox_controller():
         pass
 
 
-# read serial data, store in Data['terabee1']
+# read serial data, store in Data[data_label]
 # TODO template for all sensor data reading
 # right now serves as the main function of a thread to collect data and update
 #  dictionary
-def serial_data():
+def serial_data(data_label):
     try:
         while True:
             s = ser.read(32)  # reads serial buffer for terabee
-            Data['terabee1'] = ""  # clears previous values
+            data[data_label] = ""  # clears previous values
             # decodes serial message (see R2Protocol2.py)
             mtype, msg, status = r2p.decode(s)
             if status == 1:
                 for i in range(len(msg)):  # loop through length of data
                     if i % 2 == 0:
-                        Data['terabee1'] += str(msg[i]) + str(msg[i + 1]) + ","
+                        data[data_label] += str(msg[i]) + str(msg[i + 1]) + ","
                         # assemble char values into int16s and put them in
                         #  Data dictionary as a string
     # FIXME: Shouldn't this just be a finally block?
@@ -151,7 +156,7 @@ def threaded_client(connection: socket.socket):
     connection.close()
 
 
-Data = {
+data = {
     "terabee1": "",
     "terabee2": "",
     "terabee3": "",
@@ -159,7 +164,7 @@ Data = {
     "imu": "",
 }
 
-Data_lock = {
+data_lock = {
     "terabee1": threading.Lock(),
     "terabee2": threading.Lock(),
     "terabee3": threading.Lock(),
@@ -183,10 +188,12 @@ def start(conn, _, receiver):
     ])
 
 
-def get_terabee_data(conn, _, __):
-    if Data_lock["terabee1"].acquire(blocking=False):
-        reply = "Server data request: " + Data["terabee1"]
-        Data_lock["terabee1"].release()
+def get_data(conn, _, __):
+    # FIXME: figure out which arg in conn specification will be this
+    data_label = ''
+    if data_lock[data_label].acquire(blocking=False):
+        reply = "Server data request: " + data[data_label]
+        data_lock[data_label].release()
     else:
         reply = "Could not acquire lock"
     conn.sendall(str.encode(reply))
@@ -198,7 +205,7 @@ for proc in ProcessTypes:
 
 # Configure module behaviors
 ProcessTypes.CHATBOT.value[1]['start'] = start
-ProcessTypes.PATH_PLANNING.value[1]['get_data'] = get_terabee_data
+ProcessTypes.PATH_PLANNING.value[1]['get_data'] = get_data
 ProcessTypes.OBJECT_DETECTION.value[1]['path'] = lambda _, __, ___: print('Got it')
 
 
@@ -226,7 +233,7 @@ ServerSocket.listen(5)
 t_xbox = threading.Thread(target=xbox_controller, args=())
 t_xbox.start()
 
-# TODO start chatbot thread 
+# TODO start chatbot thread
 
 # Chatbot needs to be created and not killed, or if it gets killed, it needs
 #  to be immediately restarted (or sleep it)

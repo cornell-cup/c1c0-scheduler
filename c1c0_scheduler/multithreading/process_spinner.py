@@ -1,9 +1,9 @@
-from .config import ProcessTypes, PType, extract_process_type
-
 import sys
 import subprocess
 import socket
 from typing import Tuple
+
+from ..config import ProcessTypes, PType, extract_process_type
 
 
 def spin(process_type_: PType) -> Tuple[subprocess.Popen, socket.socket]:

@@ -2,5 +2,6 @@
   "packages": [
     "c1c0_scheduler",
     "c1c0_scheduler.multithreading"
+    "c1c0_scheduler.socket_utils"
   ]
 }
