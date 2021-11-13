@@ -45,7 +45,7 @@ class Client(object):
     def communicate(self, request):
         if self.handshakeComplete:
             self.ClientSocket.send(str.encode(request))
-            ResponseSocket = self.ClientSocket.recv(32)
+            ResponseSocket = self.ClientSocket.recv(64)
             Response = ResponseSocket.decode('utf-8')
             print(Response)
             return Response

@@ -30,9 +30,9 @@ for i in range(0,40):
         for i in range(len(msg)): #loop through length of data
             if i % 2 == 0:
                 # Data['terabee1'] += str(ord(msg[i])) + str(ord(msg[i+1])) + "," #assemble char values into int16s and put them in Data dictionary as a string
-                Data['terabee1'] += str(msg[i]) + str(msg[i+1]) + "," #assemble char values into int16s and put them in Data dictionary as a string
+                Data['terabee1'] += str(msg[i]*256 + msg[i+1]) + "," #assemble char values into int16s and put them in Data dictionary as a string
+    elif(status == 0):
+        print("Incorrect Checksum")
     print(Data['terabee1'])
-    #print(s)
-    #time.sleep(3)
-    # time.sleep(3)
 proc1.close()
+

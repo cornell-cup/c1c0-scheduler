@@ -190,7 +190,7 @@ def threaded_client(connection):
                 reply = "path-planning started with arguments"
                 argument = data.decode('utf-8')[14:]
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "client_pathplanning.py", argument])
+                pid = subprocess.Popen([sys.executable, "client_pathplanning.py", argument]) #"/home/ccrt/C1C0_path_planning/Jetson.py"
             elif ("object-detection" in data.decode('utf-8')):
                 reply = "object-detection started"
                 argument = data.decode('utf-8')[17:]

@@ -12,7 +12,9 @@ else:
     argument = "get data"
 proc1 = client.Client("object-detection")
 proc1.handshake()
-while(True):
+i = 0
+while(i < 5):
     proc1.communicate(argument)
+    i = i + 1
     time.sleep(3)
 proc1.close()

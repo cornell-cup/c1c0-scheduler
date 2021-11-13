@@ -13,7 +13,20 @@ def on_button_released(button):
 # for xbox control
 def on_axis_moved(axis):
     # TODO send command to locomotion to control the head rotatioon
-    print('Axis {0} moved to {1} {2}'.format(axis.name, axis.x, axis.y))
+    # print('Axis {0} moved to {1} {2}'.format(axis.name, axis.x, axis.y))
+    if(axis.x <= -0.5):
+        axis_x = -1
+    elif(axis.x <= 0.5):
+        axis_x = 0
+    else:
+        axis_x = 1
+    if(axis.y <= -0.5):
+        axis_y = -1
+    elif(axis.y <= 0.5):
+        axis_y = 0
+    else:
+        axis_y = 1
+    print('Axis {0} moved to {1} {2}'.format(axis.name, axis_x, axis_y))
 
 # give function handlers to xbox controller package
 def xboxcontroller():
