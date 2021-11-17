@@ -4,11 +4,15 @@ import time
 
 # for xbox control: kill all thread except chatbot
 def on_button_pressed(button):    
-    print('Button {0} was pressed'.format(button.name))
+    #print('Button {0} was pressed'.format(button.name))
+    print(button.name)
+    return button.name
 
 # for xbox control
 def on_button_released(button):
-    print('Button {0} was released'.format(button.name))
+    #print('Button {0} was released'.format(button.name))
+    print(button.name)
+    return button.name
 
 # for xbox control
 def on_axis_moved(axis):
@@ -26,12 +30,14 @@ def on_axis_moved(axis):
         axis_y = 0
     else:
         axis_y = 1
-    print('Axis {0} moved to {1} {2}'.format(axis.name, axis_x, axis_y))
+    #print('Axis {0} moved to {1} {2}'.format(axis.name, axis_x, axis_y))
+    print(str(axis_x), str(axis_y))
+    return [str(axis_x), str(axis_y)]
     
     
 # test
-def testbutton(button):
-	print('it works')
+#def testbutton(button):
+#	print('it works')
 
 # give function handlers to xbox controller package
 def xboxcontroller():
@@ -43,9 +49,9 @@ def xboxcontroller():
 
 			# Left and right axis move event
 			controller.axis_l.when_moved = on_axis_moved
-			controller.axis_r.when_moved = on_axis_moved
+			#controller.axis_r.when_moved = on_axis_moved
 			
-			''''
+			'''
 			# Left and right triggers move event
 			controller.button_thumb_l.when_pressed = on_button_pressed
 			controller.button_thumb_l.when_released = on_button_released
@@ -67,19 +73,37 @@ def xboxcontroller():
 				????????
 			
 			button_x does not work
+			
+			next step: if receive an instruction for axis_r, invalidate it because we need the other button for rotation
+			i kind of just removed the axis_r instruction since it's not necessary
+			
+			switched head rotation buttons to bumpers instead of triggers 
+			
+			use return instead of print, for axis return an array of axis_x, axis_y
+			since there's only one axis used no need for axis name
 			'''
 			
-			# Bumper buttons
+			# Left bumper button
 			controller.button_select.when_pressed = on_button_pressed
 			controller.button_select.when_released = on_button_released
-			controller.button_mode.when_pressed = on_button_pressed
-			controller.button_mode.when_released = on_button_released
+			
+			# Right bumper button
+			controller.button_start.when_pressed = on_button_pressed
+			controller.button_start.when_released = on_button_released
+			
+			#Mode is left trigger
+			#controller.button_mode.when_pressed = on_button_pressed
+			#controller.button_mode.when_released = on_button_released
 			
 			# Button X and B events
-			controller.button_x.when_pressed = on_button_pressed
-			controller.button_x.when_released = on_button_released
-			controller.button_b.when_pressed = on_button_pressed
-			controller.button_b.when_released = on_button_released
+			#controller.button_x.when_pressed = on_button_pressed
+			#controller.button_x.when_released = on_button_released
+			#controller.button_b.when_pressed = on_button_pressed
+			#controller.button_b.when_released = on_button_released
+			
+			
+			
+			
 
 			signal.pause()
 	except KeyboardInterrupt:
