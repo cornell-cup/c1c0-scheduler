@@ -1,0 +1,3 @@
+*.pyc
+multithreading/__pycache__/
+__pycache__/

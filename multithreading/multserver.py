@@ -28,6 +28,7 @@ Data_lock = {
 
 sys.path.append('../../c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
 import R2Protocol2 as r2p
+import locomotion_API
 
 ser = serial.Serial(
 	port = '/dev/ttyTHS1',
@@ -201,14 +202,10 @@ def threaded_client(connection):
                 connection.sendall(str.encode(reply))
             
         elif (client == "path-planning"):
-            if (data.decode('utf-8') == "get data"):
-                reply = ""
-                if (Data_lock["terabee1"].acquire(blocking=False)):
-                    print(str(t.ident) + " got the lock!!!!")
-                    reply = "Server data request: " + Data["terabee1"]
-                    Data_lock["terabee1"].release()
-                else:
-                    reply = "Could not acquire lock"
+            if ("locomotion" in data.decode('utf-8')):
+                motor_power = data.decode('utf-8')[11:]
+                locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, motor_power)
+                reply = "motor power command sent to locomotion"
                 connection.sendall(str.encode(reply))
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
