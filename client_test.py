@@ -4,8 +4,13 @@ import time
 if __name__ == '__main__':
     client = client.Client('Testing Client')
     print(client.start_submodule('path-planning'))
-    for datum in client.get_data('some_data_id'):
-        print(f'Got datum: "{datum}"')
+    i = 0
+    for datum in client.get_data('terabee1'):
+        print(f'Got "{i}th piece of data {datum}"')
+        i += 1
+    # Lol, for comparison
+    # for i in range(2**64):
+    #     print(f'Got fake datum: "{i}"')
 
 
 
