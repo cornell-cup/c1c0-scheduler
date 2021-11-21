@@ -9,6 +9,7 @@ README_NAME = 'README.rst'
 #  setuptools. This isn't an issue, but can lead to future confusion.
 
 
+# noinspection SpellCheckingInspection
 _env_falsey_vals = ['n', 'no', 'false', '0']
 
 try:

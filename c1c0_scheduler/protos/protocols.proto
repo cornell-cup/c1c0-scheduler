@@ -6,15 +6,20 @@ package scheduler;
 service Scheduler{
   // Starts a specific module specified by StartModuleRequest. Gets back
   // a StartModuleResponse
-  rpc StartModule (StartModuleRequest) returns (StartModuleResponse) {}
+  rpc SysCommand (SysRequest) returns (SysResponse) {}
+
+  rpc SysCommandStream (SysRequest) returns (stream SysResponse) {}
 }
 
 // Used to start modules, contains the module name
-message StartModuleRequest {
-  string module_name = 1;
+message SysRequest {
+  string sender = 1;
+  string cmd = 2;
+  optional string recipient = 3;
+  optional string data = 4;
 }
 
 // Received when module is started
-message StartModuleResponse {
+message SysResponse {
   string response = 1;
 }

@@ -1,5 +1,10 @@
 include AUTHORS
 include PACKAGES
 include VERSION
+include README.rst
 include requirements.txt
+include .gitignore
+include setup.py
+include tests.py
+include start_server.py
 include c1c0_scheduler/*
