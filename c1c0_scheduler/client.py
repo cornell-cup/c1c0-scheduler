@@ -26,16 +26,18 @@ class Client:
         if args:
             kwargs['data'] = ', '.join(args)
         stub = protocols_pb2_grpc.SchedulerStub(self.channel)
-        response = stub.SysCommand(protocols_pb2.SysRequest(**kwargs))
+        return stub.SysCommand(protocols_pb2.SysRequest(**kwargs))
 
     def get_data(self, data_id, *args):
         kwargs = {
             'sender': self.module_name,
             'cmd': 'get_data',
-            'recipient': data_id
+            'recipient': data_id,
+            'refresh_rate': 0
         }
         if args:
             kwargs['data'] = ', '.join(args)
         stub = protocols_pb2_grpc.SchedulerStub(self.channel)
-        for datum in stub.SysCommandStream(protocols_pb2.SysRequest(**kwargs)):
+        for datum in stub.SysCommandStream(protocols_pb2.SysRequestStream(
+                **kwargs)):
             yield datum

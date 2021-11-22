@@ -5,24 +5,41 @@
 
 import subprocess
 import os
-from typing import MutableMapping, Tuple, Mapping, List
+import threading
+from typing import MutableMapping, Tuple, Mapping, List, Union
 
 import serial
 from xbox360controller import Xbox360Controller
 
 from c1c0_movement.Locomotion import R2Protocol2 as r2p
 
-from ..system import System, Worker
+from ..system import System, Worker, DataProvider
 from ..utils import ReaderWriterSuite
 
 
-# JETSON = True
-JETSON = False
+DUMMY_VALUES = True
+# DUMMY_VALUES = False
 
 
 class C1C0System(System):
 
-    class SerialReader(Worker):
+    class SerialReader(Worker, DataProvider):
+
+        class DummySerialData(Worker, DataProvider):
+            def __init__(self, data_id, val, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.data_id = data_id
+                self.data = val
+                from random import random
+                self.random = random
+
+            def run(self) -> None:
+                import time
+                while not self.stop_event.is_set():
+                    time.sleep(0.0001)
+                    with self.new_data:
+                        self.data += 1 if (int(self.random() * 4) % 2) else -1
+                        self.new_data.notify_all()
 
         def __init__(self, port, baudrate, data_id, *args, **kwargs):
             super().__init__(*args, **kwargs)
@@ -30,28 +47,37 @@ class C1C0System(System):
             self.ser_line = serial.Serial(port=port, baudrate=baudrate)
             self.ser_line.close()
             self.data = ''
-            self.MAX_DATA_LEN = kwargs.get('MAX_DATA_LEN', 2**16)
 
         def run(self):
             super().run()
             self.ser_line.open()
             try:
-                while not self.stop_event.is_set():
-                    new_data = ''
-                    s = self.ser_line.read(32)  # reads serial buf for terabee
-                    # decodes serial message (see R2Protocol2.py)
-                    mtype, msg, status = r2p.decode(s)
-                    if status == 1:
-                        for i in range(len(msg)):  # loop through data
-                            if i % 2 == 0:
-                                new_data += (str(msg[i]) + str(
-                                    msg[i + 1]) + ",")
-                        #  Only set data when checksum is set
-                        self.data = new_data
+                print('acquiring new_data lock')
+                with self.new_data:
+                    print('acquired new_data lock')
+                    while not self.stop_event.is_set():
+                        new_data = ''
+                        # reads serial buffer for terabee
+                        s = self.ser_line.read(32)
+                        # decodes serial message (see R2Protocol2.py)
+                        mtype, msg, status = r2p.decode(s)
+                        if status == 1:
+                            for i in range(len(msg)):  # loop through data
+                                if i % 2 == 0:
+                                    new_data += (str(msg[i]) + str(
+                                        msg[i + 1]) + ",")
+                            #  Only set data when checksum is set
+                            self.data = new_data
+                            self.new_data.notify_all()
             finally:
                 self.ser_line.close()
 
     class XBoxControllerReader(Worker):
+
+        class DummyXboxData(Worker):
+            def run(self) -> None:
+                pass
+
         kill_switch: bool
 
         def __init__(self, *args, **kwargs):
@@ -91,44 +117,28 @@ class C1C0System(System):
             # 'terabee1': ('/dev/ttyTHS1', 115200)
     }
     thread_list: List[Worker] = []
-    data_threads: Mapping[str, Worker]
-    controller_thread: XBoxControllerReader
+    data_threads: \
+        Mapping[str, Union[SerialReader, SerialReader.DummySerialData]]
+    controller_thread: \
+        Union[XBoxControllerReader, XBoxControllerReader.DummyXboxData]
     active_subsystems: MutableMapping[str, subprocess.Popen] = {}
     active_subsystems_lock_suite: ReaderWriterSuite = ReaderWriterSuite()
 
     def __init__(self, *args, **kwargs):
-        if JETSON:
+        super().__init__(*args, **kwargs)
+        if DUMMY_VALUES:
+            # Add dummy serial data
+            self.data_threads = {
+                'terabee1': self.SerialReader.DummySerialData('terabee1', 0),
+                'terabee2': self.SerialReader.DummySerialData('terabee2', 0)
+            }
+            self.controller_thread = self.XBoxControllerReader.DummyXboxData()
+        else:
             self.data_threads = {
                 data_id: self.SerialReader(port, baudrate, data_id)
                 for data_id, (port, baudrate) in self.serial_lines.items()
             }
-        else:
-            class DummySerialData(Worker):
-                def __init__(self, data_id, val):
-                    super().__init__(*args, **kwargs)
-                    self.data_id = data_id
-                    self.data = val
-                    from random import random
-                    self.random = random
-
-                def run(self) -> None:
-                    import time
-                    while not self.stop_event.is_set():
-                        self.data += 1 if (int(self.random()*4) % 2) else -1
-                        time.sleep(0.1)
-
-            # Add dummy serial data
-            self.data_threads = {
-                'terabee1': DummySerialData('terabee1', 0),
-                'terabee2': DummySerialData('terabee2', 0)
-            }
-        if JETSON:
             self.controller_thread = self.XBoxControllerReader()
-        else:
-            class DummyXboxData(Worker):
-                def run(self) -> None:
-                    pass
-            self.controller_thread = DummyXboxData()
         self.thread_list.append(self.controller_thread)
         self.thread_list.extend(self.data_threads.values())
 
@@ -136,7 +146,7 @@ class C1C0System(System):
             # Note: Locking is not necessary here due to only one writer, worst
             #  case scenario is *just* late data, which wouldn't be solved
             #  by locking either.
-            return self.data_threads[data_id].data
+            return self.data_threads[data_id]
 
         def start_subsystem(caller, target, *_):
             with self.active_subsystems_lock_suite.writer():
@@ -144,9 +154,6 @@ class C1C0System(System):
                     self.active_subsystems[target].kill()
                 path = os.path.join('.', 'c1c0_scheduler', 'c1c0',
                                     'shells', 'start.sh')
-                print(path)
-                print(os.getcwd())
-                print(os.path.abspath(path))
                 subsystem = subprocess.Popen([
                     path, target, caller
                 ])
@@ -178,5 +185,3 @@ class C1C0System(System):
 
     def get_functionality(self):
         return self.funcs
-
-

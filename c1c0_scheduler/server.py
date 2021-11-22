@@ -3,8 +3,7 @@ from concurrent import futures
 import grpc
 
 from . import protocols_pb2, protocols_pb2_grpc, config
-from .system import System
-
+from .system import System, DataProvider
 
 system: System = config.system
 # DEBUG = False
@@ -35,10 +34,19 @@ class Scheduler(protocols_pb2_grpc.SchedulerServicer):
                 request.sender, request.recipient, *request.data)))
 
     def SysCommandStream(self, request, context):
-        while True:
-            yield protocols_pb2.SysResponse(
-                response=str(system.get_functionality()[request.cmd](
-                    request.sender, request.recipient, *request.data)))
+        refresh_rate = request.refresh_rate
+        # This command is only compatible with streaming threads
+        data_obj: DataProvider = system.get_functionality()[request.cmd](
+            request.sender, request.recipient, *request.data)
+        print(f'refresh_rate={refresh_rate}')
+        if not getattr(data_obj, 'is_data_provider'):
+            raise RuntimeError('Stream requested of non-stream functionality.')
+        print('Server response lock acquire')
+        with data_obj.new_data:
+            print('Server response lock acquired')
+            while True:
+                yield protocols_pb2.SysResponse(response=str(data_obj.data))
+                data_obj.new_data.wait(refresh_rate)
 
 
 def serve():

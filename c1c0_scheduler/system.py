@@ -1,6 +1,6 @@
 import threading
 from abc import ABC, abstractmethod
-from typing import Mapping, Callable, Iterable
+from typing import Mapping, Callable, Iterable, Any
 
 
 class Worker(ABC, threading.Thread):
@@ -16,6 +16,13 @@ class Worker(ABC, threading.Thread):
 
     def stop(self) -> None:
         self.stop_event.set()
+
+
+class DataProvider(ABC):
+    # Expected return value from Continuous response functions to the server
+    new_data: threading.Condition = threading.Condition()
+    data: Any
+    is_data_provider = True
 
 
 class System(ABC):

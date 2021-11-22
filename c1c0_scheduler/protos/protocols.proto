@@ -8,7 +8,7 @@ service Scheduler{
   // a StartModuleResponse
   rpc SysCommand (SysRequest) returns (SysResponse) {}
 
-  rpc SysCommandStream (SysRequest) returns (stream SysResponse) {}
+  rpc SysCommandStream (SysRequestStream) returns (stream SysResponse) {}
 }
 
 // Used to start modules, contains the module name
@@ -17,6 +17,15 @@ message SysRequest {
   string cmd = 2;
   optional string recipient = 3;
   optional string data = 4;
+}
+
+
+message SysRequestStream {
+  string sender = 1;
+  string cmd = 2;
+  optional float refresh_rate = 3;
+  optional string recipient = 4;
+  optional string data = 5;
 }
 
 // Received when module is started
