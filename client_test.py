@@ -1,5 +1,4 @@
 from c1c0_scheduler import client
-import time
 
 if __name__ == '__main__':
     client = client.Client('Testing Client')
