@@ -42,11 +42,11 @@ class Scheduler(protocols_pb2_grpc.SchedulerServicer):
         if not getattr(data_obj, 'is_data_provider'):
             raise RuntimeError('Stream requested of non-stream functionality.')
         print('Server response lock acquire')
-        # with data_obj.new_data:
-        print('Server response lock acquired')
-        while True:
-            yield protocols_pb2.SysResponse(response=str(data_obj.data))
-            # data_obj.new_data.wait(refresh_rate)
+        with data_obj.new_data:
+            print('Server response lock acquired')
+            while True:
+                yield protocols_pb2.SysResponse(response=str(data_obj.data))
+                data_obj.new_data.wait(refresh_rate)
 
 
 def serve():

@@ -6,6 +6,7 @@ from typing import Mapping, Callable, Iterable, Any
 class Worker(ABC, threading.Thread):
 
     stop_event = threading.Event()
+    daemon = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -37,9 +37,9 @@ class C1C0System(System):
                 import time
                 while not self.stop_event.is_set():
                     time.sleep(0.0001)
-                    # with self.new_data:
-                    self.data += 1 if (int(self.random() * 4) % 2) else -1
-                    # self.new_data.notify_all()
+                    with self.new_data:
+                        self.data += 1 if (int(self.random() * 4) % 2) else -1
+                        self.new_data.notify_all()
 
         def __init__(self, port, baudrate, data_id, *args, **kwargs):
             super().__init__(*args, **kwargs)
@@ -53,22 +53,22 @@ class C1C0System(System):
             self.ser_line.open()
             try:
                 print('acquiring new_data lock')
-                # with self.new_data:
-                print('acquired new_data lock')
-                while not self.stop_event.is_set():
-                    new_data = ''
-                    # reads serial buffer for terabee
-                    s = self.ser_line.read(32)
-                    # decodes serial message (see R2Protocol2.py)
-                    mtype, msg, status = r2p.decode(s)
-                    if status == 1:
-                        for i in range(len(msg)):  # loop through data
-                            if i % 2 == 0:
-                                new_data += (str(msg[i]) + str(
-                                    msg[i + 1]) + ",")
-                        #  Only set data when checksum is set
-                        self.data = new_data
-                        # self.new_data.notify_all()
+                with self.new_data:
+                    print('acquired new_data lock')
+                    while not self.stop_event.is_set():
+                        new_data = ''
+                        # reads serial buffer for terabee
+                        s = self.ser_line.read(32)
+                        # decodes serial message (see R2Protocol2.py)
+                        mtype, msg, status = r2p.decode(s)
+                        if status == 1:
+                            for i in range(len(msg)):  # loop through data
+                                if i % 2 == 0:
+                                    new_data += (str(msg[i]) + str(
+                                        msg[i + 1]) + ",")
+                            #  Only set data when checksum is set
+                            self.data = new_data
+                            self.new_data.notify_all()
             finally:
                 self.ser_line.close()
 
