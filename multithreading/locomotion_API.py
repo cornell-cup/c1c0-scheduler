@@ -31,37 +31,3 @@ def locomotion_msg(port, baud, motor_power):
 		time.sleep(0.1)
 	except KeyboardInterrupt:
 		ser.close()
-	
-						
-#if __name__ == '__main__':
-	#init_serial('/dev/ttyTHS1', 9600)
-	#if len(sys.argv) != 2:
-	#	print("need 1 argument: tuple command for locomotion")
-	#motor_power = sys.argv[1]
-	#array1 = [10,60,30,40,50,60]
-	#s = struct.Struct('13s')
-	#motor_power_array = s.pack(motor_power.encode('utf-8'))
-	#motor_power_array = bytearray(motor _power.encode('utf-8'))
-	#print(motor_power_array)
-	#s = struct.Struct('4s')
-	#type_data = "loco"
-	#type_data_array = s.pack(type_data.encode('utf-8'))
-	#type_data_array = bytearray(type_data.encode('utf-8'))
-	#encoded = r2p.encode(type_data_array, motor_power_array)
-	#print(encoded)
-	#print(type_data_array)
-	#try:
-		#while True:
-	#		start = time.time()
-	#		print("start time: " + str(start))
-	#		msg = r2p.encode(bytes('loco','utf-8'), bytearray(motor_power.encode()))
-	#		print(msg)
-	#		ser.write(msg)	
-	#		print(r2p.decode(msg))		
-	#		time.sleep(0.1)
-	#		end = time.time()
-	#		print("end time: " + str(end))	
-	#		elapse = end - start
-	#		print("elapsed time: " + str(elapse))
-	#except KeyboardInterrupt:
-		ser.close()
