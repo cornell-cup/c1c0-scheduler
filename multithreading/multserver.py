@@ -7,7 +7,6 @@ import serial
 import sys
 from contextlib import contextmanager
 import subprocess
-import sys
 sys.path.append('../../c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
 import R2Protocol2 as r2p
 import locomotion_API
@@ -30,9 +29,9 @@ from xboxcontrol_API import xboxcontroller
 # }
 
 ser = serial.Serial(
-	port = '/dev/ttyTHS1',
-	baudrate = 115200,
-)
+        port = '/dev/ttyTHS1',
+        baudrate = 115200,
+        )
 ser.close()
 ser.open()
 
@@ -85,19 +84,19 @@ t_xbox.start()
 
 # # give function handlers to xbox controller package
 # def xboxcontroller():
-	# try:
-		# with Xbox360Controller(0, axis_threshold=0.2) as controller:
-			# # Button A events
-			# controller.button_a.when_pressed = on_button_pressed
-			# controller.button_a.when_released = on_button_released
+        # try:
+                # with Xbox360Controller(0, axis_threshold=0.2) as controller:
+                        # # Button A events
+                        # controller.button_a.when_pressed = on_button_pressed
+                        # controller.button_a.when_released = on_button_released
 
-			# # Left and right axis move event
-			# controller.axis_l.when_moved = on_axis_moved
-			# controller.axis_r.when_moved = on_axis_moved
+                        # # Left and right axis move event
+                        # controller.axis_l.when_moved = on_axis_moved
+                        # controller.axis_r.when_moved = on_axis_moved
 
-			# signal.pause()
-	# except KeyboardInterrupt:
-		# pass
+                        # signal.pause()
+        # except KeyboardInterrupt:
+                # pass
 
 # # read serial data, store in Data['terabee1']
 # # TODO template for all sensor data reading
@@ -130,10 +129,10 @@ def kill_thread(client):
             ThreadCount -= 1
 
 def threaded_client(connection):
-	"""
-	Function to initialize a software subprocess as a thread,
-	handshake with the scheduler, and process requests from processes 
-	"""
+    """
+    Function to initialize a software subprocess as a thread,
+    handshake with the scheduler, and process requests from processes 
+    """
     global chatbotThread
     t = threading.currentThread()
     connection.send(str.encode('Welcome to the Server'))
@@ -160,7 +159,7 @@ def threaded_client(connection):
             connection.sendall(str.encode(reply))
         if not data:
             break
-        
+
     t.setName(client)
     #Commence Communication
     while(getattr(t, "do_run", True) and (not detectClient)):
@@ -173,7 +172,7 @@ def threaded_client(connection):
                 argument = data.decode('utf-8')[14:]
                 # print("this is pathplanning argument -- " + argument)
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "/home/ccrt/C1C0_path_planning/Jetson.py", argument]) #"client_pathplanning.py"
+                pid = subprocess.Popen([sys.executable, "/home/ccrt/C1C0_path_planning/Jetson.py", argument]) #"client_pathplanning.py" "/home/ccrt/C1C0_path_planning/Jetson.py"
             elif ("object-detection" in data.decode('utf-8')):
                 reply = "object-detection started with arguments"
                 argument = data.decode('utf-8')[17:]
@@ -181,11 +180,11 @@ def threaded_client(connection):
                 pid = subprocess.Popen([sys.executable, "client_objectdetection.py", argument]) 
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
-                connection.sendall(str.encode(reply))           
+                connection.sendall(str.encode(reply))   
         elif (client == "path-planning"):
             if ("locomotion" in data.decode('utf-8')):
                 motor_power = data.decode('utf-8')[11:]
-                locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, motor_power)
+                locomotion_API.locomotion_msg('/dev/ttyACM0', 115200, motor_power) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 reply = "motor power command sent to locomotion"
                 connection.sendall(str.encode(reply))
             else:
@@ -193,7 +192,6 @@ def threaded_client(connection):
                 connection.sendall(str.encode(reply))
         elif (client == "object-detection"):
             if ("arm" in data.decode('utf-8')):
-				arm_argument
                 reply = ""
                 if (Data_lock["terabee1"].acquire(blocking=False)):
                     print(str(t.ident) + " got the lock!!!!")
@@ -207,7 +205,7 @@ def threaded_client(connection):
                 connection.sendall(str.encode(reply))
         if not data:
             break
-    
+
     connection.close()
 
 #Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)

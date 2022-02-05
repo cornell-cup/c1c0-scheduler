@@ -15,19 +15,20 @@ ser = None
 
 
 def init_serial(port, baud):
-	"""
-	Opens serial port for locomotion communication
-	port should be a string linux port: Ex dev/ttyTHS1
-	Baud is int the data rate, commonly multiples of 9600
-	"""
-	global ser
-	ser = serial.Serial(port, baud)
+    """
+    Opens serial port for locomotion communication
+    port should be a string linux port: Ex dev/ttyTHS1
+    Baud is int the data rate, commonly multiples of 9600
+    """
+    global ser
+    ser = serial.Serial(port, baud)
 
 def locomotion_msg(port, baud, motor_power):
-	init_serial(port, baud)
-	try:
-		msg = r2p.encode(bytes('loco','utf-8'), bytearray(motor_power.encode()))
-		ser.write(msg)		
-		time.sleep(0.1)
-	except KeyboardInterrupt:
-		ser.close()
+    init_serial(port, baud)
+    try:
+        msg = r2p.encode(bytes('loco','utf-8'), bytearray(motor_power.encode()))
+        print(msg)
+        ser.write(msg)
+        time.sleep(0.1)
+    except KeyboardInterrupt:
+        ser.close()
