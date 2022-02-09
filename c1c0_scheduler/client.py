@@ -38,6 +38,6 @@ class Client:
         if args:
             kwargs['data'] = ', '.join(args)
         stub = protocols_pb2_grpc.SchedulerStub(self.channel)
-        for datum in stub.SysCommandStream(protocols_pb2.SysRequestStream(
+        for datum in stub.SysCommandStream(protocols_pb2.SysRequest(
                 **kwargs)):
             yield datum

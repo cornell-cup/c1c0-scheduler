@@ -22,7 +22,7 @@ class SchedulerStub(object):
                 )
         self.SysCommandStream = channel.unary_stream(
                 '/scheduler.Scheduler/SysCommandStream',
-                request_serializer=protocols__pb2.SysRequestStream.SerializeToString,
+                request_serializer=protocols__pb2.SysRequest.SerializeToString,
                 response_deserializer=protocols__pb2.SysResponse.FromString,
                 )
 
@@ -55,7 +55,7 @@ def add_SchedulerServicer_to_server(servicer, server):
             ),
             'SysCommandStream': grpc.unary_stream_rpc_method_handler(
                     servicer.SysCommandStream,
-                    request_deserializer=protocols__pb2.SysRequestStream.FromString,
+                    request_deserializer=protocols__pb2.SysRequest.FromString,
                     response_serializer=protocols__pb2.SysResponse.SerializeToString,
             ),
     }
@@ -98,7 +98,7 @@ class Scheduler(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/scheduler.Scheduler/SysCommandStream',
-            protocols__pb2.SysRequestStream.SerializeToString,
+            protocols__pb2.SysRequest.SerializeToString,
             protocols__pb2.SysResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -1,7 +1,11 @@
+#!../venv/bin/python3
 import subprocess
 
 
 def run_protos():
+    """
+    Runs the bash command to compile the proto files.
+    """
     print()
     cmd = '''
     python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/protocols.proto
@@ -11,6 +15,9 @@ def run_protos():
 
 
 def correct_grpc_module():
+    """
+    Opens and edits the generated files to relatively import each other.
+    """
     with open('protocols_pb2_grpc.py', 'r+') as f:
         lines = []
         for line in f.readlines():

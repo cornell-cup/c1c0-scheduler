@@ -2,33 +2,25 @@ syntax = 'proto3';
 
 package scheduler;
 
+// Used to start modules.
+message SysRequest{
+  string sender = 1;
+  string cmd = 2;
+  optional string recipient = 3;
+  optional string data = 4;
+  optional float refresh_rate = 5;
+}
+
+// Received when module is started
+message SysResponse {
+  string response = 1;
+}
+
 // Scheduler service, used to schedule processes/tasks
 service Scheduler{
   // Starts a specific module specified by StartModuleRequest. Gets back
   // a StartModuleResponse
   rpc SysCommand (SysRequest) returns (SysResponse) {}
 
-  rpc SysCommandStream (SysRequestStream) returns (stream SysResponse) {}
-}
-
-// Used to start modules, contains the module name
-message SysRequest {
-  string sender = 1;
-  string cmd = 2;
-  optional string recipient = 3;
-  optional string data = 4;
-}
-
-
-message SysRequestStream {
-  string sender = 1;
-  string cmd = 2;
-  optional float refresh_rate = 3;
-  optional string recipient = 4;
-  optional string data = 5;
-}
-
-// Received when module is started
-message SysResponse {
-  string response = 1;
+  rpc SysCommandStream (SysRequest) returns (stream SysResponse) {}
 }

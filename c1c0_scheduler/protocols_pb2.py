@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0fprotocols.proto\x12\tscheduler\"k\n\nSysRequest\x12\x0e\n\x06sender\x18\x01 \x01(\t\x12\x0b\n\x03\x63md\x18\x02 \x01(\t\x12\x16\n\trecipient\x18\x03 \x01(\tH\x00\x88\x01\x01\x12\x11\n\x04\x64\x61ta\x18\x04 \x01(\tH\x01\x88\x01\x01\x42\x0c\n\n_recipientB\x07\n\x05_data\"\x9d\x01\n\x10SysRequestStream\x12\x0e\n\x06sender\x18\x01 \x01(\t\x12\x0b\n\x03\x63md\x18\x02 \x01(\t\x12\x19\n\x0crefresh_rate\x18\x03 \x01(\x02H\x00\x88\x01\x01\x12\x16\n\trecipient\x18\x04 \x01(\tH\x01\x88\x01\x01\x12\x11\n\x04\x64\x61ta\x18\x05 \x01(\tH\x02\x88\x01\x01\x42\x0f\n\r_refresh_rateB\x0c\n\n_recipientB\x07\n\x05_data\"\x1f\n\x0bSysResponse\x12\x10\n\x08response\x18\x01 \x01(\t2\x97\x01\n\tScheduler\x12=\n\nSysCommand\x12\x15.scheduler.SysRequest\x1a\x16.scheduler.SysResponse\"\x00\x12K\n\x10SysCommandStream\x12\x1b.scheduler.SysRequestStream\x1a\x16.scheduler.SysResponse\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x0fprotocols.proto\x12\tscheduler\"\x97\x01\n\nSysRequest\x12\x0e\n\x06sender\x18\x01 \x01(\t\x12\x0b\n\x03\x63md\x18\x02 \x01(\t\x12\x16\n\trecipient\x18\x03 \x01(\tH\x00\x88\x01\x01\x12\x11\n\x04\x64\x61ta\x18\x04 \x01(\tH\x01\x88\x01\x01\x12\x19\n\x0crefresh_rate\x18\x05 \x01(\x02H\x02\x88\x01\x01\x42\x0c\n\n_recipientB\x07\n\x05_dataB\x0f\n\r_refresh_rate\"\x1f\n\x0bSysResponse\x12\x10\n\x08response\x18\x01 \x01(\t2\x91\x01\n\tScheduler\x12=\n\nSysCommand\x12\x15.scheduler.SysRequest\x1a\x16.scheduler.SysResponse\"\x00\x12\x45\n\x10SysCommandStream\x12\x15.scheduler.SysRequest\x1a\x16.scheduler.SysResponse\"\x00\x30\x01\x62\x06proto3'
 )
 
 
@@ -61,6 +61,13 @@ _SYSREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='refresh_rate', full_name='scheduler.SysRequest.refresh_rate', index=4,
+      number=5, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -82,84 +89,14 @@ _SYSREQUEST = _descriptor.Descriptor(
       index=1, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
-  ],
-  serialized_start=30,
-  serialized_end=137,
-)
-
-
-_SYSREQUESTSTREAM = _descriptor.Descriptor(
-  name='SysRequestStream',
-  full_name='scheduler.SysRequestStream',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='sender', full_name='scheduler.SysRequestStream.sender', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='cmd', full_name='scheduler.SysRequestStream.cmd', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='refresh_rate', full_name='scheduler.SysRequestStream.refresh_rate', index=2,
-      number=3, type=2, cpp_type=6, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='recipient', full_name='scheduler.SysRequestStream.recipient', index=3,
-      number=4, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='data', full_name='scheduler.SysRequestStream.data', index=4,
-      number=5, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
     _descriptor.OneofDescriptor(
-      name='_refresh_rate', full_name='scheduler.SysRequestStream._refresh_rate',
-      index=0, containing_type=None,
-      create_key=_descriptor._internal_create_key,
-    fields=[]),
-    _descriptor.OneofDescriptor(
-      name='_recipient', full_name='scheduler.SysRequestStream._recipient',
-      index=1, containing_type=None,
-      create_key=_descriptor._internal_create_key,
-    fields=[]),
-    _descriptor.OneofDescriptor(
-      name='_data', full_name='scheduler.SysRequestStream._data',
+      name='_refresh_rate', full_name='scheduler.SysRequest._refresh_rate',
       index=2, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=140,
-  serialized_end=297,
+  serialized_start=31,
+  serialized_end=182,
 )
 
 
@@ -190,8 +127,8 @@ _SYSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=299,
-  serialized_end=330,
+  serialized_start=184,
+  serialized_end=215,
 )
 
 _SYSREQUEST.oneofs_by_name['_recipient'].fields.append(
@@ -200,17 +137,10 @@ _SYSREQUEST.fields_by_name['recipient'].containing_oneof = _SYSREQUEST.oneofs_by
 _SYSREQUEST.oneofs_by_name['_data'].fields.append(
   _SYSREQUEST.fields_by_name['data'])
 _SYSREQUEST.fields_by_name['data'].containing_oneof = _SYSREQUEST.oneofs_by_name['_data']
-_SYSREQUESTSTREAM.oneofs_by_name['_refresh_rate'].fields.append(
-  _SYSREQUESTSTREAM.fields_by_name['refresh_rate'])
-_SYSREQUESTSTREAM.fields_by_name['refresh_rate'].containing_oneof = _SYSREQUESTSTREAM.oneofs_by_name['_refresh_rate']
-_SYSREQUESTSTREAM.oneofs_by_name['_recipient'].fields.append(
-  _SYSREQUESTSTREAM.fields_by_name['recipient'])
-_SYSREQUESTSTREAM.fields_by_name['recipient'].containing_oneof = _SYSREQUESTSTREAM.oneofs_by_name['_recipient']
-_SYSREQUESTSTREAM.oneofs_by_name['_data'].fields.append(
-  _SYSREQUESTSTREAM.fields_by_name['data'])
-_SYSREQUESTSTREAM.fields_by_name['data'].containing_oneof = _SYSREQUESTSTREAM.oneofs_by_name['_data']
+_SYSREQUEST.oneofs_by_name['_refresh_rate'].fields.append(
+  _SYSREQUEST.fields_by_name['refresh_rate'])
+_SYSREQUEST.fields_by_name['refresh_rate'].containing_oneof = _SYSREQUEST.oneofs_by_name['_refresh_rate']
 DESCRIPTOR.message_types_by_name['SysRequest'] = _SYSREQUEST
-DESCRIPTOR.message_types_by_name['SysRequestStream'] = _SYSREQUESTSTREAM
 DESCRIPTOR.message_types_by_name['SysResponse'] = _SYSRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -220,13 +150,6 @@ SysRequest = _reflection.GeneratedProtocolMessageType('SysRequest', (_message.Me
   # @@protoc_insertion_point(class_scope:scheduler.SysRequest)
   })
 _sym_db.RegisterMessage(SysRequest)
-
-SysRequestStream = _reflection.GeneratedProtocolMessageType('SysRequestStream', (_message.Message,), {
-  'DESCRIPTOR' : _SYSREQUESTSTREAM,
-  '__module__' : 'protocols_pb2'
-  # @@protoc_insertion_point(class_scope:scheduler.SysRequestStream)
-  })
-_sym_db.RegisterMessage(SysRequestStream)
 
 SysResponse = _reflection.GeneratedProtocolMessageType('SysResponse', (_message.Message,), {
   'DESCRIPTOR' : _SYSRESPONSE,
@@ -244,8 +167,8 @@ _SCHEDULER = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=333,
-  serialized_end=484,
+  serialized_start=218,
+  serialized_end=363,
   methods=[
   _descriptor.MethodDescriptor(
     name='SysCommand',
@@ -262,7 +185,7 @@ _SCHEDULER = _descriptor.ServiceDescriptor(
     full_name='scheduler.Scheduler.SysCommandStream',
     index=1,
     containing_service=None,
-    input_type=_SYSREQUESTSTREAM,
+    input_type=_SYSREQUEST,
     output_type=_SYSRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,

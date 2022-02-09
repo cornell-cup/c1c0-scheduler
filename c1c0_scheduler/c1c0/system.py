@@ -52,10 +52,10 @@ class C1C0System(System):
             super().run()
             self.ser_line.open()
             try:
-                print('acquiring new_data lock')
-                with self.new_data:
+                while not self.stop_event.is_set():
+                    print('acquiring new_data lock')
                     print('acquired new_data lock')
-                    while not self.stop_event.is_set():
+                    with self.new_data:
                         new_data = ''
                         # reads serial buffer for terabee
                         s = self.ser_line.read(32)
@@ -78,22 +78,19 @@ class C1C0System(System):
             def run(self) -> None:
                 pass
 
-        kill_switch: bool
-
         def __init__(self, *args, **kwargs):
             super().__init__(*args, *kwargs)
-            self.kill_switch = False
 
         def run(self):
             super().run()
 
             def on_button_pressed(button):
                 print(f'Button {button.name} was pressed')
-                self.kill_switch = True
+                self.stop_event.set()
 
             def on_button_released(button):
                 print(f'Button {button.name} was released')
-                self.kill_switch = False
+                self.stop_event.clear()
 
             def on_axis_moved(axis):
                 # TODO send command to locomotion to control the head rotation
