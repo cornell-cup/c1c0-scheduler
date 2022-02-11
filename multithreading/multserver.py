@@ -10,6 +10,7 @@ import subprocess
 sys.path.append('../../c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
 import R2Protocol2 as r2p
 import locomotion_API
+import arm_API
 from xboxcontrol_API import xboxcontroller
 
 # Data = {
@@ -180,7 +181,7 @@ def threaded_client(connection):
                 pid = subprocess.Popen([sys.executable, "client_objectdetection.py", argument]) 
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
-                connection.sendall(str.encode(reply))   
+                connection.sendall(str.encode(reply))
         elif (client == "path-planning"):
             if ("locomotion" in data.decode('utf-8')):
                 motor_power = data.decode('utf-8')[11:]
@@ -193,13 +194,19 @@ def threaded_client(connection):
         elif (client == "object-detection"):
             if ("arm" in data.decode('utf-8')):
                 reply = ""
-                if (Data_lock["terabee1"].acquire(blocking=False)):
-                    print(str(t.ident) + " got the lock!!!!")
-                    reply = "Server data request: " + Data["terabee1"]
-                    Data_lock["terabee1"].release()
-                else:
-                    reply = "Could not acquire lock"
+                arm_angle = data.decode('utf-8')[4:]
+                print(arm_angle)
+                arm_API.arm_msg('/dev/ttyTHS1', 115200, arm_angle)
+                reply = "arm angle command sent to precision arm"
                 connection.sendall(str.encode(reply))
+
+                #if (Data_lock["terabee1"].acquire(blocking=False)):
+                #    print(str(t.ident) + " got the lock!!!!")
+                #    reply = "Server data request: " + Data["terabee1"]
+                #    Data_lock["terabee1"].release()
+                #else:                                      
+                #    reply = "Could not acquire lock"
+                #connection.sendall(str.encode(reply))
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))

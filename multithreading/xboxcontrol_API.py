@@ -35,9 +35,12 @@ def on_axis_moved(axis):
     return [str(axis_x), str(axis_y)]
     
     
-# test
-#def testbutton(button):
-#	print('it works')
+ #test
+#def testbutton(button
+
+# for communication to xboxToLoco.py
+cat = open('xboxToLoco.py')
+
 
 # give function handlers to xbox controller package
 def xboxcontroller():
@@ -51,57 +54,27 @@ def xboxcontroller():
 			controller.axis_l.when_moved = on_axis_moved
 			#controller.axis_r.when_moved = on_axis_moved
 			
+			# Left bumper button (small front button)
+			controller.button_trigger_l.when_pressed = on_button_pressed
+			controller.button_trigger_l.when_released = on_button_released
+			
+			# Right bumper button (small front button)
+			controller.button_trigger_r.when_pressed = on_button_pressed
+			controller.button_trigger_r.when_released = on_button_released
+			
+			# Button B events
+			controller.button_b.when_pressed = on_button_pressed
+			controller.button_b.when_released = on_button_released
+			
+			# Button X events
+			controller.button_x.when_pressed = on_button_pressed
+			controller.button_x.when_released = on_button_released
+			
 			'''
-			# Left and right triggers move event
-			controller.button_thumb_l.when_pressed = on_button_pressed
-			controller.button_thumb_l.when_released = on_button_released
-			controller.button_thumb_r.when_pressed = on_button_pressed
-			controller.button_thumb_r.when_released = on_button_released
-
-			# test
-			controller.trigger_l.when_moved = testbutton
-			controller.trigger_r.when_moved = testbutton
-			
-			Notes: 
-			button_thumb_l corresponds to the the Right Trigger
-			it prints when pressed and released
-			but it also prints 'axis_r moved to 0 {-1, 0, or 1}'
-				this seems like a bug, since axis_r should be the Right Joystick
-			
-			button_thumb_r does NOT correspond to the Left Trigger
-			movement of the Left Trigger prints axis_r movement as well, but it differs from the Right Trigger
-				????????
-			
-			button_x does not work
-			
-			next step: if receive an instruction for axis_r, invalidate it because we need the other button for rotation
-			i kind of just removed the axis_r instruction since it's not necessary
-			
-			switched head rotation buttons to bumpers instead of triggers 
-			
+			Next Steps:
 			use return instead of print, for axis return an array of axis_x, axis_y
 			since there's only one axis used no need for axis name
 			'''
-			
-			# Left bumper button
-			controller.button_select.when_pressed = on_button_pressed
-			controller.button_select.when_released = on_button_released
-			
-			# Right bumper button
-			controller.button_start.when_pressed = on_button_pressed
-			controller.button_start.when_released = on_button_released
-			
-			#Mode is left trigger
-			#controller.button_mode.when_pressed = on_button_pressed
-			#controller.button_mode.when_released = on_button_released
-			
-			# Button X and B events
-			#controller.button_x.when_pressed = on_button_pressed
-			#controller.button_x.when_released = on_button_released
-			#controller.button_b.when_pressed = on_button_pressed
-			#controller.button_b.when_released = on_button_released
-			
-			
 			
 			
 
@@ -115,3 +88,5 @@ if __name__ == "__main__":
 		time.sleep(0.2)
 		if KeyboardInterrupt:
 			break
+			
+cat.close()
