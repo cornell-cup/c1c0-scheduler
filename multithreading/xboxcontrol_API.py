@@ -1,18 +1,22 @@
 from xbox360controller import Xbox360Controller
 import signal
 import time
+import client
 
 # for xbox control: kill all thread except chatbot
 def on_button_pressed(button):    
     #print('Button {0} was pressed'.format(button.name))
-    print(button.name)
-    return button.name
+    #print(button.name)
+    scheduler.communicate('xbox: ' + str(button.name) + ' pressed')
+    #return button.name
 
 # for xbox control
 def on_button_released(button):
     #print('Button {0} was released'.format(button.name))
-    print(button.name)
-    return button.name
+    #print(button.name)
+    scheduler.communicate('xbox: ' + str(button.name) + ' pressed')
+
+    #return button.name
 
 # for xbox control
 def on_axis_moved(axis):
@@ -31,19 +35,20 @@ def on_axis_moved(axis):
     else:
         axis_y = 1
     #print('Axis {0} moved to {1} {2}'.format(axis.name, axis_x, axis_y))
-    print(str(axis_x), str(axis_y))
-    return [str(axis_x), str(axis_y)]
+    #print(str(axis_x), str(axis_y))
+    scheduler.communicate('xbox: axis: ' + str(axis_x) + ' ' + str(axis_y))
+    #return [str(axis_x), str(axis_y)]
     
     
  #test
 #def testbutton(button
 
 # for communication to xboxToLoco.py
-cat = open('xboxToLoco.py')
+# cat = open('xboxToLoco.py')
 
 
 # give function handlers to xbox controller package
-def xboxcontroller():
+def xboxcontroller_control():
 	try:
 		with Xbox360Controller(0, axis_threshold=0.2) as controller:
 			# Button A events
@@ -75,18 +80,33 @@ def xboxcontroller():
 			use return instead of print, for axis return an array of axis_x, axis_y
 			since there's only one axis used no need for axis name
 			'''
-			
-			
-
 			signal.pause()
 	except KeyboardInterrupt:
 		pass
 
+def xboxcontroller():
+    global scheduler 
+    scheduler = client.Client("xboxcontroller")
+    scheduler.handshake()
+    while True:
+        xboxcontroller_control()
+        time.sleep(0.2)
+        if KeyboardInterrupt:
+            scheduler.close()
+            break
+
+
 if __name__ == "__main__":
-	while True:
-		xboxcontroller()
-		time.sleep(0.2)
-		if KeyboardInterrupt:
-			break
+    scheduler = client.Client("xboxcontroller")
+    scheduler.handshake()
+    #try:
+  	#except:
+    # 	print("Scheduler handshake unsuccesful")
+    while True:
+        xboxcontroller_control()
+        time.sleep(0.2)
+        if KeyboardInterrupt:
+            scheduler.close()
+            break
 			
-cat.close()
+# cat.close()

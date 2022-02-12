@@ -13,47 +13,6 @@ import locomotion_API
 import arm_API
 from xboxcontrol_API import xboxcontroller
 
-# Data = {
-    # "terabee1" : "",
-    # "terabee2" : "",
-    # "terabee3" : "",
-    # "lidar" : "",
-    # "imu" : "",
-# }
-
-# Data_lock = {
-    # "terabee1" : threading.Lock(),
-    # "terabee2" : threading.Lock(),
-    # "terabee3" : threading.Lock(),
-    # "lidar" : threading.Lock(),
-    # "imu" : threading.Lock(),
-# }
-
-ser = serial.Serial(
-        port = '/dev/ttyTHS1',
-        baudrate = 115200,
-        )
-ser.close()
-ser.open()
-
-ServerSocket = socket.socket()
-host = '127.0.0.1'
-port = 1233
-ThreadCount = 0
-threadlist = []
-chatbotThread = None
-try:
-    ServerSocket.bind((host, port))
-except socket.error as e:
-    print(str(e))
-
-print('Waiting for a Connection..')
-ServerSocket.listen(5)
-
-t_xbox = threading.Thread(target=xboxcontroller, args=())
-t_xbox.start()
-# TODO start chatbot thread 
-
 # # Serial Data thread that collects data and updates global dictionaries
 # # Alternate method: have data updated locally on the sensor microcontroller;
 # #                   the server actively polling the data when needed
@@ -142,7 +101,13 @@ def threaded_client(connection):
     while(getattr(t, "do_run", True) and detectClient):
         reply = ""
         data = connection.recv(2048)
-        if(data.decode('utf-8') == "I am Chatbot"):
+        if(data.decode('utf-8') == "I am xboxcontroller"):
+            xboxcontrollerThread = t
+            reply = "xboxcontroller is recognized"
+            client = "xboxcontroller"
+            detectClient = False
+            connection.sendall(str.encode(reply))
+        elif(data.decode('utf-8') == "I am Chatbot"):
             chatbotThread = t
             reply = "Chatbot is recognized"
             client = "Chatbot"
@@ -158,10 +123,10 @@ def threaded_client(connection):
             client = "object-detection"
             detectClient = False
             connection.sendall(str.encode(reply))
-        if not data:
+        elif not data:
             break
-
     t.setName(client)
+
     #Commence Communication
     while(getattr(t, "do_run", True) and (not detectClient)):
         data = connection.recv(2048)
@@ -181,6 +146,10 @@ def threaded_client(connection):
                 pid = subprocess.Popen([sys.executable, "client_objectdetection.py", argument]) 
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
+                connection.sendall(str.encode(reply))
+        elif (client == "xboxcontroller"):
+            if ("xbox" in data.decode('utf-8')):
+                reply = "xboxcontroller signal: " + data.decode('utf-8')[6:]
                 connection.sendall(str.encode(reply))
         elif (client == "path-planning"):
             if ("locomotion" in data.decode('utf-8')):
@@ -214,6 +183,31 @@ def threaded_client(connection):
             break
 
     connection.close()
+
+ser = serial.Serial(
+        port = '/dev/ttyTHS1',
+        baudrate = 115200,
+        )
+ser.close()
+ser.open()
+
+ServerSocket = socket.socket()
+host = '127.0.0.1'
+port = 1233
+ThreadCount = 0
+threadlist = []
+chatbotThread = None
+try:
+    ServerSocket.bind((host, port))
+except socket.error as e:
+    print(str(e))
+
+print('Waiting for a Connection..')
+ServerSocket.listen(5)
+
+xboxThread = threading.Thread(target=xboxcontroller, args=( ))
+xboxThread.start()
+# TODO start chatbot thread 
 
 #Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
 while True:
