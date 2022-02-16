@@ -4,14 +4,20 @@ from . import protocols_pb2, protocols_pb2_grpc
 
 
 class Client:
+    """
+    Used to interact with the Server. Automatically connects when using
+    context handlers. eg)
+    `with [foo] as [bar]:`
+    """
     def __init__(self, module_name):
         self.module_name = module_name
-        self.channel = grpc.insecure_channel('localhost:50051')
+        self.channel = None
 
     def close(self):
         self.channel.close()
 
     def __enter__(self):
+        self.channel = grpc.insecure_channel('localhost:50051')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):

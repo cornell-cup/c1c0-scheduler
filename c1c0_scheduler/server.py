@@ -13,8 +13,15 @@ system: System = config.system
 
 
 class Scheduler(protocols_pb2_grpc.SchedulerServicer):
+    """
+    The server object that exposes the System's functionality.
+    """
     # noinspection PyUnresolvedReferences
     async def SysCommand(self, request, context):
+        """
+        Takes a request and context and returns the result dependent on the
+        command (cmd) embedded in the request.
+        """
         if DEBUG:
             print('SysCommand called:')
             print(f'cmd:{request.cmd}\n'
@@ -27,6 +34,10 @@ class Scheduler(protocols_pb2_grpc.SchedulerServicer):
                 request.sender, request.recipient, *request.data)))
 
     async def SysCommandStream(self, request, context):
+        """
+        Takes a request and context and yields the result dependent on the
+        command (cmd) embedded in the request.
+        """
         refresh_rate = request.refresh_rate
         # This command is only compatible with streaming threads
         data_obj: DataProvider = system.get_functionality()[request.cmd](
@@ -43,6 +54,9 @@ class Scheduler(protocols_pb2_grpc.SchedulerServicer):
 
 
 async def serve():
+    """
+    Serves the server.
+    """
     server = grpc.aio.server(ThreadPoolExecutor(max_workers=MAX_WORKERS))
     protocols_pb2_grpc.add_SchedulerServicer_to_server(Scheduler(), server)
     server.add_insecure_port('[::]:50051')

@@ -3,6 +3,9 @@ from contextlib import contextmanager
 
 
 class ReaderWriterSuite:
+    """
+    Standard Reader Writer
+    """
     # Based on wikipedia:
     #   https://en.wikipedia.org/wiki/Readers%E2%80%93writer_lock
 
