@@ -14,8 +14,14 @@ def on_button_pressed(button):
 def on_button_released(button):
     #print('Button {0} was released'.format(button.name))
     #print(button.name)
-    scheduler.communicate('xbox: ' + str(button.name) + ' pressed')
+    scheduler.communicate('xbox: ' + str(button.name) + ' released')
+    #return button.name
 
+# for xbox control
+def on_button_held(button):
+    #print('Button {0} was released'.format(button.name))
+    #print(button.name)
+    scheduler.communicate('xbox: ' + str(button.name) + ' held')
     #return button.name
 
 # for xbox control
@@ -49,6 +55,7 @@ def on_axis_moved(axis):
 
 # give function handlers to xbox controller package
 def xboxcontroller_control():
+	
 	try:
 		with Xbox360Controller(0, axis_threshold=0.2) as controller:
 			# Button A events
@@ -74,13 +81,29 @@ def xboxcontroller_control():
 			# Button X events
 			controller.button_x.when_pressed = on_button_pressed
 			controller.button_x.when_released = on_button_released
-			
-			'''
-			Next Steps:
-			use return instead of print, for axis return an array of axis_x, axis_y
-			since there's only one axis used no need for axis name
-			'''
+
+
+			while True:
+				if controller.button_a.is_pressed: # is_pressed is a boolean
+					on_button_held(controller.button_a)
+					time.sleep(0.2)
+				if controller.button_b.is_pressed: # is_pressed is a boolean
+					on_button_held(controller.button_b)
+					time.sleep(0.2)
+				if controller.button_x.is_pressed: # is_pressed is a boolean
+					on_button_held(controller.button_x)
+					time.sleep(0.2)
+				if controller.button_trigger_l.is_pressed: # is_pressed is a boolean
+					on_button_held(controller.button_trigger_l)
+					time.sleep(0.2)
+				if controller.button_trigger_r.is_pressed: # is_pressed is a boolean
+					on_button_held(controller.button_trigger_r)
+					time.sleep(0.2)
+
+				#TODO add axis value polling
+				
 			signal.pause()
+			
 	except KeyboardInterrupt:
 		pass
 
