@@ -22,7 +22,7 @@ def correct_grpc_module():
         lines = []
         for line in f.readlines():
             if line.startswith('import protocols_pb2 as protocols__pb2'):
-                line = f'from . {line}'
+                line = f'try:\n    from . {line}except ImportError:\n    from c1c0_scheduler {line}'
             lines.append(line)
         f.seek(0)
         f.writelines(lines)

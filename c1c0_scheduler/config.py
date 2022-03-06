@@ -1,7 +1,9 @@
-from types import ModuleType
 from typing import Optional
 
-from .system import System
+try:
+    from .system import System
+except ImportError:
+    from c1c0_scheduler.system import System
 
 system: Optional[System] = None
 """
@@ -22,13 +24,14 @@ MAX_WORKERS = 10
 Number of workers for gRPC to use for the server process.
 """
 
-def init_c1c0() -> System:
+
+def get_default() -> System:
     global system
-    from .c1c0.system import C1C0System
-    system = C1C0System()
-    system.start()
+    try:
+        from .c1c0.system import C1C0System
+        from .c1c0.config import DATA_WORKER_INFO
+    except ImportError:
+        from c1c0_scheduler.c1c0.system import C1C0System
+        from c1c0_scheduler.c1c0.config import DATA_WORKER_INFO
+    system = C1C0System(DATA_WORKER_INFO)
     return system
-
-
-def init_default() -> System:
-    return init_c1c0()

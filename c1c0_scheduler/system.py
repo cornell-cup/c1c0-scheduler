@@ -42,7 +42,7 @@ class System(ABC):
     funcs = {}
 
     @abstractmethod
-    def __init__(self, data_worker_info: Iterable[Tuple[str, int]],
+    def __init__(self, name, data_worker_info: Iterable[Tuple[str, int]],
                  controller_workers: int = 1, *args, d_data_workers: int = 0,
                  d_controller_workers: int = 0, **kwargs):
         """
@@ -58,6 +58,7 @@ class System(ABC):
         d_controller_workers
             Number of controller debugger workers to spawn
         """
+        self.name = name
         self.data_worker_info = data_worker_info
         self.controller_workers = controller_workers
         self.d_data_workers = d_data_workers

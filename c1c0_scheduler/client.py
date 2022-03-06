@@ -1,6 +1,9 @@
 import grpc
 
-from . import protocols_pb2, protocols_pb2_grpc
+try:
+    from . import protocols_pb2, protocols_pb2_grpc
+except ImportError:
+    from c1c0_scheduler import protocols_pb2, protocols_pb2_grpc
 
 
 class Client:
@@ -31,6 +34,7 @@ class Client:
         }
         if args:
             kwargs['data'] = ', '.join(args)
+        print(self.channel)
         stub = protocols_pb2_grpc.SchedulerStub(self.channel)
         return stub.SysCommand(protocols_pb2.SysRequest(**kwargs))
 

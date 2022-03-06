@@ -2,7 +2,10 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from . import protocols_pb2 as protocols__pb2
+try:
+    from . import protocols_pb2 as protocols__pb2
+except ImportError:
+    from c1c0_scheduler import protocols_pb2 as protocols__pb2
 
 
 class SchedulerStub(object):

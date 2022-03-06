@@ -13,9 +13,12 @@ from xbox360controller import Xbox360Controller
 
 from c1c0_movement.Locomotion import R2Protocol2 as r2p
 
-from ..system import System, Worker, DataProvider
-from ..utils import ReaderWriterSuite
-
+try:
+    from ..system import System, Worker, DataProvider
+    from ..utils import ReaderWriterSuite
+except ImportError:
+    from c1c0_scheduler.system import System, Worker, DataProvider
+    from c1c0_scheduler.utils import ReaderWriterSuite
 
 DUMMY_VALUES = True
 # DUMMY_VALUES = False
@@ -63,7 +66,7 @@ class SerialReader(Worker, DataProvider):
     A Worker subclass that collects data and makes it publicly available for
     other processes.
     """
-    def __init__(self, port: str, baudrate: int, data_id: str, *args, **kwargs):
+    def __init__(self, port: str, baudrate: int, *args, **kwargs):
         """
         PARAMETERS
         ----------
@@ -75,7 +78,6 @@ class SerialReader(Worker, DataProvider):
             The id for the data you are collecting.
         """
         super().__init__(*args, **kwargs)
-        self.data_id = data_id
         self.ser_line = serial.Serial(port=port, baudrate=baudrate)
         self.ser_line.close()
         self.data = ''
@@ -172,7 +174,8 @@ class C1C0System(System):
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__('C1C0_System', *args, **kwargs)
+        print(self.data_worker_info)
         self.data_threads = {
             f'terabee{i}': SerialReader(port, baudrate)
             for i, (port, baudrate) in enumerate(self.data_worker_info)
@@ -224,6 +227,7 @@ class C1C0System(System):
             'get_data': get_data,
             'start_subsystem': start_subsystem
         }
+        print(f'Data threads: {self.data_threads}')
 
     def start(self, *args, **kwargs):
         """

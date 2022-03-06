@@ -1,13 +1,18 @@
 from concurrent.futures import ThreadPoolExecutor
 
 import asyncio
-from typing import Coroutine, Any
+from typing import Coroutine, Any, Optional
 
 import grpc
 
-from . import protocols_pb2, protocols_pb2_grpc, config
-from .config import DEBUG, MAX_WORKERS
-from .system import System, DataProvider
+try:
+    from . import protocols_pb2, protocols_pb2_grpc, config
+    from .config import DEBUG, MAX_WORKERS
+    from .system import System, DataProvider
+except ImportError:
+    from c1c0_scheduler import protocols_pb2, protocols_pb2_grpc, config
+    from c1c0_scheduler.config import DEBUG, MAX_WORKERS
+    from c1c0_scheduler.system import System, DataProvider
 
 system: System = config.system
 
@@ -64,22 +69,28 @@ async def serve():
     await server.wait_for_termination()
 
 
-def setup_and_serve() -> Coroutine[Any, Any, None]:
+def setup_and_serve(module: Optional[System] = None, *args, **kwargs) -> \
+        Coroutine[Any, Any, None]:
     global system
     # Initialize robot's services
-    system = config.init_default()
-    print(f'C1C0 System has been initialized!')
+    if module is None:
+        system = config.get_default()
+    else:
+        system = module
+    system.start(*args, **kwargs)
+    print(f'{system.name} has been initialized!')
     print(f'Functionality:\n{system.get_functionality()}')
     print(f'Workers:\n{system.get_workers()}')
     # Start serving
     return serve()
 
 
-def main():
+def run(module: Optional[System] = None, *args, **kwargs) -> None:
+    # asyncio.run(setup_and_serve())
+    # Above was only added as of Python 3.7
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(asyncio.wait([setup_and_serve()]))
-    asyncio.run(setup_and_serve())
+    loop.run_until_complete(setup_and_serve(module, *args, **kwargs))
 
 
 if __name__ == '__main__':
-    asyncio.run(setup_and_serve())
+    run()
