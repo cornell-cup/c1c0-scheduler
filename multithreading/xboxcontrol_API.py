@@ -2,10 +2,16 @@ from xbox360controller import Xbox360Controller
 import signal
 import time
 import client
-#import HeadRotation_XBox_API.py as HR
+import HeadRotation_XBox_API as hR
+
+open = 0
 
 # for xbox control: kill all thread except chatbot
-def on_button_pressed(button):    
+def on_button_pressed(button):   
+    global open
+    if not open:
+        hR.open()
+        open = 1
     #print('Button {0} was pressed'.format(button.name))
     #print(button.name)
     #scheduler.communicate('xbox: ' + str(button.name) + ' pressed')
@@ -14,12 +20,18 @@ def on_button_pressed(button):
     #scheduler.communicate(str(button.name))
     #return button.name
     if(button.name == 'button_trigger_l'):
-        scheduler.communicate('xbox: (-2.00,-2.00)')
+        hR.leftButton()
+        #scheduler.communicate('xbox: (-2.00,-2.00)')
     elif(button.name == 'button_trigger_r'):
-        scheduler.communicate('xbox: (+2.00,+2.00)')
+        #scheduler.communicate('xbox: (+2.00,+2.00)')
+        hR.rightButton()
 
 # for xbox control
 def on_button_released(button):
+    global open
+    if not open:
+        hR.open()
+        open = 1
     #print('Button {0} was released'.format(button.name))
     #print(button.name)
     #scheduler.communicate('xbox: ' + str(button.name) + ' released')
@@ -29,12 +41,18 @@ def on_button_released(button):
     #scheduler.communicate(str(button.name))
     #return button.name
     if(button.name == 'button_trigger_l'):
-        scheduler.communicate('xbox: (-2.00,-2.00)')
+        hR.leftButton()
+        #scheduler.communicate('xbox: (-2.00,-2.00)')
     elif(button.name == 'button_trigger_r'):
-        scheduler.communicate('xbox: (+2.00,+2.00)')
+        #scheduler.communicate('xbox: (+2.00,+2.00)')
+        hR.rightButton()
 
 # for xbox control
 def on_button_held(button):
+    global open
+    if not open:
+        hR.open()
+        open = 1
     #print('Button {0} was released'.format(button.name))
     #print(button.name)
     #scheduler.communicate('xbox: ' + str(button.name) + ' held')
@@ -44,9 +62,11 @@ def on_button_held(button):
     #scheduler.communicate(str(button.name))
     #return button.name
     if(button.name == 'button_trigger_l'):
-        scheduler.communicate('xbox: (-2.00,-2.00)')
+        hR.leftButton()
+        #scheduler.communicate('xbox: (-2.00,-2.00)')
     elif(button.name == 'button_trigger_r'):
-        scheduler.communicate('xbox: (+2.00,+2.00)')
+        #scheduler.communicate('xbox: (+2.00,+2.00)')
+        hR.rightButton()
 
 # for xbox control
 def on_axis_moved(axis):
