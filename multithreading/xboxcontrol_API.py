@@ -7,22 +7,45 @@ import client
 def on_button_pressed(button):    
     #print('Button {0} was pressed'.format(button.name))
     #print(button.name)
-    scheduler.communicate('xbox: ' + str(button.name) + ' pressed')
+    #scheduler.communicate('xbox: ' + str(button.name) + ' pressed')
+    #scheduler.communicate('xbox: (+1.00,-1.00)')
+    #str1 = 'Xbox: '+str(button.name)+' read'
+    #scheduler.communicate(str(button.name))
     #return button.name
+    if(button.name == 'button_trigger_l'):
+        scheduler.communicate('xbox: (-2.00,-2.00)')
+    elif(button.name == 'button_trigger_r'):
+        scheduler.communicate('xbox: (+2.00,+2.00)')
 
 # for xbox control
 def on_button_released(button):
     #print('Button {0} was released'.format(button.name))
     #print(button.name)
-    scheduler.communicate('xbox: ' + str(button.name) + ' released')
+    #scheduler.communicate('xbox: ' + str(button.name) + ' released')
+    #scheduler.communicate('Xbox:(GHIJKL)')
+    #scheduler.communicate('xbox: (+1.00,-1.00)')
+    #str1 = 'Xbox: '+str(button.name)+' rels'
+    #scheduler.communicate(str(button.name))
     #return button.name
+    if(button.name == 'button_trigger_l'):
+        scheduler.communicate('xbox: (-2.00,-2.00)')
+    elif(button.name == 'button_trigger_r'):
+        scheduler.communicate('xbox: (+2.00,+2.00)')
 
 # for xbox control
 def on_button_held(button):
     #print('Button {0} was released'.format(button.name))
     #print(button.name)
-    scheduler.communicate('xbox: ' + str(button.name) + ' held')
+    #scheduler.communicate('xbox: ' + str(button.name) + ' held')
+    #scheduler.communicate('Xbox:(MNOPQR)')
+    #scheduler.communicate('xbox: (+1.00,-1.00)')
+    #str1 = 'Xbox: '+str(button.name)+' held'
+    #scheduler.communicate(str(button.name))
     #return button.name
+    if(button.name == 'button_trigger_l'):
+        scheduler.communicate('xbox: (-2.00,-2.00)')
+    elif(button.name == 'button_trigger_r'):
+        scheduler.communicate('xbox: (+2.00,+2.00)')
 
 # for xbox control
 def on_axis_moved(axis):
@@ -35,15 +58,26 @@ def on_axis_moved(axis):
     else:
         axis_x = 1
     if(axis.y <= -0.5):
-        axis_y = -1
+        axis_y = 1
     elif(axis.y <= 0.5):
         axis_y = 0
     else:
-        axis_y = 1
+        axis_y = -1
     #print('Axis {0} moved to {1} {2}'.format(axis.name, axis_x, axis_y))
     #print(str(axis_x), str(axis_y))
-    scheduler.communicate('xbox: axis: ' + str(axis_x) + ' ' + str(axis_y))
+    if(axis_x == 1):
+        axis_x = '+' + str(axis_x)
+    if(axis_x == 0):
+        axis_x = '+' + str(axis_x)
+    if(axis_y == 1):
+        axis_y = '+' + str(axis_y)
+    if(axis_y == 0):
+        axis_y = '+' + str(axis_y)
+        
+    #scheduler.communicate('xbox: axis: ' + str(axis_x) + ' ' + str(axis_y))
+    scheduler.communicate('xbox: (' + str(axis_x) + '.00,' + str(axis_y) + '.00)')
     #return [str(axis_x), str(axis_y)]
+    # (+0.00,-0.00)
     
     
  #test
