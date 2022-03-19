@@ -2,6 +2,7 @@ from xbox360controller import Xbox360Controller
 import signal
 import time
 import client
+#import HeadRotation_XBox_API.py as HR
 
 # for xbox control: kill all thread except chatbot
 def on_button_pressed(button):    
