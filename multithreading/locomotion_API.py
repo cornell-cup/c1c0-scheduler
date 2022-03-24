@@ -8,7 +8,7 @@ import struct
 Locomotion API for use with path_planning. 
 
 """
-sys.path.append('/home/ccrt/c1c0-movement/c1c0-movement/Locomotion') #Might need to be resolved
+sys.path.append('/home/c1c0-main/c1c0-movement/c1c0-movement/Locomotion') #Might need to be resolved
 import R2Protocol2 as r2p
 
 ser = None
@@ -27,7 +27,11 @@ def locomotion_msg(port, baud, motor_power):
     init_serial(port, baud)
     try:
         msg = r2p.encode(bytes('loco','utf-8'), bytearray(motor_power.encode()))
+        print(motor_power.encode())
+        #print(len(motor_power.encode()))
+        print(len(msg))
         print(msg)
+        print('\n')
         ser.write(msg)
         time.sleep(0.1)
     except KeyboardInterrupt:

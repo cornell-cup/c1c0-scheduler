@@ -12,6 +12,7 @@ import R2Protocol2 as r2p
 import locomotion_API
 import arm_API
 from xboxcontrol_API import xboxcontroller
+import HeadRotation_XBox_API as headrotation
 
 # # Serial Data thread that collects data and updates global dictionaries
 # # Alternate method: have data updated locally on the sensor microcontroller;
@@ -147,10 +148,22 @@ def threaded_client(connection):
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
+                '''
         elif (client == "xboxcontroller"):
             if ("xbox" in data.decode('utf-8')):
                 reply = "xboxcontroller signal: " + data.decode('utf-8')[6:]
                 connection.sendall(str.encode(reply))
+                '''
+        elif (client == "xboxcontroller"):
+            if ("xbox" in data.decode('utf-8')):
+                reply = "xboxcontroller signal: " + data.decode('utf-8')[6:] + " sent to arduino"
+                locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')[6:]) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                connection.sendall(str.encode(reply))
+            elif("head" in data.decode('uft-8')):
+                reply = "xboxcontroller signal: " + data.decode('utf-8')[6:] + " sent to arduino"
+                headrotation.head('/dev/ttyTHS1', 115200, data.decode('utf-8')) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                connection.sendall(str.encode(reply))
+                
         elif (client == "path-planning"):
             if ("locomotion" in data.decode('utf-8')):
                 motor_power = data.decode('utf-8')[11:]

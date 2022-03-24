@@ -26,12 +26,12 @@ def zero():
 
 #Call this method when the left bumper is held to get the head to rotate to the left at a predetermined rate
 def leftButton():
-	headRotate(5, 1, 0)
+	return headRotate(5, 1, 0)
 	time.sleep(0.2)
 
 #Call this method when the right bumper is held to get the head to rotate to the right at a predetermined rate
 def rightButton():
-	headRotate(5, 0, 0)
+	return headRotate(5, 0, 0)
 	time.sleep(0.2)
 
 #Call this method to turn to a specific angle between 0 and 202 degrees (boundaries are for these testing purposes with the HS-755HB servo, but are different from the one on C1C0)
@@ -47,11 +47,26 @@ def headRotate(ang, negative, absolute):
 #	ang = 20
 #	absolute = 0
 #	negative = 0
-	data = bytearray((ang).to_bytes(1,'big') + (absolute).to_bytes(1,'big') + (negative).to_bytes(1,'big'))
-	msg = r2p.encode(bytes("SND","utf-8"),(address).to_bytes(1,'big'),data)
+	#data = bytearray((ang).to_bytes(1,'big') + (absolute).to_bytes(1,'big') + (negative).to_bytes(1,'big')) + bytearray([0,0,0,0,0]) + str.encode("head", "utf-8")
+	data = str(ang) + str(absolute) + str(negative) + "rotathead"
+	msg = r2p.encode(bytes("head","utf-8"),(address).to_bytes(1,'big'),data) 
 	print(msg)
 	print(len(msg))
-	ser.write(msg)
+	#ser.write(msg)
+	return data
 
-
+def head_msg(port, baud, data):
+    init_serial(port, baud)
+    try:
+        msg = r2p.encode(bytes("head","utf-8"), (address).to_bytes(1,'big'), data) 
+        #msg = r2p.encode(bytes('loco','utf-8'), bytearray(motor_power.encode()))
+        print(data.encode())
+        #print(len(motor_power.encode()))
+        print(len(msg))
+        print(msg)
+        print('\n')
+        ser.write(msg)
+        time.sleep(0.1)
+    except KeyboardInterrupt:
+        ser.close()
 

@@ -20,11 +20,11 @@ def on_button_pressed(button):
     #scheduler.communicate(str(button.name))
     #return button.name
     if(button.name == 'button_trigger_l'):
-        hR.leftButton()
+        scheduler.communicate(hR.leftButton())
         #scheduler.communicate('xbox: (-2.00,-2.00)')
     elif(button.name == 'button_trigger_r'):
         #scheduler.communicate('xbox: (+2.00,+2.00)')
-        hR.rightButton()
+        scheduler.communicate(hR.rightButton())
 
 # for xbox control
 def on_button_released(button):
@@ -41,11 +41,11 @@ def on_button_released(button):
     #scheduler.communicate(str(button.name))
     #return button.name
     if(button.name == 'button_trigger_l'):
-        hR.leftButton()
+        scheduler.communicate(hR.leftButton())
         #scheduler.communicate('xbox: (-2.00,-2.00)')
     elif(button.name == 'button_trigger_r'):
         #scheduler.communicate('xbox: (+2.00,+2.00)')
-        hR.rightButton()
+        scheduler.communicate(hR.rightButton())
 
 # for xbox control
 def on_button_held(button):
