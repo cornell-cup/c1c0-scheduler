@@ -1,8 +1,8 @@
 import random
 import serial
 import time 
-#import R2Protocol2 as r2p
-import modified_protocol2 as r2p
+import R2Protocol2 as r2p
+#import modified_protocol2 as r2p
 
 ser = None
 
@@ -48,18 +48,26 @@ def headRotate(ang, negative, absolute):
 #	absolute = 0
 #	negative = 0
 	#data = bytearray((ang).to_bytes(1,'big') + (absolute).to_bytes(1,'big') + (negative).to_bytes(1,'big')) + bytearray([0,0,0,0,0]) + str.encode("head", "utf-8")
-	data = str(ang) + str(absolute) + str(negative) + "rotathead"
-	msg = r2p.encode(bytes("head","utf-8"),(address).to_bytes(1,'big'),data) 
-	print(msg)
-	print(len(msg))
+	data = str(ang) + str(absolute) + str(negative) + 'rotathead'
+	#msg = r2p.encode(bytes("head","utf-8"),(address).to_bytes(1,'big'),data) 
+	#print(msg)
+	#print(len(msg))
 	#ser.write(msg)
 	return data
+
+def init_serial(port, baud):
+    """
+    Opens serial port for locomotion communication
+    port should be a string linux port: Ex dev/ttyTHS1
+    Baud is int the data rate, commonly multiples of 9600
+    """
+    global ser
+    ser = serial.Serial(port, baud)
 
 def head_msg(port, baud, data):
     init_serial(port, baud)
     try:
-        msg = r2p.encode(bytes("head","utf-8"), (address).to_bytes(1,'big'), data) 
-        #msg = r2p.encode(bytes('loco','utf-8'), bytearray(motor_power.encode()))
+        msg = r2p.encode(bytes("head","utf-8"), bytearray(data.encode()))
         print(data.encode())
         #print(len(motor_power.encode()))
         print(len(msg))

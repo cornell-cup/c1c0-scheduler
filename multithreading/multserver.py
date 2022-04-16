@@ -159,9 +159,9 @@ def threaded_client(connection):
                 reply = "xboxcontroller signal: " + data.decode('utf-8')[6:] + " sent to arduino"
                 locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')[6:]) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 connection.sendall(str.encode(reply))
-            elif("head" in data.decode('uft-8')):
-                reply = "xboxcontroller signal: " + data.decode('utf-8')[6:] + " sent to arduino"
-                headrotation.head('/dev/ttyTHS1', 115200, data.decode('utf-8')) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+            elif("head" in data.decode('utf-8')):
+                reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
+                headrotation.head_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 connection.sendall(str.encode(reply))
                 
         elif (client == "path-planning"):

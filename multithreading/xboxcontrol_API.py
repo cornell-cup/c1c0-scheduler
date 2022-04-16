@@ -62,11 +62,13 @@ def on_button_held(button):
     #scheduler.communicate(str(button.name))
     #return button.name
     if(button.name == 'button_trigger_l'):
-        hR.leftButton()
+        scheduler.communicate(hR.leftButton())
+        #hR.leftButton()
         #scheduler.communicate('xbox: (-2.00,-2.00)')
     elif(button.name == 'button_trigger_r'):
+        scheduler.communicate(hR.rightButton())
         #scheduler.communicate('xbox: (+2.00,+2.00)')
-        hR.rightButton()
+        #hR.rightButton()
 
 # for xbox control
 def on_axis_moved(axis):
@@ -97,6 +99,25 @@ def on_axis_moved(axis):
         
     #scheduler.communicate('xbox: axis: ' + str(axis_x) + ' ' + str(axis_y))
     scheduler.communicate('xbox: (' + str(axis_x) + '.00,' + str(axis_y) + '.00)')
+
+def nonzero_axis(axis):
+    if(axis.x <= -0.5):
+        axis_x = -1
+    elif(axis.x <= 0.5):
+        axis_x = 0
+    else:
+        axis_x = 1
+    if(axis.y <= -0.5):
+        axis_y = 1
+    elif(axis.y <= 0.5):
+        axis_y = 0
+    else:
+        axis_y = -1
+        
+    if axis_x == 1 or axis_x == -1 or axis_y == 1 or axis_y == -1:
+        return True
+    return False
+
     #return [str(axis_x), str(axis_y)]
     # (+0.00,-0.00)
     
@@ -153,6 +174,9 @@ def xboxcontroller_control():
 					time.sleep(0.2)
 				if controller.button_trigger_r.is_pressed: # is_pressed is a boolean
 					on_button_held(controller.button_trigger_r)
+					time.sleep(0.2)
+				if nonzero_axis(controller.axis_l):
+					on_axis_moved(controller.axis_l)
 					time.sleep(0.2)
 
 				#TODO add axis value polling
