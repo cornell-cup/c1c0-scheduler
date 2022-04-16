@@ -18,5 +18,5 @@ while(i < 5):
     msg = 'arm ' + arm_angle
     proc1.communicate(msg)
     i = i + 1
-    time.sleep(3)
+    time.sleep(10)
 proc1.close()

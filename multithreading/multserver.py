@@ -7,7 +7,7 @@ import serial
 import sys
 from contextlib import contextmanager
 import subprocess
-sys.path.append('../../c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
+sys.path.append('~/Desktop/c1c0-modules/c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
 import R2Protocol2 as r2p
 import locomotion_API
 import arm_API
@@ -139,12 +139,14 @@ def threaded_client(connection):
                 argument = data.decode('utf-8')[14:]
                 # print("this is pathplanning argument -- " + argument)
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "/home/ccrt/C1C0_path_planning/Jetson.py", argument]) #"client_pathplanning.py" "/home/ccrt/C1C0_path_planning/Jetson.py"
+                pid = subprocess.Popen([sys.executable, "client_pathplanning.py", argument]) #"client_pathplanning.py" "/home/cornellcup-cs-jetson/Desktop/c1c0-modules/C1C0_path_planning/Jetson.py"
             elif ("object-detection" in data.decode('utf-8')):
                 reply = "object-detection started with arguments"
-                argument = data.decode('utf-8')[17:]
+                argument = data.decode('utf-8')[36:]
+                print("data: " + data.decode('utf-8'))
+                print("argument: " + argument) 
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "client_objectdetection.py", argument]) 
+                pid = subprocess.Popen([sys.executable, "client_objectdetection.py", argument]) #"client_objectdetection.py" "/home/cornellcup-cs-jetson/Desktop/c1c0-modules/r2-object_detection/scheduler_test.py"
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
@@ -167,7 +169,8 @@ def threaded_client(connection):
         elif (client == "path-planning"):
             if ("locomotion" in data.decode('utf-8')):
                 motor_power = data.decode('utf-8')[11:]
-                locomotion_API.locomotion_msg('/dev/ttyACM0', 115200, motor_power) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                print(motor_power)
+                locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, motor_power) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 reply = "motor power command sent to locomotion"
                 connection.sendall(str.encode(reply))
             else:

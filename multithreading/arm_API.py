@@ -17,7 +17,7 @@ def init_serial(port,baud):
 def arm_msg(port, baud, arm_angle):
 	init_serial(port, baud)
 	try: 
-		msg = r2p.encode(bytes('PRM','utf-8'), bytearray(arm_angle.encode()))
+		msg = r2p.encode(bytes('PARM','utf-8'), bytearray(arm_angle.encode()))
 		print(msg)
 		ser.write(msg)
 	except KeyboardInterrupt:

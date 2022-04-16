@@ -8,6 +8,6 @@ import time
 proc1 = client.Client("Chatbot")
 proc1.handshake()
 #for i in range(0,10):
-proc1.communicate("object-detection apple")
-time.sleep(3)
+proc1.communicate("path-planning ('move-forward', 5.0)") #object-detection
+time.sleep(120)
 proc1.close()
