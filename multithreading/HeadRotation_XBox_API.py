@@ -48,7 +48,7 @@ def headRotate(ang, negative, absolute):
 #	absolute = 0
 #	negative = 0
 	#data = bytearray((ang).to_bytes(1,'big') + (absolute).to_bytes(1,'big') + (negative).to_bytes(1,'big')) + bytearray([0,0,0,0,0]) + str.encode("head", "utf-8")
-	data = str(ang) + str(absolute) + str(negative) + 'rotathead'
+	data = 'head rot: ' + str(ang) + str(absolute) + str(negative)
 	#msg = r2p.encode(bytes("head","utf-8"),(address).to_bytes(1,'big'),data) 
 	#print(msg)
 	#print(len(msg))
@@ -68,11 +68,11 @@ def head_msg(port, baud, data):
     init_serial(port, baud)
     try:
         msg = r2p.encode(bytes("head","utf-8"), bytearray(data.encode()))
-        print(data.encode())
+        #print(data.encode())
         #print(len(motor_power.encode()))
-        print(len(msg))
-        print(msg)
-        print('\n')
+        #print(len(msg))
+        #print(msg)
+        #print('\n')
         ser.write(msg)
         time.sleep(0.1)
     except KeyboardInterrupt:

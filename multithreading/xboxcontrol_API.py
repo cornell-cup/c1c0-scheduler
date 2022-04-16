@@ -74,20 +74,19 @@ def on_button_held(button):
 def on_axis_moved(axis):
     # TODO send command to locomotion to control the head rotatioon
     # print('Axis {0} moved to {1} {2}'.format(axis.name, axis.x, axis.y))
-    if(axis.x <= -0.5):
+    if(axis.x <= -0.8):
         axis_x = -1
-    elif(axis.x <= 0.5):
+    elif(axis.x <= 0.8):
         axis_x = 0
     else:
         axis_x = 1
-    if(axis.y <= -0.5):
+    if(axis.y <= -0.8):
         axis_y = 1
-    elif(axis.y <= 0.5):
+    elif(axis.y <= 0.8):
         axis_y = 0
     else:
         axis_y = -1
     #print('Axis {0} moved to {1} {2}'.format(axis.name, axis_x, axis_y))
-    #print(str(axis_x), str(axis_y))
     if(axis_x == 1):
         axis_x = '+' + str(axis_x)
     if(axis_x == 0):
@@ -101,20 +100,22 @@ def on_axis_moved(axis):
     scheduler.communicate('xbox: (' + str(axis_x) + '.00,' + str(axis_y) + '.00)')
 
 def nonzero_axis(axis):
-    if(axis.x <= -0.5):
+    if(axis.x <= -0.8):
         axis_x = -1
-    elif(axis.x <= 0.5):
+    elif(axis.x <= 0.8):
         axis_x = 0
     else:
         axis_x = 1
-    if(axis.y <= -0.5):
+    if(axis.y <= -0.8):
         axis_y = 1
-    elif(axis.y <= 0.5):
+    elif(axis.y <= 0.8):
         axis_y = 0
     else:
         axis_y = -1
         
     if axis_x == 1 or axis_x == -1 or axis_y == 1 or axis_y == -1:
+        print("value is: " + str(axis.x) + "  " + str(axis.y))
+        print("convert into: " + str(axis_x) + "  " + str(axis_y))
         return True
     return False
 
@@ -133,22 +134,22 @@ def nonzero_axis(axis):
 def xboxcontroller_control():
 	
 	try:
-		with Xbox360Controller(0, axis_threshold=0.2) as controller:
+		with Xbox360Controller(0, axis_threshold=0.5) as controller:
 			# Button A events
 			controller.button_a.when_pressed = on_button_pressed
 			controller.button_a.when_released = on_button_released
 
 			# Left and right axis move event
-			controller.axis_l.when_moved = on_axis_moved
+			#controller.axis_l.when_moved = on_axis_moved
 			#controller.axis_r.when_moved = on_axis_moved
 			
 			# Left bumper button (small front button)
-			controller.button_trigger_l.when_pressed = on_button_pressed
-			controller.button_trigger_l.when_released = on_button_released
+			#controller.button_trigger_l.when_pressed = on_button_pressed
+			#controller.button_trigger_l.when_released = on_button_released
 			
 			# Right bumper button (small front button)
-			controller.button_trigger_r.when_pressed = on_button_pressed
-			controller.button_trigger_r.when_released = on_button_released
+			#controller.button_trigger_r.when_pressed = on_button_pressed
+			#controller.button_trigger_r.when_released = on_button_released
 			
 			# Button B events
 			controller.button_b.when_pressed = on_button_pressed
@@ -160,16 +161,18 @@ def xboxcontroller_control():
 
 
 			while True:
-				if controller.button_a.is_pressed: # is_pressed is a boolean
-					on_button_held(controller.button_a)
-					time.sleep(0.2)
-				if controller.button_b.is_pressed: # is_pressed is a boolean
-					on_button_held(controller.button_b)
-					time.sleep(0.2)
-				if controller.button_x.is_pressed: # is_pressed is a boolean
-					on_button_held(controller.button_x)
-					time.sleep(0.2)
+				#if controller.button_a.is_pressed: # is_pressed is a boolean
+				#	on_button_held(controller.button_a)
+				#	time.sleep(0.2)
+				#if controller.button_b.is_pressed: # is_pressed is a boolean
+				#	on_button_held(controller.button_b)
+				#	time.sleep(0.2)
+				#if controller.button_x.is_pressed: # is_pressed is a boolean
+				#	on_button_held(controller.button_x)
+				#	time.sleep(0.2)
+				#print(str(controller.button_trigger_l.is_pressed))
 				if controller.button_trigger_l.is_pressed: # is_pressed is a boolean
+					print("yessss")
 					on_button_held(controller.button_trigger_l)
 					time.sleep(0.2)
 				if controller.button_trigger_r.is_pressed: # is_pressed is a boolean
