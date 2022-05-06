@@ -69,6 +69,10 @@ def on_button_held(button):
         scheduler.communicate(hR.rightButton())
         #scheduler.communicate('xbox: (+2.00,+2.00)')
         #hR.rightButton()
+    elif(button.name == 'button_x'):
+        scheduler.communicate('xbox: (+0.00,+0.00)')
+    elif(button.name == 'button_y'):
+        scheduler.communicate('xbox: (+0.00,+0.00)')
 
 # for xbox control
 def on_axis_moved(axis):
@@ -87,6 +91,7 @@ def on_axis_moved(axis):
     else:
         axis_y = -1
     #print('Axis {0} moved to {1} {2}'.format(axis.name, axis_x, axis_y))
+    '''
     if(axis_x == 1):
         axis_x = '+' + str(axis_x)
     if(axis_x == 0):
@@ -95,9 +100,23 @@ def on_axis_moved(axis):
         axis_y = '+' + str(axis_y)
     if(axis_y == 0):
         axis_y = '+' + str(axis_y)
-        
+        '''
     #scheduler.communicate('xbox: axis: ' + str(axis_x) + ' ' + str(axis_y))
-    scheduler.communicate('xbox: (' + str(axis_x) + '.00,' + str(axis_y) + '.00)')
+    lvalue = 0
+    rvalue = 0
+    if(axis_x == 0 and axis_y == 1):
+        lvalue = '+' + str(0.2) + '0'
+        rvalue = '+' + str(0.2) + '0'
+    elif(axis_x == 0 and axis_y == -1):
+        lvalue = '-' + str(0.2) + '0'
+        rvalue = '-' + str(0.2) + '0'
+    elif(axis_x == -1 and axis_y == 0):
+        lvalue = '-' + str(0.2) + '0'
+        rvalue = '+' + str(0.2) + '0'
+    elif(axis_x == 1 and axis_y == 0):
+        lvalue = '+' + str(0.2) + '0'
+        rvalue = '-' + str(0.2) + '0'
+    scheduler.communicate('xbox: (' + str(lvalue) + ',' + str(rvalue) + ')')
 
 def nonzero_axis(axis):
     if(axis.x <= -0.8):
@@ -114,8 +133,8 @@ def nonzero_axis(axis):
         axis_y = -1
         
     if axis_x == 1 or axis_x == -1 or axis_y == 1 or axis_y == -1:
-        print("value is: " + str(axis.x) + "  " + str(axis.y))
-        print("convert into: " + str(axis_x) + "  " + str(axis_y))
+        #print("value is: " + str(axis.x) + "  " + str(axis.y))
+        #print("convert into: " + str(axis_x) + "  " + str(axis_y))
         return True
     return False
 
@@ -178,6 +197,10 @@ def xboxcontroller_control():
 				if controller.button_trigger_r.is_pressed: # is_pressed is a boolean
 					on_button_held(controller.button_trigger_r)
 					time.sleep(0.2)
+				if controller.button_x.is_pressed:
+					on_button_held(controller.button_x)
+				if controller.button_y.is_pressed:
+					on_button_held(controller.button_y)
 				if nonzero_axis(controller.axis_l):
 					on_axis_moved(controller.axis_l)
 					time.sleep(0.2)
