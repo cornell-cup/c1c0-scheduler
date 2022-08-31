@@ -34,7 +34,6 @@ class Client:
         }
         if args:
             kwargs['data'] = ', '.join(args)
-        print(self.channel)
         stub = protocols_pb2_grpc.SchedulerStub(self.channel)
         return stub.SysCommand(protocols_pb2.SysRequest(**kwargs))
 
