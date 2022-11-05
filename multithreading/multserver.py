@@ -124,6 +124,11 @@ def threaded_client(connection):
             client = "object-detection"
             detectClient = False
             connection.sendall(str.encode(reply))
+        elif(data.decode('utf-8') == "I am facial-recognition"):
+            reply = "facial-recognition is recognized"
+            client = "facial-recognition"
+            detectClient = False
+            connection.sendall(str.encode(reply))
         elif not data:
             break
     t.setName(client)
@@ -147,6 +152,11 @@ def threaded_client(connection):
                 print("argument: " + argument) 
                 connection.sendall(str.encode(reply))
                 pid = subprocess.Popen([sys.executable, "client_objectdetection.py", argument]) #"client_objectdetection.py" "/home/cornellcup-cs-jetson/Desktop/c1c0-modules/r2-object_detection/scheduler_test.py"
+            elif ("attendance" in data.decode('utf-8')):
+                reply = "facial-recognition started"
+                print("data: " + data.decode('utf-8'))
+                connection.sendall(str.encode(reply))
+                pid = subprocess.Popen([sys.executable, "-m", "r2_facial_recognition.client"], env={'PYTHONPATH':'/home/cornellcupcs/Desktop/c1c0_modules/r2-facial_recognition_client'})
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
@@ -201,17 +211,28 @@ def threaded_client(connection):
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
+        elif (client == "facial-recognition"):
+            if ("found" in data.decode('utf-8')):
+                people = data.decode('utf-8')[6:]
+                print(people)
+                # locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, motor_power) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                # in place of the line above, need to implement a chatbot API that can receive commands or something
+                reply = "facial recognition results sent to chatbot"
+                connection.sendall(str.encode(reply))
+            else:
+                reply = 'Server Says: ' + data.decode('utf-8')
+                connection.sendall(str.encode(reply))
         if not data:
             break
 
     connection.close()
 
-ser = serial.Serial(
-        port = '/dev/ttyTHS1',
-        baudrate = 115200,
-        )
-ser.close()
-ser.open()
+# ser = serial.Serial(
+#         port = '/dev/ttyTHS1',
+#         baudrate = 115200,
+#         )
+# ser.close()
+# ser.open()
 
 ServerSocket = socket.socket()
 ServerSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -228,10 +249,11 @@ except socket.error as e:
 print('Waiting for a Connection..')
 ServerSocket.listen(5)
 
-xboxThread = threading.Thread(target=xboxcontroller, args=( ))
-xboxThread.start()
-# TODO start chatbot thread 
-
+# xboxThread = threading.Thread(target=xboxcontroller, args=( ))
+# xboxThread.start()
+# TODO start chatbot thread
+# subprocess.Popen([sys.executable, "-m", "r2_facial_recognition.client"], env={'PYTHONPATH':'/home/cornellcupcs/Desktop/c1c0_modules/r2-facial_recognition_client'})
+subprocess.Popen([sys.executable, "client_chatbot.py"])
 #Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
 while True:
     Client, address = ServerSocket.accept()
