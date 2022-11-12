@@ -159,7 +159,7 @@ def threaded_client(connection):
                 reply = "facial-recognition started"
                 print("data: " + data.decode('utf-8'))
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "-m", os.getenv('FACILAL_RECOGNITION')], env={'PYTHONPATH':os.getenv('FACIAL_RECOGNITION_PATH')})
+                pid = subprocess.Popen([sys.executable, "-m", os.getenv('FACIAL_RECOGNITION')], env={'PYTHONPATH':os.getenv('FACIAL_RECOGNITION_PATH')})
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
