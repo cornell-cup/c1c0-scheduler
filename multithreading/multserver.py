@@ -13,6 +13,9 @@ import locomotion_API
 import arm_API
 from xboxcontrol_API import xboxcontroller
 import HeadRotation_XBox_API as headrotation
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # # Serial Data thread that collects data and updates global dictionaries
 # # Alternate method: have data updated locally on the sensor microcontroller;
@@ -144,19 +147,19 @@ def threaded_client(connection):
                 argument = data.decode('utf-8')[14:]
                 # print("this is pathplanning argument -- " + argument)
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "client_pathplanning.py", argument]) #"client_pathplanning.py" "/home/cornellcup-cs-jetson/Desktop/c1c0-modules/C1C0_path_planning/Jetson.py"
+                pid = subprocess.Popen([sys.executable, os.getenv('PATH_PLANNING'), argument]) #"client_pathplanning.py" "/home/cornellcup-cs-jetson/Desktop/c1c0-modules/C1C0_path_planning/Jetson.py"
             elif ("object-detection" in data.decode('utf-8')):
                 reply = "object-detection started with arguments"
                 argument = data.decode('utf-8')[36:]
                 print("data: " + data.decode('utf-8'))
                 print("argument: " + argument) 
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "client_objectdetection.py", argument]) #"client_objectdetection.py" "/home/cornellcup-cs-jetson/Desktop/c1c0-modules/r2-object_detection/scheduler_test.py"
+                pid = subprocess.Popen([sys.executable, os.getenv('OBJECT_DETECTION'), argument]) #"client_objectdetection.py" "/home/cornellcup-cs-jetson/Desktop/c1c0-modules/r2-object_detection/scheduler_test.py"
             elif ("attendance" in data.decode('utf-8')):
                 reply = "facial-recognition started"
                 print("data: " + data.decode('utf-8'))
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "-m", "r2_facial_recognition.client"], env={'PYTHONPATH':'/home/cornellcupcs/Desktop/c1c0_modules/r2-facial_recognition_client'})
+                pid = subprocess.Popen([sys.executable, "-m", os.getenv('FACILAL_RECOGNITION')], env={'PYTHONPATH':os.getenv('FACIAL_RECOGNITION_PATH')})
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
@@ -253,7 +256,7 @@ ServerSocket.listen(5)
 # xboxThread.start()
 # TODO start chatbot thread
 # subprocess.Popen([sys.executable, "-m", "r2_facial_recognition.client"], env={'PYTHONPATH':'/home/cornellcupcs/Desktop/c1c0_modules/r2-facial_recognition_client'})
-subprocess.Popen([sys.executable, "client_chatbot.py"])
+subprocess.Popen([sys.executable, os.getenv('CHATBOT')])
 #Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
 while True:
     Client, address = ServerSocket.accept()
