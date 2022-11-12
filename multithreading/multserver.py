@@ -139,7 +139,7 @@ def threaded_client(connection):
                 argument = data.decode('utf-8')[14:]
                 # print("this is pathplanning argument -- " + argument)
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "client_pathplanning.py", argument]) #"client_pathplanning.py" "/home/cornellcup-cs-jetson/Desktop/c1c0-modules/C1C0_path_planning/Jetson.py"
+                pid = subprocess.Popen([sys.executable, "/home/c1c0-main/c1c0-path_planning_lidarbranch/Jetson.py", argument]) #"client_pathplanning.py" "/home/cornellcup-cs-jetson/Desktop/c1c0-modules/C1C0_path_planning/Jetson.py"
             elif ("object-detection" in data.decode('utf-8')):
                 reply = "object-detection started with arguments"
                 argument = data.decode('utf-8')[36:]
@@ -231,6 +231,7 @@ ServerSocket.listen(5)
 xboxThread = threading.Thread(target=xboxcontroller, args=( ))
 xboxThread.start()
 # TODO start chatbot thread 
+pid = subprocess.Popen([sys.executable, "client_chatbot.py"])
 
 #Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
 while True:

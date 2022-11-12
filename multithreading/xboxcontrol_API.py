@@ -72,7 +72,8 @@ def on_button_held(button):
     elif(button.name == 'button_x'):
         scheduler.communicate('xbox: (+0.00,+0.00)')
     elif(button.name == 'button_y'):
-        scheduler.communicate('xbox: (+0.00,+0.00)')
+        #scheduler.communicate('xbox: (+0.00,+0.00)')
+        scheduler.communicate(hR.zero())
 
 # for xbox control
 def on_axis_moved(axis):
