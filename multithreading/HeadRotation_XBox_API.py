@@ -21,7 +21,7 @@ def close():
 
 #Call this method to return the head to 90 degrees
 def zero():
-	headRotate(90, 0, 1)
+	return headRotate(0, 0, 1)
 	time.sleep(0.2)
 
 #Call this method when the left bumper is held to get the head to rotate to the left at a predetermined rate

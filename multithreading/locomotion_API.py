@@ -33,6 +33,6 @@ def locomotion_msg(port, baud, motor_power):
         #print(msg)
         #print('\n')
         ser.write(msg)
-        time.sleep(0.1)
+        ser.flush()
     except KeyboardInterrupt:
         ser.close()
