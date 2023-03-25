@@ -87,14 +87,14 @@ try_venv() { # $1 = venv path
 try_pip() { # $1 = pip path, $2 = requirements path
     info "\tInstalling $1...\n"
 
-    $1 freeze -r $2 2>&1 > /dev/null | grep -q "not installed"
-    if [ ! $? -eq 0 ]; then
+    $1 freeze -r $2 2>&1 > /dev/null | grep "not installed" &> /dev/null
+    if [ $? -eq 0 ]; then
         if [ "$verbose" = true ]; then $1 install -r $2 || perr "Failed to install $1\n";
         else $1 install -r $2 &> /dev/null || perr "Failed to install $1\n"; fi
     fi
 
-    $1 freeze -r $2 2>&1 > /dev/null | grep -q "not installed"
-    if [ ! $? -eq 0 ]; then return 1;
+    $1 freeze -r $2 2>&1 > /dev/null | grep "not installed" &> /dev/null
+    if [ $? -eq 0 ]; then return 1;
     else return 0; fi
 }
 
