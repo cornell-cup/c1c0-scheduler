@@ -1,5 +1,5 @@
 #include <Servo.h>
-#include "/Users/cecerae/Desktop/servo/headRotation/modified_protocol.h" //Change to whatever path containts the modified R2 protocol, very specific
+#include "modified_protocol.h" //Change to whatever path containts the modified R2 protocol, very specific
 
 
 Servo headServo;  // create servo object to control a servo, currently set up for the HS-755HB servo (non-continuous rotation between 0 and 202 degrees

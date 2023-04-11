@@ -92,7 +92,7 @@ def kill_thread(client):
             threadlist.remove(thread)
             ThreadCount -= 1
 
-def threaded_client(connection):
+def threaded_client(connection: 'socket.socket'):
     """
     Function to initialize a software subprocess as a thread,
     handshake with the scheduler, and process requests from processes 
