@@ -7,14 +7,13 @@ Purposes of the API:
 
 """
 import socket
-import re
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Optional, Iterable, Tuple
 
-from c1c0_scheduler import config, exceptions
+from c1c0_scheduler import config, exceptions, utils
 
 # class ProcessType(Enum):
 #     """
@@ -27,42 +26,33 @@ from c1c0_scheduler import config, exceptions
 
 
 
-def gen_msg(mod: str, *args: 'Iterable[str]') -> str:
-    """
-    Generates msgs sent over socket
-    """
-    return config.CHAR_SEP.join('%s'*(len(args)+1)).format(mod, *args) + config.MSG_SEP
-
-
-def decode_msg(msg):
-    return list(re.findall(config.MSG_REGEX, msg)[0])
 
 class Client:
     """
     The universal C1C0 client, allowing the modules to communicate runtime info back to the scheduler.
     """
     encoding = 'utf-8'
-    RECV_SIZE = 32
+    BUFFER_SIZE = config.BUFFER_SIZE
 
-    def __init__(self, process_name: str, host: 'Optional[str]', port: 'Optional[int]'):
+    def __init__(self, process_name: str, host: 'Optional[str]' = None, port: 'Optional[int]' = None):
         """
         Parameter: process_type
         Invariant: process_type is a string in ["path-planning", "object-detection", "locomotion"]
         """
-        self.sock = socket.socket(config.AF, config.SOCK_TYPE)
+        self.sock = socket.socket(config.AF, config.SOCK_KIND)
 
-        self.process_name: str = process_name
+        self._name: str = process_name
         self.host = config.HOST if host is None else host
         self.port = config.PORT if port is None else port
         self.connected = False
 
     def communicate(self, *payload):
         try:
-            self.sock.send(gen_msg(self.process_name, *payload).encode(self.encoding))
-            resp = self.sock.recv(64).decode(self.encoding)
+            self.sock.send(utils.gen_msg(self.name, *payload).encode(self.encoding))
+            resp = self.sock.recv(self.BUFFER_SIZE).decode(self.encoding)
             # print(resp)
         except socket.error:
-            raise exceptions.DisconnectedClient(self.process_name)
+            raise exceptions.DisconnectedClient(self.name)
         return resp
 
 
@@ -72,12 +62,14 @@ class Client:
 
         See server equivalent [not yet implemented]
         """
-        resp = self.communicate(decode_msg(resp))
+        print(f'Sending {val} to server.')
+        resp = self.communicate(val)
+        print(f'Received {resp} from server.')
         try:
-            sender, datum, *opt = decode_msg(resp)
-            return sender == self.process_name and datum == val
+            sender, datum, *opt = utils.decode_msg(resp)
+            return sender == self.name and datum == val
         except ValueError as e:
-            raise exceptions.DisconnectedClient() from e
+            raise exceptions.DisconnectedClient(self.name) from e
 
     def connect(self, host_port: 'Tuple[str, int]' = None):
         """
@@ -91,7 +83,7 @@ class Client:
         try:
             self.sock.connect(host_port)
         except socket.error as e:
-            raise exceptions.DisconnectedClient(self.process_name) from e
+            raise exceptions.DisconnectedClient(self.name) from e
 
         attempt = 0
         while not self.connected:
@@ -102,9 +94,15 @@ class Client:
 
     def close(self):
         if not self._echo_check('disconnected'):
-            raise exceptions.DisconnectedClient(self.process_name)
+            raise exceptions.DisconnectedClient(self.name)
         self.sock.close()
         # print("closed connection")
     
+    @property
+    def name(self) -> str:
+        return self._name
     
+    @name.setter
+    def name(self, name_):
+        self._name = name_
 
