@@ -10,6 +10,8 @@
 # ./setup_jetson.sh [-v (verbose mode)]
 #-------------------------------------------------------------------------------
 
+#!/bin/bash
+
 # Parse command line arguments
 if [ "$1" = "-v" ]; then verbose=true;
 else verbose=false; fi
@@ -24,8 +26,7 @@ info() { aqua && printf "$1" && none; }
 perr() { ruby && printf "$1" && none; }
 bord() { aqua && echo "----------------------------------------" && none; }
 
-# Attempts to install the given linux package.
-# Returns 0 if successful, 1 if not.
+# Attempts to install the given linux package. Returns 0 if successful, 1 if not.
 try_install() { # $1 = package name
     info "\tInstalling $1...\n"
 
@@ -40,8 +41,8 @@ try_install() { # $1 = package name
     else return 0; fi
 }
 
-# Attempts to clone the given git repository to the given repo path.
-# Returns 0 if successful, 1 if not.
+# Attempts to clone the given git repository to the given repo path. Returns 0
+# if successful, 1 if not.
 try_clone() { # $1 = repo link, $2 = repo path
     info "\tCloning $1...\n"
 
@@ -54,8 +55,8 @@ try_clone() { # $1 = repo link, $2 = repo path
     else return 0; fi
 }
 
-# Attempts to checkout to the given branch of the given git repository.
-# Returns 0 if successful, 1 if not.
+# Attempts to checkout to the given branch of the given git repository. Returns
+# 0 if successful, 1 if not.
 try_checkout() { # $1 = repo path, $2 = branch name
     info "\tChecking $1:$2...\n"
 
@@ -68,8 +69,8 @@ try_checkout() { # $1 = repo path, $2 = branch name
     else return 0; fi
 }
 
-# Attempts to create a python virtual environment in the given venv path.
-# Returns 0 if successful, 1 if not.
+# Attempts to create a python virtual environment in the given venv path. Returns
+# 0 if successful, 1 if not.
 try_venv() { # $1 = venv path
     info "\tCreating $1...\n"
 
@@ -82,20 +83,39 @@ try_venv() { # $1 = venv path
     else return 0; fi
 }
 
-# Attempts to install the given requirements file using the given pip path.
-# Returns 0 if successful, 1 if not.
-try_pip() { # $1 = pip path, $2 = requirements path
+# Attempts to install the given pip package using the given pip path. Returns 0
+# if successful, 1 if not.
+try_pip() { # $1 = pip path, $2 = package name
     info "\tInstalling $1...\n"
 
-    $1 freeze -r $2 2>&1 > /dev/null | grep "not installed" &> /dev/null
-    if [ $? -eq 0 ]; then
-        if [ "$verbose" = true ]; then $1 install -r $2 || perr "Failed to install $1\n";
-        else $1 install -r $2 &> /dev/null || perr "Failed to install $1\n"; fi
+    $1 show $2 &> /dev/null
+    if [ ! $? -eq 0 ]; then
+        if [ "$verbose" = true ]; then $1 install $2 || perr "Failed to install $1\n";
+        else $1 install $2 &> /dev/null || perr "Failed to install $1\n"; fi
     fi
 
-    $1 freeze -r $2 2>&1 > /dev/null | grep "not installed" &> /dev/null
+    $1 show $2 &> /dev/null
     if [ $? -eq 0 ]; then return 1;
     else return 0; fi
+}
+
+# Attempts to read the given requirements file and install all packages that don't
+# need to be built from source. Returns 0 if successful, 1 if not.
+try_requirements() { # $1 = pip path, $2 = requirements file
+    info "\tReading $2...\n"
+
+    skip_list = "Pillow"
+    status=0
+
+    while read -r line; do
+        for word in $skip_list; do
+            if [[ "$line" == "$word" ]]; then continue 2; fi
+        done
+
+        try_pip $1 $line || status=1
+    done < $2
+
+    return $status
 }
 
 # Install python related packages
@@ -119,7 +139,7 @@ bord && info "Building path planning...\n"
 if [ $path_continue = true ]; then try_clone $path_remote $path_local || path_continue=false; fi
 if [ $path_continue = true ]; then try_checkout $path_local $path_branch || path_continue=false; fi
 if [ $path_continue = true ]; then try_venv $path_venv || path_continue=false; fi
-if [ $path_continue = true ]; then try_pip $path_pip $path_req || path_continue=false; fi
+if [ $path_continue = true ]; then try_requirements $path_pip $path_req || path_continue=false; fi
 if [ $path_continue = false ]; then perr "Failed to build path planning\n"; fi
 
 # Facial recognition information
@@ -136,7 +156,7 @@ bord && info "Building facial recognition...\n"
 if [ $facial_continue = true ]; then try_clone $facial_remote $facial_local || facial_continue=false; fi
 if [ $facial_continue = true ]; then try_checkout $facial_local $facial_branch || facial_continue=false; fi
 if [ $facial_continue = true ]; then try_venv $facial_venv || facial_continue=false; fi
-if [ $facial_continue = true ]; then try_pip $facial_pip $facial_req || facial_continue=false; fi
+if [ $facial_continue = true ]; then try_requirements $facial_pip $facial_req || facial_continue=false; fi
 if [ $facial_continue = false ]; then perr "Failed to build facial recognition\n"; fi
 
 # Chatbot information
@@ -153,7 +173,7 @@ bord && info "Building chatbot...\n"
 if [ $chat_continue = true ]; then try_clone $chat_remote $chat_local || chat_continue=false; fi
 if [ $chat_continue = true ]; then try_checkout $chat_local $chat_branch || chat_continue=false; fi
 if [ $chat_continue = true ]; then try_venv $chat_venv || chat_continue=false; fi
-if [ $chat_continue = true ]; then try_pip $chat_pip $chat_req || chat_continue=false; fi
+if [ $chat_continue = true ]; then try_requirements $chat_pip $chat_req || chat_continue=false; fi
 if [ $chat_continue = false ]; then perr "Failed to build chatbot\n"; fi
 
 # Object detection information
@@ -170,7 +190,7 @@ bord && info "Building object detection...\n"
 if [ $object_continue = true ]; then try_clone $object_remote $object_local || object_continue=false; fi
 if [ $object_continue = true ]; then try_checkout $object_local $object_branch || object_continue=false; fi
 if [ $object_continue = true ]; then try_venv $object_venv || object_continue=false; fi
-if [ $object_continue = true ]; then try_pip $object_pip $object_req || object_continue=false; fi
+if [ $object_continue = true ]; then try_requirements $object_pip $object_req || object_continue=false; fi
 if [ $object_continue = false ]; then perr "Failed to build objection detection\n"; fi
 
 # Movement information
