@@ -26,14 +26,14 @@ info() { aqua && printf "$1" && none; }
 perr() { ruby && printf "$1" && none; }
 bord() { aqua && echo "----------------------------------------" && none; }
 
-# Attempts to install the given linux package. Returns 0 if successful, 1 if not.
-try_install() { # $1 = package name
-    info "\tInstalling $1...\n"
+# Attempts to get the given linux package. Returns 0 if successful, 1 if not.
+try_get() { # $1 = package name
+    info "\tGetting $1...\n"
 
     dpkg -s "$1" &> /dev/null
     if [ ! $? -eq 0 ]; then
-        if [ "$verbose" = true ]; then sudo apt-get install "$1" || perr "Failed to install $1\n";
-        else sudo apt-get install "$1" &> /dev/null || perr "Failed to install $1\n"; fi
+        if [ "$verbose" = true ]; then sudo apt-get install "$1" || perr "\tFailed to get $1\n";
+        else sudo apt-get install "$1" &> /dev/null || perr "\tFailed to get $1\n"; fi
     fi
 
     dpkg -s "$1" &> /dev/null
@@ -47,8 +47,8 @@ try_clone() { # $1 = repo link, $2 = repo path
     info "\tCloning $1...\n"
 
     if [ ! -d "$2/.git" ]; then
-        if [ "$verbose" = true ]; then git clone "$1" "$2" || perr "Failed to clone $1\n";
-        else git clone "$1" "$2" &> /dev/null || perr "Failed to clone $1\n"; fi
+        if [ "$verbose" = true ]; then git clone "$1" "$2" || perr "\tFailed to clone $1\n";
+        else git clone "$1" "$2" &> /dev/null || perr "\tFailed to clone $1\n"; fi
     fi
 
     if  [ ! -d "$2/.git" ]; then return 1;
@@ -61,8 +61,8 @@ try_checkout() { # $1 = repo path, $2 = branch name
     info "\tChecking $1:$2...\n"
 
     if [ $(git -C $1 rev-parse --abbrev-ref HEAD) != $2 ]; then
-        if [ "$verbose" = true ]; then git -C $1 checkout $2 || perr "Failed to checkout $1:$2\n";
-        else git -C $1 checkout $2 &> /dev/null || perr "Failed to checkout $1:$2\n"; fi
+        if [ "$verbose" = true ]; then git -C $1 checkout $2 || perr "\tFailed to checkout $1:$2\n";
+        else git -C $1 checkout $2 &> /dev/null || perr "\tFailed to checkout $1:$2\n"; fi
     fi
 
     if [ $(git -C $1 rev-parse --abbrev-ref HEAD) != "$2" ]; then return 1;
@@ -86,12 +86,12 @@ try_venv() { # $1 = venv path
 # Attempts to install the given pip package using the given pip path. Returns 0
 # if successful, 1 if not.
 try_pip() { # $1 = pip path, $2 = package name
-    info "\tInstalling $1...\n"
+    info "\t\tInstalling $2\n"
 
     $1 show $2 &> /dev/null
     if [ ! $? -eq 0 ]; then
-        if [ "$verbose" = true ]; then $1 install $2 || perr "Failed to install $1\n";
-        else $1 install $2 &> /dev/null || perr "Failed to install $1\n"; fi
+        if [ "$verbose" = true ]; then $1 install $2 || perr "\t\tFailed to install $2\n";
+        else $1 install $2 &> /dev/null || perr "\t\tFailed to install $2\n"; fi
     fi
 
     $1 show $2 &> /dev/null
@@ -104,8 +104,12 @@ try_pip() { # $1 = pip path, $2 = package name
 try_requirements() { # $1 = pip path, $2 = requirements file
     info "\tReading $2...\n"
 
-    skip_list = "Pillow"
+    skip_list=""
     status=0
+
+    info "\t\tUpgrading pip...\n"
+    if [ "$verbose" = true ]; then $1 install --upgrade pip || perr "\t\tFailed to upgrade pip\n";
+    else $1 install --upgrade pip &> /dev/null || perr "\t\tFailed to upgrade pip\n"; fi
 
     while read -r line; do
         for word in $skip_list; do
@@ -119,11 +123,12 @@ try_requirements() { # $1 = pip path, $2 = requirements file
 }
 
 # Install python related packages
-bord && info "Installing libraries...\n"
-try_install python3
-try_install python3-dev
-try_install python3-pip
-try_install python3-venv
+bord && info "Getting packages...\n"
+try_get python3
+try_get python3-dev
+try_get python3-pip
+try_get python3-venv
+try_get python3-wheel
 
 # Path planning information
 path_continue=true
