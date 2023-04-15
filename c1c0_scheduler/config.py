@@ -46,10 +46,10 @@ CONTROL_SYSTEMS = {
     }
 }
 
-CHAR_SEP = ':'
+PAYLOAD_SEP = ':'
 MSG_SEP = ';'
 MSG_PLACEHOLDER = '{}'
-MSG_REGEX = f'([\w-]+){CHAR_SEP}([\w\d]+){MSG_SEP}'
+MSG_REGEX = f'([\w-]+){PAYLOAD_SEP}([\w\d]+){MSG_SEP}'
 # MSG_FMT = f'%s{CHAR_SEP}%s{MSG_SEP}'
 
 # As scary as this looks, all it does is remove them from the config namespace.

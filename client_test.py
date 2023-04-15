@@ -12,6 +12,7 @@ args, unknown_args = parser.parse_known_args()
 name = args.mod
 
 client = Client(name)
+print(f'{name}.timeout={client.sock.gettimeout()}')
 client.connect()
 
 time.sleep(10)

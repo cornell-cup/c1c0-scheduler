@@ -48,6 +48,7 @@ class Client:
 
     def communicate(self, *payload):
         try:
+            print(f'Client sending {utils.gen_msg(self.name, *payload).encode(self.encoding)}')
             self.sock.send(utils.gen_msg(self.name, *payload).encode(self.encoding))
             resp = self.sock.recv(self.BUFFER_SIZE).decode(self.encoding)
             # print(resp)

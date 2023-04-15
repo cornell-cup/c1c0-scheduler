@@ -12,7 +12,7 @@ def gen_msg(mod: str, *args: 'Iterable[str]') -> str:
     """
     Generates msgs to be sent over the socket for the scheduler.
     """
-    return config.CHAR_SEP.join(
+    return config.PAYLOAD_SEP.join(
         [config.MSG_PLACEHOLDER]*(len(args)+1)
     ).format(mod, *args) + config.MSG_SEP
 
@@ -22,8 +22,10 @@ def decode_msg(msg) -> 'Iterable[str]':
     Decodes messages that were sent over a socket for the scheduler.
     """
     try:
+        # print(f'Decode got {msg}')
         return list(re.findall(config.MSG_REGEX, msg)[0])
     except IndexError:
+        # print(f'Error, invalid msg: `{msg}`')
         return list()
 
 # For pre-python3.8

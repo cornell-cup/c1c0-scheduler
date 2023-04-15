@@ -1,7 +1,7 @@
 import time
 import threading
 
-from c1c0_scheduler.server import Subsystem, default_read
+from c1c0_scheduler.server import Subsystem, HierarchicalControlSystem, default_read
 from c1c0_scheduler.client import Client
 from c1c0_scheduler.config import SUBSYSTEMS
 from c1c0_scheduler.display import Window
@@ -17,6 +17,11 @@ def delayed_start(subsystem: 'Subsystem', delay):
     print(f'delayed starting: {subsystem.name}')
     subsystem.start()
 
+def chatbot_prot(subsystem: 'HierarchicalControlSystem', delay=0.1):
+    time.sleep(0.1)
+    
+
+
 if __name__ == '__main__':
     with Subsystem.ctx():
         # Created facial client
@@ -26,6 +31,9 @@ if __name__ == '__main__':
         facial_system = Subsystem('facial-recognition', default_read)
         obj_det_system = Subsystem('object-detection', default_read)
         path_planning_system = Subsystem('path-planning', default_read)
+
+        # chatbot = HierarchicalControlSystem('chatbot', group=0, timeout=1.0)
+        # xbox_controller = HierarchalControlSystem('xbox-controller', group=1, timeout=0.0)
 
         facial_system.start()
         obj_det_system.start()

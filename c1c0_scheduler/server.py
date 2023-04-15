@@ -53,6 +53,27 @@ class System:
         self._name = name_
 
 
+
+def default_read(subsystem: 'Subsystem', *args, **kwargs):
+    """
+    
+    """
+    print(f'Server waiting for data from: {subsystem.name}')
+    # Example usage
+    print(subsystem.name)
+    data = subsystem.communicate(send=False, recv=True)
+    while data:
+        mod_name, *payload = data
+        print(f' Server subsystem {subsystem.name} received the msg: {[mod_name, *payload]}')
+        if mod_name != subsystem.name:
+            logger.warning(f'Received data for another module.')
+        if not payload:
+            continue
+        
+        # temp
+        subsystem.buffer += config.MSG_SEP + config.PAYLOAD_SEP.join(payload)
+        data = subsystem.communicate(send=False, recv=True)
+
 class Subsystem(System):
 
     # CLASS-INSTANCE FUNCTIONALIY
@@ -74,7 +95,10 @@ class Subsystem(System):
         while True:
             sock, addr = cls.server_socket.accept()
             resp = sock.recv(cls.buffer_size).decode(cls.encoding)
-            mod, *payload = utils.decode_msg(resp)
+            try:
+                mod, *payload = utils.decode_msg(resp)
+            except ValueError:
+                logger.error(f'Accepted a socket but received no data. sock={sock} addr={addr}')
             cls.headless_clients.update({
                 mod: {
                 'sock': sock,
@@ -105,7 +129,7 @@ class Subsystem(System):
     # INSTANCE FUNCTIONALITY
     # ##############################
 
-    def __init__(self, name: str, read_func: 'Optional[Callable]' = None, 
+    def __init__(self, name: str, read_func: 'Callable' = default_read, 
                  host=config.HOST, port=config.PORT, *args, **kwargs):
         """
         PARAMETERS
@@ -136,7 +160,7 @@ class Subsystem(System):
         self.connected = False
         self.buffer = ''
         
-        self.read_func: 'Callable' = lambda *_, **__: None if read_func is None else read_func
+        self.read_func: 'Callable' = read_func
         self.data_thread = None
         self.process_handle = None
         
@@ -280,11 +304,14 @@ class Subsystem(System):
         payload
             The data sent to the module.
         """
+        # TODO: Refactor to use sock.recv_into
         try:
             if send:
                 self.sock.send(utils.gen_msg(self.name, *payload).encode(self.encoding))
             if recv:
-                return utils.decode_msg(self.sock.recv(self.buffer_size).decode(self.encoding))
+                data = self.sock.recv(self.buffer_size)
+                print(data)
+                return utils.decode_msg(self.sock.recv(self.buffer_size, ).decode(self.encoding))
             # print(resp)
         except socket.error:
             raise exceptions.DisconnectedClient(self.name)
@@ -293,7 +320,9 @@ class Subsystem(System):
 Subsystem.server_thread = threading.Thread(target=Subsystem._accept, daemon=False)
 
 # Used for chatbot and other locally bound systems
-class HierarchalControlSystem(System):
+# class HierarchalControlSystem(System):
+# Temporary demo fix
+class HierarchicalControlSystem(Subsystem):
     """
     A system that has higher priority than other subsystems.
     Individual instances form a hierarchical control system.
@@ -303,11 +332,15 @@ class HierarchalControlSystem(System):
     groups = []
     holding_group = None
 
-    def __init__(self, name, group = 0, timeout = 1.0):
-        super().__init__(name)
+    modules_data = config.CONTROL_SYSTEMS
+
+    # def __init__(self, name, group = 0, timeout = 1.0):
+    # temp
+    def __init__(self, name, group = 0, timeout = 1.0, *args, **kwargs):
+        super().__init__(name, *args, **kwargs)
         self._group = group
         self.timeout = timeout
-        HierarchalControlSystem.groups.append(self)
+        HierarchicalControlSystem.groups.append(self)
     
     @property
     def group(self):
@@ -318,27 +351,35 @@ class HierarchalControlSystem(System):
         self._group = group_
     
     def __enter__(self):
+        # temp demo fix
+        super().__enter__()
+
         self.control_mutex.acquire(True, )
-        HierarchalControlSystem.holding_group = self.group
+        HierarchicalControlSystem.holding_group = self.group
     
     def __exit__(self, *exc_data):
+        # temp demo fix
+        super().__exit__(*exc_data)
+
         self.control_mutex.release()
 
 
-def default_read(subsystem: Subsystem, *args, **kwargs):
-    """
-    
-    """
-    print(f'Server waiting for data from: {subsystem.name}')
-    mod_name, *payload = subsystem.communicate(send=False, recv=True)
-    print(f' Server subsystem {subsystem.name} received the msg: {[mod_name, *payload]}')
-    if mod_name != subsystem.name:
+def spawn_subsystem():
+    return Subsystem()
+
+def default_control_read(control_sys: HierarchicalControlSystem, *args, **kwargs):
+    print(f'Server waiting for data from: {control_sys.name}')
+    # Example usage
+    mod_name, *payload = control_sys.communicate(send=False, recv=True)
+    print(f' Server subsystem {control_sys.name} received the msg: {[mod_name, *payload]}')
+    if mod_name != control_sys.name:
         logger.warning(f'Received data for another module.')
     if not payload:
         return
-    subsystem.buffer += ',' + ','.join(payload)
+    
+    try:
+        cmd, *payload = payload
 
-# Usage example
-
-   
+    except ValueError:
+        return
 
