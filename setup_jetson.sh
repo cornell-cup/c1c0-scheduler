@@ -95,7 +95,7 @@ try_pip() { # $1 = pip path, $2 = package name
     fi
 
     $1 show $2 &> /dev/null
-    if [ $? -eq 0 ]; then return 1;
+    if [ ! $? -eq 0 ]; then return 1;
     else return 0; fi
 }
 
@@ -104,19 +104,22 @@ try_pip() { # $1 = pip path, $2 = package name
 try_requirements() { # $1 = pip path, $2 = requirements file
     info "\tReading $2...\n"
 
-    skip_list=""
+    declare -A special
+    special["blis"]="BLIS_ARCH=\"generic\" $1 install" \
     status=0
 
-    info "\t\tUpgrading pip...\n"
+    info "\tUpgrading $1...\n"
     if [ "$verbose" = true ]; then $1 install --upgrade pip || perr "\t\tFailed to upgrade pip\n";
     else $1 install --upgrade pip &> /dev/null || perr "\t\tFailed to upgrade pip\n"; fi
 
     while read -r line; do
-        for word in $skip_list; do
-            if [[ "$line" == "$word" ]]; then continue 2; fi
+        for key in ${!special[@]}; do
+            if [[ "$line" == *"$key"* ]]; then eval "${special[$key]} $line"; fi
         done
 
         try_pip $1 $line || status=1
+
+	if [ "$status" = 1 ]; then perr "\t\tFailed to install $line\n"; break 1; fi
     done < $2
 
     return $status
