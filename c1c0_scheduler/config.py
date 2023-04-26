@@ -5,8 +5,8 @@ import sys
 # UNIVERSAL SCHEDULER DEVELOPMENT/PRODUCTION MODE SWITCH
 DEBUG = True
 
-# HOST = '127.0.0.1'
-HOST = '192.168.4.127'
+HOST = '127.0.0.1'
+# HOST = '192.168.4.127'
 PORT = 1233
 ENCODING = 'utf-8'
 
@@ -39,10 +39,10 @@ SUBSYSTEMS = {
 
 CONTROL_SYSTEMS = {
     'chatbot': {
-    
+
     },
     'xbox-controller': {
-    
+
     }
 }
 
