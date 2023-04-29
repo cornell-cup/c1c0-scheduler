@@ -125,13 +125,49 @@ try_requirements() { # $1 = pip path, $2 = requirements file
     return $status
 }
 
+# Attempts to download a zip and extract it into a subfolder
+try_get_zip() {
+    subfolder=$1
+    file_host_url=$2
+    filename=$3
+
+    curl -o "$subfolder" "$url"
+    tar -xf "$subfolder/$filename"
+}
+
+# TODO: 
+# Atttempts to install dlib and requisite sublibraries
+try_dlib() {
+    cd dlib
+    git submodule init
+    git submodule update
+
+    mkdir build
+    cd build
+    cmake  -D DLIB_USE_CUDA=1 -D USE_AVX_INSTRUCTIONS=1 ../
+    cmake --build . --config Release
+    cd ..
+
+    python3 setup.py bdist_wheel
+}
+
 # Install python related packages
-bord && info "Getting packages...\n"
+bord && info "Getting Python packages...\n"
 try_get python3
 try_get python3-dev
 try_get python3-pip
 try_get python3-venv
 try_get python3-wheel
+
+# DLib install
+dlib_continue=true
+dlib_remote="https://github.com/davisking/dlib.git"
+dlib_local="../dlib"
+
+bord && info "Building dlib... \n"
+if [ $dlib_continue = true ]; then try_clone $dlib_remote $dlib_local || dlib_continue=false; fi
+if [ $dlib_continue = true ]; then try_dlib || dlib_continue=false; fi
+
 
 # Path planning information
 path_continue=true
@@ -171,18 +207,25 @@ if [ $facial_continue = false ]; then perr "Failed to build facial recognition\n
 chat_continue=true
 chat_remote="git@github.com:cornell-cup/r2-chatbot.git"
 chat_local="../r2-chatbot"
-chat_branch="master"
+chat_branch="chatgpt-integration"
 chat_venv="$chat_local/r2_chatterbot/venv"
 chat_pip="$chat_venv/bin/pip"
 chat_req="$chat_local/r2_chatterbot/requirements.txt"
 
 # Set up chatbot
 bord && info "Building chatbot...\n"
+try_get portaudio19-dev
+try_get python-pyaudio
+try_get python3-pyaudio
+
 if [ $chat_continue = true ]; then try_clone $chat_remote $chat_local || chat_continue=false; fi
 if [ $chat_continue = true ]; then try_checkout $chat_local $chat_branch || chat_continue=false; fi
 if [ $chat_continue = true ]; then try_venv $chat_venv || chat_continue=false; fi
 if [ $chat_continue = true ]; then try_requirements $chat_pip $chat_req || chat_continue=false; fi
 if [ $chat_continue = false ]; then perr "Failed to build chatbot\n"; fi
+
+# Downloads stanford_ner
+try_get_zip "stanford-ner-4.2.0.zip"
 
 # Object detection information
 object_continue=true
