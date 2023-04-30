@@ -1,22 +1,28 @@
-import tkinter as tk
 import time
+import tkinter as tk
+import tkinter.ttk as ttk
 from c1c0_scheduler.server import Subsystem, default_read
 
 
-# Color Constants
+# Color constants
 PAGE_COLOR: str = '#D7F0FF'
 NAVBAR_COLOR: str = '#7FB3D5'
 TABLE_COLOR: str = '#2A3B4C'
 TERMINAL_COLOR: str = '#1F1F1F'
 TERMINAL_TEXT: str = '#F0F0F0'
 
-# Size Constants
+
+# Size constants
 PAGE_RATIO: int = 0.925
 NAVBAR_RATIO: int = 0.075
 BUTTON_PADDING: int = 16
 
-# Time Constants
-DELAY_TIME: int = 500
+
+# Status constants
+DELAY_TIME: int = 100
+TIME_RUNNING: int = 0
+DATA_SENT: int = 0
+DATA_RECEIVED: int = 0
 
 
 class Window(tk.Tk):
@@ -37,6 +43,7 @@ class Window(tk.Tk):
         self.navbar: tk.Frame = tk.Frame(self, height = navbar_height, bg = NAVBAR_COLOR)
         self.navbar.pack(side = 'top', fill = 'both', expand = True)
         self.container.pack(side = 'top', fill = 'x', expand = False)
+
 
     def add(self: 'Window', page: 'HomePage | SystemPage') -> None:
         # Placing page and button
@@ -60,17 +67,31 @@ class HomePage(tk.Frame):
         self.systems: list[Subsystem] = systems
 
         # Creating status table
-        self.status: Table = Table(self, len(systems), 3, 0.48, 0.885)
+        self.status: Table = Table(self, 8, 2, 0.885, 0.48)
         self.status.place(in_ = self, relx = 0.01, rely = 0.02)
+        self.status.edit_head('c0', 'System')
+        self.status.edit_head('c1', 'Status')
 
         # Creating statistics table
-        self.statistic: Table = Table(self, 6, 2, 0.48, 0.885)
+        self.statistic: Table = Table(self, 8, 2, 0.885, 0.48)
         self.statistic.place(in_ = self, relx = 0.51, rely = 0.02)
+        self.statistic.edit_head('c0', 'Statistic')
+        self.statistic.edit_head('c1', 'Value')
+
+        # Updating table
+        self.update()
 
     def update(self: 'HomePage') -> None:
+        # Updating status table
         for i, system in enumerate(self.systems):
-            text: str = "Connected" if system.connected else "Disconnected"
-            self.status.write(i, 0, text)
+            status = 'Connected' if system.connected else 'Disconnected'
+            name = system.name.replace('-', ' ').title() + ':'
+            self.status.edit_row(i, [name, status])
+
+        # Updating statistics table
+        self.statistic.edit_row(0, ['Time Running:', str(TIME_RUNNING / 1000) + ' s'])
+        self.statistic.edit_row(1, ['Data Sent:', str(DATA_SENT / 1000) + ' kb'])
+        self.statistic.edit_row(2, ['Data Received:', str(DATA_RECEIVED / 1000) + ' kb'])
 
     def lift(self: 'HomePage') -> None:
         # Raising page and tables
@@ -79,12 +100,37 @@ class HomePage(tk.Frame):
         self.statistic.tkraise()
 
 
-class Table(tk.Frame):
-    def __init__(self: 'Table', parent: HomePage, wnum: int, hnum: int, width: float, height: float, *args: tuple, **kwargs: dict) -> None:
+class Table(ttk.Treeview):
+    def __init__(self: 'Table', parent: HomePage, hnum: int, wnum: int, height: float, width: float) -> None:
         # Processing arguments
-        self.table_width: int = int(parent.winfo_screenwidth() * width)
-        self.table_height: int = int(parent.winfo_screenheight() * height)
-        super().__init__(bg = TABLE_COLOR, width = self.table_width, height = self.table_height, *args, **kwargs)
+        self.table_width = int(parent.winfo_screenwidth() * width)
+        self.table_height = int(parent.winfo_screenheight() * height)
+        self.cell_width = int(self.table_width / wnum)
+        self.cell_height = int(self.table_height / (hnum + 1))
+
+        # Creating columns and rows
+        self.columns = ['c' + str(i) for i in range(wnum)]
+        super().__init__(parent, column = self.columns, height = hnum, show = 'headings')
+        for column in self.columns:
+            self.heading(column, text = '', anchor = 'center')
+            self.column(column, width = self.cell_width, anchor = 'center')
+        for row in range(hnum):
+            self.insert('', 'end', iid=str(row), values = [''] * wnum)
+
+        # Styling table
+        style = ttk.Style(parent)
+        style.theme_use('clam')
+        style.configure('Treeview', rowheight = self.cell_height, font = ('Helvetica', 16))
+        style.configure('Treeview', background = TABLE_COLOR, foreground = 'white')
+        style.configure('Treeview.Heading', rowheight = self.cell_height, font = ('Helvetica', 24))
+
+    def edit_head(self: 'Table', column: str, text: str) -> None:
+        # Editing heading
+        self.heading(column, text = text)
+
+    def edit_row(self: 'Table', row: int, text: list[str]) -> None:
+        # Editing row
+        self.item(str(row), values = text)
 
 
 class SystemPage(tk.Frame):
@@ -106,8 +152,15 @@ class SystemPage(tk.Frame):
 
     def update(self: 'SystemPage') -> None:
         # Updating terminals
-        self.from_system.write('From System Working ... {0}\n'.format(time.time()))
-        self.to_system.write('To System Working ...{0}\n'.format(time.time()))
+        if (TIME_RUNNING % 1000 == 0):
+            from_str = 'From System Working ... {0}\n'.format(TIME_RUNNING)
+            to_str = 'To System Working ... {0}\n'.format(TIME_RUNNING)
+            self.from_system.write(from_str)
+            self.to_system.write(to_str)
+
+            global DATA_SENT, DATA_RECEIVED
+            DATA_SENT += from_str.encode('utf-8').__len__()
+            DATA_RECEIVED += to_str.encode('utf-8').__len__()
 
     def lift(self: 'SystemPage') -> None:
         # Raising page and terminals
@@ -164,17 +217,23 @@ if __name__ == '__main__':
 
     # Updating window
     def update() -> None:
-        if (facial_recognition is not None): facial_recognition.update()
-        if (object_detection is not None): object_detection.update()
-        if (path_planning is not None): path_planning.update()
+        global TIME_RUNNING, DELAY_TIME
+        TIME_RUNNING += DELAY_TIME
+
+        home_page.update()
+        facial_recognition.update()
+        object_detection.update()
+        path_planning.update()
+
         window.after(DELAY_TIME, update)
 
     # Closing window
     def close() -> None:
         window.destroy()
-        if (facial_system is not None): facial_system.stop()
-        if (object_system is not None): object_system.stop()
-        if (path_system is not None): path_system.stop()
+
+        #! facial_system.stop()
+        #! object_system.stop()
+        #! path_system.stop()
 
     # Starting window
     window.after(DELAY_TIME, update)
