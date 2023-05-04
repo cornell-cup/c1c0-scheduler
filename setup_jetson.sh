@@ -185,20 +185,31 @@ dlib_remote="https://github.com/davisking/dlib.git"
 dlib_local="../dlib"
 
 bord && info "Building dlib... \n"
+# dlib deps
+try_get libavdevice
+try_get libavfilter
+try_get libavformat
+try_get libavcodec
+try_get libswresample
+try_get libswscale
+try_get libavutil
+
 if [ $dlib_continue = true ]; then try_clone $dlib_remote $dlib_local || dlib_continue=false; fi
 if [ $dlib_continue = true ]; then try_dlib || dlib_continue=false; fi
 
-
-try_get libssl-dev
-try_get libxinerama-dev
-try_get libxcursor-dev
-try_get libcanberra-gtk-module
-try_get libcanberra-gtk3-module
+# Pyrealsense2 install
 pyrs2_continue=true
 pyrs2_remote="https://github.com/IntelRealSense/librealsense.git"
 pyrs2_local="../pyrealsense2"
 
 bord && info "Building pyrealsense2... \n"
+# pyrealsense2 deps
+try_get libssl-dev
+try_get libxinerama-dev
+try_get libxcursor-dev
+try_get libcanberra-gtk-module
+try_get libcanberra-gtk3-module
+
 if [ $pyrs2_continue = true ]; then try_clone $pyrs2_remote $pyrs2_local || pyrs2_continue=false; fi
 if [ $pyrs2_continue = true ]; then try_pyrealsense2 || pyrs2_continue=false; fi
 
