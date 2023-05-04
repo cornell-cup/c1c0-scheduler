@@ -184,7 +184,7 @@ dlib_local="../dlib"
 
 bord && info "Building dlib... \n"
 # dlib deps
-if [ $dlib_continue = true ]; then dlib_deps || info "\tSkipping dlib's dependency check\n"
+if [ $dlib_continue = true ]; then dlib_deps || info "\tSkipping dlib's dependency check\n" || dlib_continue=false; fi
 
 if [ $dlib_continue = true ]; then try_clone $dlib_remote $dlib_local || dlib_continue=false; fi
 if [ $dlib_continue = true ]; then try_dlib || dlib_continue=false; fi
