@@ -139,17 +139,19 @@ try_zip() {
 # Atttempts to install dlib and requisite sublibraries
 try_dlib() {
     
-    mkdir dlib && cd lib
-
+    cd dlib
+    info "\tUpdating submodules...\n"
     git submodule init
     git submodule update
 
+    info "\tRunning cmake...\n"
     mkdir build && cd build
 
     cmake  -D DLIB_USE_CUDA=1 -D USE_AVX_INSTRUCTIONS=0 ../
     cmake --build . --config Release
     
     cd ..
+    info "\tBuilding python wrapper..."
     python3 setup.py bdist_wheel
 }
 
