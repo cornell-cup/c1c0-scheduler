@@ -148,7 +148,7 @@ try_dlib() {
     mkdir build &> /dev/null # Silently fail
     cd build
     if [ "$verbose" = true ]; then cmake -D DLIB_USE_CUDA=1 ../ || perr "Failed to run cmake pt 1.";
-    else cmake -D DLIB_USE_CUDA=1 -D DUSE_AVX_INSTRUCTIONS=0 ../ &> /dev/null || perr "Failed to run cmake pt 1."; fi
+    else cmake -D DLIB_USE_CUDA=1 ../ &> /dev/null || perr "Failed to run cmake pt 1."; fi
 
     if [ "$verbose" = true ]; then cmake --build . --config Release || perr "Failed to run cmake pt 2.";
     else cmake --build . --config Release &> /dev/null || perr "Failed to run cmake pt 2."; fi
@@ -186,13 +186,13 @@ dlib_local="../dlib"
 
 bord && info "Building dlib... \n"
 # dlib deps
-try_get libavdevice
-try_get libavfilter
-try_get libavformat
-try_get libavcodec
-try_get libswresample
-try_get libswscale
-try_get libavutil
+try_get libavdevice-dev
+try_get libavfilter-dev
+try_get libavformat-dev
+try_get libavcodec-dev
+try_get libswresample-dev
+try_get libswscale-dev
+try_get libavutil-dev
 
 if [ $dlib_continue = true ]; then try_clone $dlib_remote $dlib_local || dlib_continue=false; fi
 if [ $dlib_continue = true ]; then try_dlib || dlib_continue=false; fi
