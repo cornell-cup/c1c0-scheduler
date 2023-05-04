@@ -191,7 +191,7 @@ if [ $dlib_continue = true ]; then try_dlib || dlib_continue=false; fi
 
 # Pyrealsense2 install
 # pyrs2_continue=true
-pyrs2_continue=false && info "Skipping pyrealsense2, will still recheck deps."
+pyrs2_continue=false && info "Skipping pyrealsense2, will still recheck deps.\n"
 pyrs2_remote="https://github.com/IntelRealSense/librealsense.git"
 pyrs2_local="../pyrealsense2"
 
@@ -208,7 +208,7 @@ if [ $pyrs2_continue = true ]; then try_pyrealsense2 || pyrs2_continue=false; fi
 
 # Path planning information
 # path_continue=true
-path_continue=false && info "Skipping path-planning, will still recheck deps."
+path_continue=false && info "Skipping path-planning, will still recheck deps.\n"
 path_remote="git@github.com:cornell-cup/C1C0_path_planning.git"
 path_local="../c1c0-path-planning"
 path_branch="integration"
@@ -255,6 +255,7 @@ bord && info "Building chatbot...\n"
 try_get portaudio19-dev
 try_get python-pyaudio
 try_get python3-pyaudio
+try_get curl
 # As per https://github.com/jetson-nano-wheels/python3.6-blis-0.7.4
 np_url="https://github.com/jetson-nano-wheels/python3.6-numpy-1.19.4/releases/download/v0.0.2/numpy-1.19.4-cp36-cp36m-linux_aarch64.whl"
 blis_url="https://github.com/jetson-nano-wheels/python3.6-blis-0.7.4/releases/download/v0.0.1/blis-0.7.4-cp36-cp36m-linux_aarch64.whl"
