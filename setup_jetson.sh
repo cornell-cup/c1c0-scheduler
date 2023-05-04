@@ -147,7 +147,7 @@ try_dlib() {
     info "\tRunning cmake...\n"
     mkdir build &> /dev/null # Silently fail
     cd build
-    if [ "$verbose" = true ]; then cmake -D DLIB_USE_CUDA=1 -D DUSE_AVX_INSTRUCTIONS=0 ../ || perr "Failed to run cmake pt 1.";
+    if [ "$verbose" = true ]; then cmake -D DLIB_USE_CUDA=1 ../ || perr "Failed to run cmake pt 1.";
     else cmake -D DLIB_USE_CUDA=1 -D DUSE_AVX_INSTRUCTIONS=0 ../ &> /dev/null || perr "Failed to run cmake pt 1."; fi
 
     if [ "$verbose" = true ]; then cmake --build . --config Release || perr "Failed to run cmake pt 2.";
@@ -256,6 +256,13 @@ if [ $chat_continue = true ]; then try_checkout $chat_local $chat_branch || chat
 if [ $chat_continue = true ]; then try_venv $chat_venv || chat_continue=false; fi
 if [ $chat_continue = true ]; then try_requirements $chat_pip $chat_req || chat_continue=false; fi
 if [ $chat_continue = false ]; then perr "Failed to build chatbot\n"; fi
+
+# Why not..
+try_clone $chat_remote $chat_local &&
+try_checkout $chat_local $chat_branch &&
+try_venv $chat_venv &&
+try_requirements $chat_pip $chat_req ||
+perr "Failed to build chatbot\n"
 
 # Downloads stanford_ner
 try_zip "stanford-ner-4.2.0.zip" "https://nlp.stanford.edu/software/stanford-ner-4.2.0.zip"
