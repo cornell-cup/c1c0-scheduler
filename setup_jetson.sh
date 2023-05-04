@@ -126,29 +126,42 @@ try_requirements() { # $1 = pip path, $2 = requirements file
 }
 
 # Attempts to download a zip and extract it into a subfolder
-try_get_zip() {
-    subfolder=$1
+try_zip() {
+    filename=$1
     file_host_url=$2
-    filename=$3
 
-    curl -o "$subfolder" "$url"
-    tar -xf "$subfolder/$filename"
+    curl -o "$filename" "$file_host_url"
+    tar -xf "$filename"
 }
 
-# TODO: 
+# NOTE: dlib & pyrealsense2 require their own functions due to aarch64 specific build instructions
+
 # Atttempts to install dlib and requisite sublibraries
 try_dlib() {
-    cd dlib
+    
+    mkdir dlib && cd lib
+
     git submodule init
     git submodule update
 
-    mkdir build
-    cd build
+    mkdir build && cd build
+
     cmake  -D DLIB_USE_CUDA=1 -D USE_AVX_INSTRUCTIONS=0 ../
     cmake --build . --config Release
+    
     cd ..
-
     python3 setup.py bdist_wheel
+}
+
+# Solution from https://github.com/35selim/RealSense-Jetson/blob/main/build_pyrealsense2_and_SDK.sh
+try_pyrealsense2() {
+    cd pyrealsense2 && mkdir build && cd build
+    sed -i '3iset(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)\' ../CMakeLists.txt
+    cmake ../ -DBUILD_PYTHON_BINDINGS:bool=true -DPYTHON_EXECUTABLE=/usr/bin/python3 -DCMAKE_BUILD_TYPE=release -DBUILD_EXAMPLES=true -DBUILD_GRAPHICAL_EXAMPLES=true -DBUILD_WITH_CUDA:bool=true
+    sudo make uninstall && sudo make clean
+    sudo make -j$(($(nproc)-1)) && sudo make install
+    echo 'export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python3.6/pyrealsense2' >> ~/.bashrc
+    sudo cp ~/librealsense/config/99-realsense-libusb.rules /etc/udev/rules.d/ && sudo udevadm control --reload-rules && udevadm trigger
 }
 
 # Install python related packages
@@ -159,6 +172,7 @@ try_get python3-pip
 try_get python3-venv
 try_get python3-wheel
 
+
 # DLib install
 dlib_continue=true
 dlib_remote="https://github.com/davisking/dlib.git"
@@ -168,6 +182,19 @@ bord && info "Building dlib... \n"
 if [ $dlib_continue = true ]; then try_clone $dlib_remote $dlib_local || dlib_continue=false; fi
 if [ $dlib_continue = true ]; then try_dlib || dlib_continue=false; fi
 
+
+try_get libssl-dev
+try_get libxinerama-dev
+try_get libxcursor-dev
+try_get libcanberra-gtk-module
+try_get libcanberra-gtk3-module
+pyrs2_continue=true
+pyrs2_remote="https://github.com/IntelRealSense/librealsense.git"
+pyrs2_local="../pyrealsense2"
+
+bord && info "Building pyrealsense2... \n"
+if [ $pyrs2_continue = true ]; then try_clone $pyrs2_remote $pyrs2_local || pyrs2_continue=false; fi
+if [ $pyrs2_continue = true ]; then try_pyrealsense2 || pyrs2_continue=false; fi
 
 # Path planning information
 path_continue=true
@@ -225,7 +252,7 @@ if [ $chat_continue = true ]; then try_requirements $chat_pip $chat_req || chat_
 if [ $chat_continue = false ]; then perr "Failed to build chatbot\n"; fi
 
 # Downloads stanford_ner
-try_get_zip "stanford-ner-4.2.0.zip"
+try_zip "stanford-ner-4.2.0.zip" "https://nlp.stanford.edu/software/stanford-ner-4.2.0.zip"
 
 # Object detection information
 object_continue=true
