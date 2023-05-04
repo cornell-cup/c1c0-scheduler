@@ -126,16 +126,9 @@ try_requirements() { # $1 = pip path, $2 = requirements file
 }
 
 # Attempts to download a zip and extract it into a subfolder
-try_zip() {
-    filename=$1
-    file_host_url=$2
 
-    curl -o "$filename" "$file_host_url"
-    tar -xf "$filename"
-}
 
 # NOTE: dlib & pyrealsense2 require their own functions due to aarch64 specific build instructions
-
 # Atttempts to install dlib and requisite sublibraries
 try_dlib() {
     
@@ -185,26 +178,20 @@ try_get python3-wheel
 
 # DLib install
 # dlib_continue=true
-dlib_continue=false && info "Skipping dlib, will still recheck deps."
+dlib_continue=false && info "Skipping dlib, will still recheck deps.\n"
 dlib_remote="https://github.com/davisking/dlib.git"
 dlib_local="../dlib"
 
 bord && info "Building dlib... \n"
 # dlib deps
-try_get libavdevice-dev
-try_get libavfilter-dev
-try_get libavformat-dev
-try_get libavcodec-dev
-try_get libswresample-dev
-try_get libswscale-dev
-try_get libavutil-dev
+if [ $dlib_continue = true ]; then dlib_deps || info "\tSkipping dlib's dependency check\n"
 
 if [ $dlib_continue = true ]; then try_clone $dlib_remote $dlib_local || dlib_continue=false; fi
 if [ $dlib_continue = true ]; then try_dlib || dlib_continue=false; fi
 
 # Pyrealsense2 install
 # pyrs2_continue=true
-pyrs2_continue=false && echo "Skipping pyrealsense2"
+pyrs2_continue=false && info "Skipping pyrealsense2, will still recheck deps."
 pyrs2_remote="https://github.com/IntelRealSense/librealsense.git"
 pyrs2_local="../pyrealsense2"
 
@@ -220,7 +207,8 @@ if [ $pyrs2_continue = true ]; then try_clone $pyrs2_remote $pyrs2_local || pyrs
 if [ $pyrs2_continue = true ]; then try_pyrealsense2 || pyrs2_continue=false; fi
 
 # Path planning information
-path_continue=true
+# path_continue=true
+path_continue=false && info "Skipping path-planning, will still recheck deps."
 path_remote="git@github.com:cornell-cup/C1C0_path_planning.git"
 path_local="../c1c0-path-planning"
 path_branch="integration"
@@ -267,15 +255,25 @@ bord && info "Building chatbot...\n"
 try_get portaudio19-dev
 try_get python-pyaudio
 try_get python3-pyaudio
+# As per https://github.com/jetson-nano-wheels/python3.6-blis-0.7.4
+np_url="https://github.com/jetson-nano-wheels/python3.6-numpy-1.19.4/releases/download/v0.0.2/numpy-1.19.4-cp36-cp36m-linux_aarch64.whl"
+blis_url="https://github.com/jetson-nano-wheels/python3.6-blis-0.7.4/releases/download/v0.0.1/blis-0.7.4-cp36-cp36m-linux_aarch64.whl"
 
 if [ $chat_continue = true ]; then try_clone $chat_remote $chat_local || chat_continue=false; fi
 if [ $chat_continue = true ]; then try_checkout $chat_local $chat_branch || chat_continue=false; fi
 if [ $chat_continue = true ]; then try_venv $chat_venv || chat_continue=false; fi
+# temp
+if [ $chat_continue = true ]; then try_pip $chat_pip $np_url || chat_continue=false; fi
+if [ $chat_continue = true ]; then try_pip $chat_pip $blis_url || chat_continue=false; fi
+# end temp
 if [ $chat_continue = true ]; then try_requirements $chat_pip $chat_req || chat_continue=false; fi
 if [ $chat_continue = false ]; then perr "Failed to build chatbot\n"; fi
 
 # Downloads stanford_ner
-try_zip "stanford-ner-4.2.0.zip" "https://nlp.stanford.edu/software/stanford-ner-4.2.0.zip"
+stanford_ner_file="stanford-ner-4.2.0.zip"
+stanford_ner_url="https://nlp.stanford.edu/software/$stanford_ner_file"
+curl -o stanford_ner_file stanford_ner_url
+tar -xf stanford_ner_file
 
 # Object detection information
 object_continue=true
