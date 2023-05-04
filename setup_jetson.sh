@@ -76,7 +76,7 @@ try_venv() { # $1 = venv path
 
     if [ ! -d "$1" ]; then
         if [ "$verbose" = true ]; then python3 -m venv "$1" || perr "Failed to create $1\n";
-        else python3 -m venv "$1" &> /dev/null || perr "Failed to create $1\n"; fi
+        else python3 -m venv --system-site-packages "$1" &> /dev/null || perr "Failed to create $1\n"; fi
     fi
 
     if [ ! -d "$1" ]; then return 1;
@@ -140,6 +140,8 @@ try_zip() {
 try_dlib() {
     
     cd ../dlib
+    # TODO: Check if .whl exists in dist/
+
     info "\tUpdating submodules...\n"
     git submodule init
     git submodule update
@@ -161,13 +163,15 @@ try_dlib() {
 
 # Solution from https://github.com/35selim/RealSense-Jetson/blob/main/build_pyrealsense2_and_SDK.sh
 try_pyrealsense2() {
-    cd .. && cd pyrealsense2 && mkdir build && cd build
+    cd ../pyrealsense2
+    mkdir build &> /dev/null
+    cd build
     sed -i '3iset(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)\' ../CMakeLists.txt
     cmake ../ -DBUILD_PYTHON_BINDINGS:bool=true -DPYTHON_EXECUTABLE=/usr/bin/python3 -DCMAKE_BUILD_TYPE=release -DBUILD_EXAMPLES=true -DBUILD_GRAPHICAL_EXAMPLES=true -DBUILD_WITH_CUDA:bool=true
     sudo make uninstall && sudo make clean
     sudo make -j$(($(nproc)-1)) && sudo make install
     echo 'export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python3.6/pyrealsense2' >> ~/.bashrc
-    sudo cp ~/librealsense/config/99-realsense-libusb.rules /etc/udev/rules.d/ && sudo udevadm control --reload-rules && udevadm trigger
+    sudo cp ../config/99-realsense-libusb.rules /etc/udev/rules.d/ && sudo udevadm control --reload-rules && udevadm trigger
 }
 
 # Install python related packages
@@ -180,7 +184,8 @@ try_get python3-wheel
 
 
 # DLib install
-dlib_continue=true
+# dlib_continue=true
+dlib_continue=false && info "Skipping dlib, will still recheck deps."
 dlib_remote="https://github.com/davisking/dlib.git"
 dlib_local="../dlib"
 
@@ -198,7 +203,8 @@ if [ $dlib_continue = true ]; then try_clone $dlib_remote $dlib_local || dlib_co
 if [ $dlib_continue = true ]; then try_dlib || dlib_continue=false; fi
 
 # Pyrealsense2 install
-pyrs2_continue=true
+# pyrs2_continue=true
+pyrs2_continue=false && echo "Skipping pyrealsense2"
 pyrs2_remote="https://github.com/IntelRealSense/librealsense.git"
 pyrs2_local="../pyrealsense2"
 
