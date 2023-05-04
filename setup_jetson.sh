@@ -148,10 +148,10 @@ try_dlib() {
     mkdir build
     cd build
     if [ "$verbose" = true ]; then cmake -D DLIB_USE_CUDA=1 -D DUSE_AVX_INSTRUCTIONS=0 ../ || perr "Failed to run cmake pt 1.";
-    else cmake -D DLIB_USE_CUDA=1 -D DUSE_AVX_INSTRUCTIONS=0 ../ &> /dev/null || perr "Failed to run cmake pt 1."
+    else cmake -D DLIB_USE_CUDA=1 -D DUSE_AVX_INSTRUCTIONS=0 ../ &> /dev/null || perr "Failed to run cmake pt 1."; fi
 
     if [ "$verbose" = true ]; then cmake --build . --config Release || perr "Failed to run cmake pt 2.";
-    else cmake --build . --config Release &> /dev/null || perr "Failed to run cmake pt 2."
+    else cmake --build . --config Release &> /dev/null || perr "Failed to run cmake pt 2."; fi
     
     
     cd ..
