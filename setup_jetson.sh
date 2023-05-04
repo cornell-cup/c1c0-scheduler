@@ -139,7 +139,7 @@ try_zip() {
 # Atttempts to install dlib and requisite sublibraries
 try_dlib() {
     
-    cd dlib
+    cd .. && cd dlib
     info "\tUpdating submodules...\n"
     git submodule init
     git submodule update
@@ -157,7 +157,7 @@ try_dlib() {
 
 # Solution from https://github.com/35selim/RealSense-Jetson/blob/main/build_pyrealsense2_and_SDK.sh
 try_pyrealsense2() {
-    cd pyrealsense2 && mkdir build && cd build
+    cd .. && cd pyrealsense2 && mkdir build && cd build
     sed -i '3iset(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)\' ../CMakeLists.txt
     cmake ../ -DBUILD_PYTHON_BINDINGS:bool=true -DPYTHON_EXECUTABLE=/usr/bin/python3 -DCMAKE_BUILD_TYPE=release -DBUILD_EXAMPLES=true -DBUILD_GRAPHICAL_EXAMPLES=true -DBUILD_WITH_CUDA:bool=true
     sudo make uninstall && sudo make clean
