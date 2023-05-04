@@ -144,7 +144,7 @@ try_dlib() {
 
     mkdir build
     cd build
-    cmake  -D DLIB_USE_CUDA=1 -D USE_AVX_INSTRUCTIONS=1 ../
+    cmake  -D DLIB_USE_CUDA=1 -D USE_AVX_INSTRUCTIONS=0 ../
     cmake --build . --config Release
     cd ..
 
