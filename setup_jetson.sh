@@ -145,7 +145,7 @@ try_dlib() {
     git submodule update
 
     info "\tRunning cmake...\n"
-    mkdir build
+    mkdir build &> /dev/null # Silently fail
     cd build
     if [ "$verbose" = true ]; then cmake -D DLIB_USE_CUDA=1 -D DUSE_AVX_INSTRUCTIONS=0 ../ || perr "Failed to run cmake pt 1.";
     else cmake -D DLIB_USE_CUDA=1 -D DUSE_AVX_INSTRUCTIONS=0 ../ &> /dev/null || perr "Failed to run cmake pt 1."; fi
