@@ -93,10 +93,21 @@ try_pip() { # $1 = pip path, $2 = package name
         if [ "$verbose" = true ]; then $1 install $2 || perr "\t\tFailed to install $2\n";
         else $1 install $2 &> /dev/null || perr "\t\tFailed to install $2\n"; fi
     fi
-
     $1 show $2 &> /dev/null
     if [ ! $? -eq 0 ]; then return 1;
     else return 0; fi
+}
+
+# No check for blis and others (maybe)
+special_pip() {
+    info "\t\tInstalling $2\n"
+
+    $1 show $2 &> /dev/null
+    if [ ! $? -eq 0 ]; then
+        if [ "$verbose" = true ]; then $1 install $2 || perr "\t\tFailed to install $2\n";
+        else $1 install $2 &> /dev/null || perr "\t\tFailed to install $2\n"; fi
+    fi
+    info "Running $1 show $2\n"
 }
 
 # Attempts to read the given requirements file and install all packages that don't
@@ -105,7 +116,7 @@ try_requirements() { # $1 = pip path, $2 = requirements file
     info "\tReading $2...\n"
 
     declare -A special
-    special["blis"]="BLIS_ARCH=\"generic\" $1 install" \
+    special["blis"]="BLIS_ARCH=\"arm64\" $1 install" \
     status=0
 
     info "\tUpgrading $1...\n"
@@ -131,7 +142,7 @@ try_requirements() { # $1 = pip path, $2 = requirements file
 # NOTE: dlib & pyrealsense2 require their own functions due to aarch64 specific build instructions
 # Atttempts to install dlib and requisite sublibraries
 try_dlib() {
-    
+    # Enters ../dlib/build
     cd ../dlib
     # TODO: Check if .whl exists in dist/
 
@@ -142,20 +153,22 @@ try_dlib() {
     info "\tRunning cmake...\n"
     mkdir build &> /dev/null # Silently fail
     cd build
-    if [ "$verbose" = true ]; then cmake -D DLIB_USE_CUDA=1 ../ || perr "Failed to run cmake pt 1.";
-    else cmake -D DLIB_USE_CUDA=1 ../ &> /dev/null || perr "Failed to run cmake pt 1."; fi
+    if [ "$verbose" = true ]; then cmake -D DLIB_USE_CUDA=1 ../ || perr "Failed to run cmake pt 1.\n";
+    else cmake -D DLIB_USE_CUDA=1 ../ &> /dev/null || perr "Failed to run cmake pt 1.\n"; fi
 
-    if [ "$verbose" = true ]; then cmake --build . --config Release || perr "Failed to run cmake pt 2.";
-    else cmake --build . --config Release &> /dev/null || perr "Failed to run cmake pt 2."; fi
+    if [ "$verbose" = true ]; then cmake --build . --config Release || perr "Failed to run cmake pt 2.\n";
+    else cmake --build . --config Release &> /dev/null || perr "Failed to run cmake pt 2.\n"; fi
     
-    
-    cd ..
+    # TODO: Replace with home dir for script
+    cd ../../c1c0-scheduling
     info "\tBuilding python wrapper..."
     python3 setup.py bdist_wheel
 }
 
 # Solution from https://github.com/35selim/RealSense-Jetson/blob/main/build_pyrealsense2_and_SDK.sh
 try_pyrealsense2() {
+    # Enters ../pyrealsense2/build
+    # TODO: variable path
     cd ../pyrealsense2
     mkdir build &> /dev/null
     cd build
@@ -165,6 +178,8 @@ try_pyrealsense2() {
     sudo make -j$(($(nproc)-1)) && sudo make install
     echo 'export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python3.6/pyrealsense2' >> ~/.bashrc
     sudo cp ../config/99-realsense-libusb.rules /etc/udev/rules.d/ && sudo udevadm control --reload-rules && udevadm trigger
+    # Exits ../pyrealsense2/build
+    cd ../../c1c0-scheduling
 }
 
 # Install python related packages
@@ -225,7 +240,8 @@ if [ $path_continue = true ]; then try_requirements $path_pip $path_req || path_
 if [ $path_continue = false ]; then perr "Failed to build path planning\n"; fi
 
 # Facial recognition information
-facial_continue=true
+# facial_continue=true
+facial_continue=false && info "Skipping facial-recognition, will still recheck deps.\n"
 facial_remote="git@github.com:cornell-cup/r2-facial_recognition_client.git"
 facial_local="../r2-facial_recognition_client"
 facial_branch="updating"
@@ -264,17 +280,22 @@ if [ $chat_continue = true ]; then try_clone $chat_remote $chat_local || chat_co
 if [ $chat_continue = true ]; then try_checkout $chat_local $chat_branch || chat_continue=false; fi
 if [ $chat_continue = true ]; then try_venv $chat_venv || chat_continue=false; fi
 # temp
-if [ $chat_continue = true ]; then try_pip $chat_pip $np_url || chat_continue=false; fi
-if [ $chat_continue = true ]; then try_pip $chat_pip $blis_url || chat_continue=false; fi
+if [ $chat_continue = true ]; then special_pip $chat_pip $np_url || chat_continue=false; fi
+if [ $chat_continue = true ]; then special_pip $chat_pip $blis_url || chat_continue=false; fi
+# TODO: Fix
+if [ $chat_continue = true ]; then $chat_venv/bin/python -m nltk.downloader stopwords $chat_pip $blis_url || chat_continue=false; fi
 # end temp
 if [ $chat_continue = true ]; then try_requirements $chat_pip $chat_req || chat_continue=false; fi
 if [ $chat_continue = false ]; then perr "Failed to build chatbot\n"; fi
 
 # Downloads stanford_ner
+# TODO: Later
 stanford_ner_file="stanford-ner-4.2.0.zip"
-stanford_ner_url="https://nlp.stanford.edu/software/$stanford_ner_file"
-curl -o stanford_ner_file stanford_ner_url
-tar -xf stanford_ner_file
+stanford_ner_url="https://downloads.cs.stanford.edu/nlp/software/$stanford_ner_file"
+# TODO: Add verbose
+# pwd
+# curl -o $stanford_ner_file $stanford_ner_url
+# tar -xf $stanford_ner_file &> /dev/null
 
 # Object detection information
 object_continue=true
