@@ -13,10 +13,20 @@ else:
 proc1 = client.Client("path-planning")
 proc1.handshake()
 argument_list = ["(+0.01,+0.01)", "(+1.25,+0.25)", "(-0.15,+0.15)", "(+0.15,-0.15)", "(-0.05,-0.05)"]
+<<<<<<< Updated upstream
 argument = ["(+0.15,+0.15)", "(+0.15,-0.15)", "(-0.15,+0.15)", "(+0.00,+0.00)", "(-0.15,+0.15)", "(+0.15,-0.15)", "(+0.00,+0.00)"]
 for motor_power in argument:
     msg = "locomotion " + motor_power#"(+0.00,+0.00)"
     print(msg)
     resp = proc1.communicate(msg)
     time.sleep(2)
+=======
+argument = ["(+0.00,+0.00)", "(+0.15,+0.15)", "(-0.15,-0.15)", "(+0.00,+0.00)", "(-0.15,+0.15)", "(+0.15,-0.15)", "(+0.00,+0.00)"]
+stop = ["(+0.00,+0.00)"]
+for motor_power in stop:
+    msg = "locomotion " + motor_power#"(+0.00,+0.00)"
+    print(msg)
+    resp = proc1.communicate(msg)
+    time.sleep(1)
+>>>>>>> Stashed changes
 proc1.close()

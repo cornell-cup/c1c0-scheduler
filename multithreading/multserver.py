@@ -13,6 +13,7 @@ import locomotion_API
 import arm_API
 from xboxcontrol_API import xboxcontroller
 import HeadRotation_XBox_API as headrotation
+import traceback
 
 # # Serial Data thread that collects data and updates global dictionaries
 # # Alternate method: have data updated locally on the sensor microcontroller;
@@ -75,7 +76,15 @@ import HeadRotation_XBox_API as headrotation
     # except KeyboardInterrupt:
         # ser.close()
 
+# Handle exceptions by sending stop command to C1C0
+'''
+def handle_interrupt():
+    locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, "(+0.00,+0.00)")
+    print("os error handeled");
+    sys.exit(0)
 
+signal.signal(signal.SIGINT, handle_interrupt)
+'''
 def kill_thread(client):
     """
     Function for halting a process thread when its work is done
@@ -146,7 +155,12 @@ def threaded_client(connection):
                 print("data: " + data.decode('utf-8'))
                 print("argument: " + argument) 
                 connection.sendall(str.encode(reply))
-                pid = subprocess.Popen([sys.executable, "client_objectdetection.py", argument]) #"client_objectdetection.py" "/home/cornellcup-cs-jetson/Desktop/c1c0-modules/r2-object_detection/scheduler_test.py"
+                pid = subprocess.Popen([sys.executable, os.getenv('OBJECT_DETECTION'), argument]) #"client_objectdetection.py" "/home/cornellcup-cs-jetson/Desktop/c1c0-modules/r2-object_detection/scheduler_test.py"
+            elif ("attendance" in data.decode('utf-8')):
+                reply = "facial-recognition started"
+                print("data: " + data.decode('utf-8'))
+                connection.sendalil(str.encode(reply))
+                pid = subprocess.Popen([sys.executable, "-m", os.getenv('FACIAL_RECOGNITION')], env={'PYTHONPATH':os.getenv('FACIAL_RECOGNITION_PATH')})
             else:
                 reply = 'Server Says: ' + data.decode('utf-8')
                 connection.sendall(str.encode(reply))
@@ -158,20 +172,26 @@ def threaded_client(connection):
                 '''
         elif (client == "xboxcontroller"):
             if ("xbox" in data.decode('utf-8')):
-                print("-------------------------------hello-----------------------")
-                #print(data)
-                #print(data.decode('utf-8')[6:])
-                reply = "xboxcontroller signal: " + data.decode('utf-8')[6:] + " sent to arduino"
-                locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')[6:]) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
-                connection.sendall(str.encode(reply))
+                try:
+                    print("--------------------------xbox-------------------------------")
+                    print(data)
+                    print(data.decode('utf-8')[6:])
+                    reply = "xboxcontroller signal: " + data.decode('utf-8')[6:] + " sent to arduino"
+                    locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')[6:]) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                    connection.sendall(str.encode(reply))
+                except:
+                    #locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, "(+0.00,+0.00)")
+                    handle_interrupt(None, None)
             elif("head" in data.decode('utf-8')):
-                print("-------------------------------hiii-----------------------")
-                #print(data)
-                #print(data.decode('utf-8'))
-                reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
-                headrotation.head_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
-                connection.sendall(str.encode(reply))
-                
+                try:
+                    print("--------------------------head-----------------------------")
+                    #print(data)
+                    #print(data.decode('utf-8'))
+                    reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
+                    headrotation.head_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                    connection.sendall(str.encode(reply))
+                except:
+                    locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, "(+0.00,+0.00)")
         elif (client == "path-planning"):
             if ("locomotion" in data.decode('utf-8')):
                 motor_power = data.decode('utf-8')[11:]
@@ -227,19 +247,45 @@ except socket.error as e:
 
 print('Waiting for a Connection..')
 ServerSocket.listen(5)
+'''
+def xbox_run():
+    try:
+        xboxcontroller()
+    except Exception as e:
+        locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, "(+0.00,+0.00)")
+        print("error handeled plzzzzz LORD");
+        sys.exit(0)
 
+def t1_run(arg1):
+    try:
+        threaded_client(arg1)
+    except Exception as e:
+        locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, "(+0.00,+0.00)")
+        print("T1 thread error");
+        sys.exit(0)
+'''
 xboxThread = threading.Thread(target=xboxcontroller, args=( ))
+#xboxThread.run = xbox_run
 xboxThread.start()
-# TODO start chatbot thread 
-pid = subprocess.Popen([sys.executable, "client_chatbot.py"])
-
+# TODO start chatbot thread
+# subprocess.Popen([sys.executable, "-m", "r2_facial_recognition.client"], env={'PYTHONPATH':'/home/cornellcupcs/Desktop/c1c0_modules/r2-facial_recognition_client'})
+# subprocess.Popen([sys.executable, os.getenv('CHATBOT')])
 #Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
 while True:
-    Client, address = ServerSocket.accept()
-    print('Connected to: ' + address[0] + ':' + str(address[1]))
-    t1 = threading.Thread(target=threaded_client, args=(Client, ))
-    t1.start()
-    threadlist.append(t1)
-    ThreadCount += 1
-    print('Thread Number: ' + str(ThreadCount))
+    try:
+        Client, address = ServerSocket.accept()
+        print('Connected to: ' + address[0] + ':' + str(address[1]))
+        t1 = threading.Thread(target=threaded_client, args=(Client, ))
+    #   t1.run = t1_run(Client)
+        t1.start()
+        threadlist.append(t1)
+        ThreadCount += 1
+        print('Thread Number: ' + str(ThreadCount))
+    except KeyboardInterrupt:
+        locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, "(+0.00,+0.00)")
+       # scheduler.communicate('head rot: 000')
+       # scheduler.communicate('xbox: (+0.00,+0.00)')
+        print("Sent stop to C1C0")
+        sys.exit(0)
+
 ServerSocket.close()

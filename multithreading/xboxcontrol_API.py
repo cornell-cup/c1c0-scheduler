@@ -73,7 +73,7 @@ def on_button_held(button):
         scheduler.communicate('xbox: (+0.00,+0.00)')
     elif(button.name == 'button_y'):
         #scheduler.communicate('xbox: (+0.00,+0.00)')
-        scheduler.communicate(hR.zero())
+        scheduler.communicate('head rot: 000')
 
 # for xbox control
 def on_axis_moved(axis):
@@ -211,7 +211,7 @@ def xboxcontroller_control():
 			signal.pause()
 			
 	except KeyboardInterrupt:
-		pass
+		scheduler.communicate('xbox: (+0.00,+0.00)')
 
 def xboxcontroller():
     global scheduler 
@@ -223,7 +223,6 @@ def xboxcontroller():
         if KeyboardInterrupt:
             scheduler.close()
             break
-
 
 if __name__ == "__main__":
     scheduler = client.Client("xboxcontroller")
