@@ -3,6 +3,7 @@ import signal
 import time
 import client
 import HeadRotation_XBox_API as hR
+import strongarm_API as strong
 
 open = 0
 
@@ -20,11 +21,13 @@ def on_button_pressed(button):
     #scheduler.communicate(str(button.name))
     #return button.name
     if(button.name == 'button_trigger_l'):
-        scheduler.communicate(hR.leftButton())
+        scheduler.communicate(strong.move_elbow(1))
+        #scheduler.communicate(hR.leftButton())
         #scheduler.communicate('xbox: (-2.00,-2.00)')
     elif(button.name == 'button_trigger_r'):
+        scheduler.communicate(strong.move_elbow(2))
         #scheduler.communicate('xbox: (+2.00,+2.00)')
-        scheduler.communicate(hR.rightButton())
+        #scheduler.communicate(hR.rightButton())
 
 # for xbox control
 def on_button_released(button):
@@ -41,11 +44,13 @@ def on_button_released(button):
     #scheduler.communicate(str(button.name))
     #return button.name
     if(button.name == 'button_trigger_l'):
-        scheduler.communicate(hR.leftButton())
+        scheduler.communicate(strong.move_elbow(0))
+        #scheduler.communicate(hR.leftButton())
         #scheduler.communicate('xbox: (-2.00,-2.00)')
     elif(button.name == 'button_trigger_r'):
+        scheduler.communicate(strong.move_elbow(0))
         #scheduler.communicate('xbox: (+2.00,+2.00)')
-        scheduler.communicate(hR.rightButton())
+        #scheduler.communicate(hR.rightButton())
 
 # for xbox control
 def on_button_held(button):
@@ -62,11 +67,13 @@ def on_button_held(button):
     #scheduler.communicate(str(button.name))
     #return button.name
     if(button.name == 'button_trigger_l'):
-        scheduler.communicate(hR.leftButton())
+        scheduler.communicate(strong.move_elbow(1))
+        #scheduler.communicate(hR.leftButton())
         #hR.leftButton()
         #scheduler.communicate('xbox: (-2.00,-2.00)')
     elif(button.name == 'button_trigger_r'):
-        scheduler.communicate(hR.rightButton())
+        scheduler.communicate(strong.move_elbow(2))
+        #scheduler.communicate(hR.rightButton())
         #scheduler.communicate('xbox: (+2.00,+2.00)')
         #hR.rightButton()
     elif(button.name == 'button_x'):

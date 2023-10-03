@@ -13,6 +13,7 @@ import locomotion_API
 import arm_API
 from xboxcontrol_API import xboxcontroller
 import HeadRotation_XBox_API as headrotation
+import strongarm_API as strongarm
 
 # from dotenv import load_dotenv
 
@@ -185,6 +186,12 @@ def threaded_client(connection):
                 reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
                 headrotation.head_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 connection.sendall(str.encode(reply))
+            elif("strong" in data.decode('utf-8')):
+                print("-------------------------------strong-----------------------")
+                print(data)
+                reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
+                strongarm.strong_msg('/dev/ttyTHS1', 9600, data.decode('utf-8'))
+                connection.sendall(str.encode(reply))
                 
         elif (client == "path-planning"):
             if ("locomotion" in data.decode('utf-8')):
@@ -257,7 +264,7 @@ xboxThread = threading.Thread(target=xboxcontroller, args=( ))
 xboxThread.start()
 # TODO start chatbot thread
 # subprocess.Popen([sys.executable, "-m", "r2_facial_recognition.client"], env={'PYTHONPATH':'/home/cornellcupcs/Desktop/c1c0_modules/r2-facial_recognition_client'})
-subprocess.Popen([sys.executable, os.getenv('CHATBOT')])
+# subprocess.Popen([sys.executable, os.getenv('CHATBOT')])
 #Chatbot needs to be created and not killed, or if it gets killed, it needs to be immediately restarted (or sleep it)
 while True:
     Client, address = ServerSocket.accept()
