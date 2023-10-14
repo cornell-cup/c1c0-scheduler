@@ -3,6 +3,7 @@ import signal
 import time
 import client
 import HeadRotation_XBox_API as hR
+import strongarm_API as strong
 
 open = 0
 
@@ -12,19 +13,21 @@ def on_button_pressed(button):
     if not open:
         hR.open()
         open = 1
-    #print('Button {0} was pressed'.format(button.name))
+    print('Button {0} was pressed'.format(button.name))
     #print(button.name)
     #scheduler.communicate('xbox: ' + str(button.name) + ' pressed')
     #scheduler.communicate('xbox: (+1.00,-1.00)')
     #str1 = 'Xbox: '+str(button.name)+' read'
     #scheduler.communicate(str(button.name))
     #return button.name
-    if(button.name == 'button_trigger_l'):
-        scheduler.communicate(hR.leftButton())
+    #if(button.name == 'button_trigger_l'):
+        #scheduler.communicate(strong.move_elbow(1))
+        #scheduler.communicate(hR.leftButton())
         #scheduler.communicate('xbox: (-2.00,-2.00)')
-    elif(button.name == 'button_trigger_r'):
+    #elif(button.name == 'button_trigger_r'):
+        #scheduler.communicate(strong.move_elbow(2))
         #scheduler.communicate('xbox: (+2.00,+2.00)')
-        scheduler.communicate(hR.rightButton())
+        #scheduler.communicate(hR.rightButton())
 
 # for xbox control
 def on_button_released(button):
@@ -40,12 +43,22 @@ def on_button_released(button):
     #str1 = 'Xbox: '+str(button.name)+' rels'
     #scheduler.communicate(str(button.name))
     #return button.name
+
+    # STRONG ARM ELBOW CONTROL
     if(button.name == 'button_trigger_l'):
-        scheduler.communicate(hR.leftButton())
+        scheduler.communicate(strong.move_elbow(0))
+        #scheduler.communicate(hR.leftButton())
         #scheduler.communicate('xbox: (-2.00,-2.00)')
     elif(button.name == 'button_trigger_r'):
+        scheduler.communicate(strong.move_elbow(0))
         #scheduler.communicate('xbox: (+2.00,+2.00)')
-        scheduler.communicate(hR.rightButton())
+        #scheduler.communicate(hR.rightButton())
+    
+    # LOCOMOTION
+    if (button.name == 'trigger_l'):
+        scheduler.communicate(strong.move_shoulder(0))
+    elif (button.name == 'trigger_r'):
+        scheduler.communicate(strong.move_shoulder(0))
 
 # for xbox control
 def on_button_held(button):
@@ -61,17 +74,23 @@ def on_button_held(button):
     #str1 = 'Xbox: '+str(button.name)+' held'
     #scheduler.communicate(str(button.name))
     #return button.name
+    
+    # STRONG ARM ELBOW CONTROL
     if(button.name == 'button_trigger_l'):
-        scheduler.communicate(hR.leftButton())
+        scheduler.communicate(strong.move_elbow(2))
+        #scheduler.communicate(hR.leftButton())
         #hR.leftButton()
         #scheduler.communicate('xbox: (-2.00,-2.00)')
     elif(button.name == 'button_trigger_r'):
-        scheduler.communicate(hR.rightButton())
+        scheduler.communicate(strong.move_elbow(1))
+        #scheduler.communicate(hR.rightButton())
         #scheduler.communicate('xbox: (+2.00,+2.00)')
         #hR.rightButton()
-    elif(button.name == 'button_x'):
+
+    # LOCOMOTION
+    if(button.name == 'button_x'):
         scheduler.communicate('xbox: (+0.00,+0.00)')
-    elif(button.name == 'button_y'):
+    if(button.name == 'button_y'):
         #scheduler.communicate('xbox: (+0.00,+0.00)')
         scheduler.communicate(hR.zero())
 
@@ -113,11 +132,12 @@ def on_axis_moved(axis):
         rvalue = '-' + str(0.2) + '0'
     elif(axis_x == -1 and axis_y == 0):
         lvalue = '-' + str(0.2) + '0'
-        rvalue = '+' + str(0.2) + '0'
+        rvalue = '+' + str(0.2) + '0' 
     elif(axis_x == 1 and axis_y == 0):
         lvalue = '+' + str(0.2) + '0'
         rvalue = '-' + str(0.2) + '0'
     scheduler.communicate('xbox: (' + str(lvalue) + ',' + str(rvalue) + ')')
+
 
 def nonzero_axis(axis):
     if(axis.x <= -0.8):
@@ -141,7 +161,24 @@ def nonzero_axis(axis):
 
     #return [str(axis_x), str(axis_y)]
     # (+0.00,-0.00)
-    
+
+def hat_axis_moved(axis):
+    # STRONG ARM HAND SERVO CONTROL
+    if (axis.x == 1) :
+        scheduler.communicate(strong.move_hand(1))
+    elif (axis.x == -1):
+        scheduler.communicate(strong.move_hand(2))
+    else:
+        scheduler.communicate(strong.move_hand(3))
+
+    # STRONG ARM SPIN SERVO CONTROL
+    if (axis.y == 1) :
+        scheduler.communicate(strong.move_spin(1))
+    elif (axis.y == -1):
+        scheduler.communicate(strong.move_spin(2))
+    else:
+        scheduler.communicate(strong.move_spin(3))    
+
     
  #test
 #def testbutton(button
@@ -163,14 +200,6 @@ def xboxcontroller_control():
 			#controller.axis_l.when_moved = on_axis_moved
 			#controller.axis_r.when_moved = on_axis_moved
 			
-			# Left bumper button (small front button)
-			#controller.button_trigger_l.when_pressed = on_button_pressed
-			#controller.button_trigger_l.when_released = on_button_released
-			
-			# Right bumper button (small front button)
-			#controller.button_trigger_r.when_pressed = on_button_pressed
-			#controller.button_trigger_r.when_released = on_button_released
-			
 			# Button B events
 			controller.button_b.when_pressed = on_button_pressed
 			controller.button_b.when_released = on_button_released
@@ -179,20 +208,23 @@ def xboxcontroller_control():
 			controller.button_x.when_pressed = on_button_pressed
 			controller.button_x.when_released = on_button_released
 
+			# Button trigger l (Left Bumper) events
+			controller.button_trigger_l.when_pressed = on_button_pressed
+			controller.button_trigger_l.when_released = on_button_released
+
+			# Button trigger r (Right Bumper) events
+			controller.button_trigger_r.when_pressed = on_button_pressed
+			controller.button_trigger_r.when_released = on_button_released
+
+			# Hat/DPAD movement event 
+			controller.hat.when_moved = hat_axis_moved
+
 
 			while True:
 				#if controller.button_a.is_pressed: # is_pressed is a boolean
 				#	on_button_held(controller.button_a)
 				#	time.sleep(0.2)
-				#if controller.button_b.is_pressed: # is_pressed is a boolean
-				#	on_button_held(controller.button_b)
-				#	time.sleep(0.2)
-				#if controller.button_x.is_pressed: # is_pressed is a boolean
-				#	on_button_held(controller.button_x)
-				#	time.sleep(0.2)
-				#print(str(controller.button_trigger_l.is_pressed))
 				if controller.button_trigger_l.is_pressed: # is_pressed is a boolean
-					print("yessss")
 					on_button_held(controller.button_trigger_l)
 					time.sleep(0.2)
 				if controller.button_trigger_r.is_pressed: # is_pressed is a boolean
@@ -204,6 +236,9 @@ def xboxcontroller_control():
 					on_button_held(controller.button_y)
 				if nonzero_axis(controller.axis_l):
 					on_axis_moved(controller.axis_l)
+					time.sleep(0.2)
+				if controller.hat.axis.x != 1 or controller.hat.axis.x != -1:
+					hat_axis_moved(controller.hat.axis)
 					time.sleep(0.2)
 
 				#TODO add axis value polling
