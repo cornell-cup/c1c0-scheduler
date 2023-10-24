@@ -5,15 +5,16 @@ import client
 import HeadRotation_XBox_API as hR
 import strongarm_API as strong
 
-open = 0
 
 # for xbox control: kill all thread except chatbot
 def on_button_pressed(button):   
-    global open
-    if not open:
-        hR.open()
-        open = 1
-    print('Button {0} was pressed'.format(button.name))
+    if(button.name == 'button_a'):
+        #scheduler.communicate('xbox: (+0.00,+0.00)')
+        scheduler.communicate(strong.move_shoulder(1))
+    if(button.name == 'button_b'):
+        #scheduler.communicate('xbox: (+0.00,+0.00)')
+        scheduler.communicate(strong.move_shoulder(2))
+    #print('Button {0} was pressed'.format(button.name))
     #print(button.name)
     #scheduler.communicate('xbox: ' + str(button.name) + ' pressed')
     #scheduler.communicate('xbox: (+1.00,-1.00)')
@@ -28,13 +29,8 @@ def on_button_pressed(button):
         #scheduler.communicate(strong.move_elbow(2))
         #scheduler.communicate('xbox: (+2.00,+2.00)')
         #scheduler.communicate(hR.rightButton())
-
 # for xbox control
 def on_button_released(button):
-    global open
-    if not open:
-        hR.open()
-        open = 1
     #print('Button {0} was released'.format(button.name))
     #print(button.name)
     #scheduler.communicate('xbox: ' + str(button.name) + ' released')
@@ -59,13 +55,10 @@ def on_button_released(button):
         scheduler.communicate(strong.move_shoulder(0))
     elif (button.name == 'trigger_r'):
         scheduler.communicate(strong.move_shoulder(0))
-
+    if(button.name == 'button_a' or button.name == 'button_b'):
+        scheduler.communicate(strong.move_shoulder(3))
 # for xbox control
 def on_button_held(button):
-    global open
-    if not open:
-        hR.open()
-        open = 1
     #print('Button {0} was released'.format(button.name))
     #print(button.name)
     #scheduler.communicate('xbox: ' + str(button.name) + ' held')
@@ -93,6 +86,11 @@ def on_button_held(button):
     if(button.name == 'button_y'):
         #scheduler.communicate('xbox: (+0.00,+0.00)')
         scheduler.communicate(hR.zero())
+
+
+    if(button.name == 'button_b'):
+        #scheduler.communicate('xbox: (+0.00,+0.00)')
+        scheduler.communicate(strong.move_shoulder(2))
 
 # for xbox control
 def on_axis_moved(axis):
@@ -162,8 +160,13 @@ def nonzero_axis(axis):
     #return [str(axis_x), str(axis_y)]
     # (+0.00,-0.00)
 
+axis_last = None
 def hat_axis_moved(axis):
+    global axis_last
     # STRONG ARM HAND SERVO CONTROL
+    if((axis.x,axis.y) == axis_last ):
+        return
+    axis_last = axis.x,axis.y
     if (axis.x == 1) :
         scheduler.communicate(strong.move_hand(1))
     elif (axis.x == -1):
@@ -189,64 +192,66 @@ def hat_axis_moved(axis):
 
 # give function handlers to xbox controller package
 def xboxcontroller_control():
-	
-	try:
-		with Xbox360Controller(0, axis_threshold=0.5) as controller:
-			# Button A events
-			controller.button_a.when_pressed = on_button_pressed
-			controller.button_a.when_released = on_button_released
+  
+  try:
+    while(not Xbox360Controller.get_available()):
+        print("Looking for Controller")
+        time.sleep(.5)
+    print("Controller Found")
+    with Xbox360Controller(0, axis_threshold=0.5) as controller:
+        # Button A events
+        controller.button_a.when_pressed = on_button_pressed
+        controller.button_a.when_released = on_button_released
 
-			# Left and right axis move event
-			#controller.axis_l.when_moved = on_axis_moved
-			#controller.axis_r.when_moved = on_axis_moved
-			
-			# Button B events
-			controller.button_b.when_pressed = on_button_pressed
-			controller.button_b.when_released = on_button_released
-			
-			# Button X events
-			controller.button_x.when_pressed = on_button_pressed
-			controller.button_x.when_released = on_button_released
+        # Left and right axis move event
+        #controller.axis_l.when_moved = on_axis_moved
+        #controller.axis_r.when_moved = on_axis_moved
+        
+        # Button B events
+        controller.button_b.when_pressed = on_button_pressed
+        controller.button_b.when_released = on_button_released
+        
+        # Button X events
+        controller.button_x.when_pressed = on_button_pressed
+        controller.button_x.when_released = on_button_released
 
-			# Button trigger l (Left Bumper) events
-			controller.button_trigger_l.when_pressed = on_button_pressed
-			controller.button_trigger_l.when_released = on_button_released
+        # Button trigger l (Left Bumper) events
+        controller.button_trigger_l.when_pressed = on_button_pressed
+        controller.button_trigger_l.when_released = on_button_released
 
-			# Button trigger r (Right Bumper) events
-			controller.button_trigger_r.when_pressed = on_button_pressed
-			controller.button_trigger_r.when_released = on_button_released
+        # Button trigger r (Right Bumper) events
+        controller.button_trigger_r.when_pressed = on_button_pressed
+        controller.button_trigger_r.when_released = on_button_released
 
-			# Hat/DPAD movement event 
-			controller.hat.when_moved = hat_axis_moved
+        # Hat/DPAD movement event 
+        controller.hat.when_moved = hat_axis_moved
 
 
-			while True:
-				#if controller.button_a.is_pressed: # is_pressed is a boolean
-				#	on_button_held(controller.button_a)
-				#	time.sleep(0.2)
-				if controller.button_trigger_l.is_pressed: # is_pressed is a boolean
-					on_button_held(controller.button_trigger_l)
-					time.sleep(0.2)
-				if controller.button_trigger_r.is_pressed: # is_pressed is a boolean
-					on_button_held(controller.button_trigger_r)
-					time.sleep(0.2)
-				if controller.button_x.is_pressed:
-					on_button_held(controller.button_x)
-				if controller.button_y.is_pressed:
-					on_button_held(controller.button_y)
-				if nonzero_axis(controller.axis_l):
-					on_axis_moved(controller.axis_l)
-					time.sleep(0.2)
-				if controller.hat.axis.x != 1 or controller.hat.axis.x != -1:
-					hat_axis_moved(controller.hat.axis)
-					time.sleep(0.2)
+        while True:
+            #if controller.button_a.is_pressed: # is_pressed is a boolean
+            # on_button_held(controller.button_a)
+            # time.sleep(0.2)
+            if controller.button_trigger_l.is_pressed: # is_pressed is a boolean
+                on_button_held(controller.button_trigger_l)
+                time.sleep(0.2)
+            if controller.button_trigger_r.is_pressed: # is_pressed is a boolean
+                on_button_held(controller.button_trigger_r)
+                time.sleep(0.2)
+            if controller.button_x.is_pressed:
+                on_button_held(controller.button_x)
+            if controller.button_y.is_pressed:
+                on_button_held(controller.button_y)
+            if nonzero_axis(controller.axis_l):
+                on_axis_moved(controller.axis_l)
+                time.sleep(0.2)
 
-				#TODO add axis value polling
-				
-			signal.pause()
-			
-	except KeyboardInterrupt:
-		pass
+
+            #TODO add axis value polling
+            
+        signal.pause()
+      
+  except KeyboardInterrupt:
+    pass
 
 def xboxcontroller():
     global scheduler 
@@ -264,13 +269,13 @@ if __name__ == "__main__":
     scheduler = client.Client("xboxcontroller")
     scheduler.handshake()
     #try:
-  	#except:
-    # 	print("Scheduler handshake unsuccesful")
+    #except:
+    #   print("Scheduler handshake unsuccesful")
     while True:
         xboxcontroller_control()
         time.sleep(0.2)
         if KeyboardInterrupt:
             scheduler.close()
             break
-			
+      
 # cat.close()

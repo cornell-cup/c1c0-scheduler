@@ -34,7 +34,7 @@ import strongarm_API as strongarm
     # list_size = len(threadlist)
     # for i in range(list_size):
         # thread = threadlist.pop()
-        # if (thread != chatbotThread):		
+        # if (thread != chatbotThread):   
             # thread.do_run = False
             # print("Thread was killed")
             # ThreadCount -= 1
@@ -173,22 +173,19 @@ def threaded_client(connection):
                 '''
         elif (client == "xboxcontroller"):
             if ("xbox" in data.decode('utf-8')):
-                print("-------------------------------hello-----------------------")
                 #print(data)
                 #print(data.decode('utf-8')[6:])
                 reply = "xboxcontroller signal: " + data.decode('utf-8')[6:] + " sent to arduino"
                 locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')[6:]) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 connection.sendall(str.encode(reply))
             elif("head" in data.decode('utf-8')):
-                print("-------------------------------hiii-----------------------")
                 #print(data)
                 #print(data.decode('utf-8'))
                 reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
                 headrotation.head_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 connection.sendall(str.encode(reply))
             elif("strong" in data.decode('utf-8')):
-                print("-------------------------------strong-----------------------")
-                print(data)
+                #print(data)
                 reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
                 strongarm.strong_msg('/dev/ttyTHS1', 9600, data.decode('utf-8'))
                 connection.sendall(str.encode(reply))
