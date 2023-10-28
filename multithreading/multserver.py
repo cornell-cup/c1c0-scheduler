@@ -10,7 +10,7 @@ import subprocess
 sys.path.append('~/Desktop/c1c0-modules/c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
 import R2Protocol2 as r2p
 import locomotion_API
-import arm_API
+import arm_API as precisearm
 from xboxcontrol_API import xboxcontroller
 import HeadRotation_XBox_API as headrotation
 import strongarm_API as strongarm
@@ -188,6 +188,11 @@ def threaded_client(connection):
                 #print(data)
                 reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
                 strongarm.strong_msg('/dev/ttyTHS1', 9600, data.decode('utf-8'))
+                connection.sendall(str.encode(reply))
+            elif("precise" in data.decode('utf-8')):
+                #print(data)
+                reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
+                precisearm.arm_msg('/dev/ttyTHS1', 9600, data.decode('utf-8'))
                 connection.sendall(str.encode(reply))
                 
         elif (client == "path-planning"):
