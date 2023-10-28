@@ -9,7 +9,7 @@ from contextlib import contextmanager
 import subprocess
 sys.path.append('~/Desktop/c1c0-modules/c1c0-movement/c1c0-movement/Locomotion') #Relative to THIS directory (multithreading)
 import R2Protocol2 as r2p
-import locomotion_API
+import Locomotion_API
 import arm_API as precisearm
 from xboxcontrol_API import xboxcontroller
 import HeadRotation_XBox_API as headrotation
@@ -176,7 +176,7 @@ def threaded_client(connection):
                 #print(data)
                 #print(data.decode('utf-8')[6:])
                 reply = "xboxcontroller signal: " + data.decode('utf-8')[6:] + " sent to arduino"
-                locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')[6:]) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                Locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')[6:]) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 connection.sendall(str.encode(reply))
             elif("head" in data.decode('utf-8')):
                 #print(data)
@@ -199,7 +199,7 @@ def threaded_client(connection):
             if ("locomotion" in data.decode('utf-8')):
                 motor_power = data.decode('utf-8')[11:]
                 print(motor_power)
-                locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, motor_power) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                Locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, motor_power) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 reply = "motor power command sent to locomotion"
                 connection.sendall(str.encode(reply))
             else:
@@ -228,7 +228,7 @@ def threaded_client(connection):
             if ("found" in data.decode('utf-8')):
                 people = data.decode('utf-8')[6:]
                 print(people)
-                # locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, motor_power) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                # Locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, motor_power) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 # in place of the line above, need to implement a chatbot API that can receive commands or something
                 reply = "facial recognition results sent to chatbot"
                 connection.sendall(str.encode(reply))
