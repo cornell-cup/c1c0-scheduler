@@ -18,9 +18,9 @@ def on_button_held(button):
         #scheduler.communicate('xbox: (+0.00,+0.00)')
         scheduler.communicate(strong.move_shoulder(2))
 
-l_last_axis = (0,0)
-# for xbox control
-def on_left_axis_moved(axis):
+last_axis = {}
+def on_axis_moved(axis):
+    global last_axis
     if(axis.x <= -0.8):
         axis_x = -1
     elif(axis.x >= .8):
@@ -33,52 +33,28 @@ def on_left_axis_moved(axis):
         axis_y = -1
     else:
         axis_y = 0
-    global l_last_axis
-    if(l_last_axis == (axis_x,axis_y)):
+    if(axis.name not in last_axis):
+        last_axis[axis.name] = (axis_x,axis_y)
+    elif(last_axis[axis.name] == (axis_x,axis_y)):
         return
-    l_last_axis = (axis_x,axis_y)
-    scheduler.communicate(loco.get_motor_msg(axis_x,axis_y))
+    last_axis[axis.name] = (axis_x,axis_y)
+    return (axis_x,axis_y)
 
-r_last_axis = (0,0)
+# for xbox control
+def on_left_axis_moved(axis):
+    axis = on_axis_moved(axis)
+    if(axis):
+        axis_x,axis_y = axis
+        scheduler.communicate(loco.get_motor_msg(axis_x,axis_y))
+
 # for xbox controll
 def on_right_axis_moved(axis):
-    if(axis.x <= -0.8):
-        axis_x = -1
-    elif(axis.x <= 0.8):
-        axis_x = 0
-    else:
-        axis_x = 1
-    if(axis.y <= -0.8):
-        axis_y = 1
-    elif(axis.y <= 0.8):
-        axis_y = 0
-    else:
-        axis_y = -1
-    global r_last_axis
-    if(r_last_axis == (axis_x,axis_y)):
-        return
-    r_last_axis = (axis_x,axis_y)
-    precise.update_arm_msg(axis_x,axis_y)
+    axis = on_axis_moved(axis)
+    if(axis):
+        axis_x,axis_y = axis
+        precise.update_arm_msg(axis_x,axis_y)
     
-def nonzero_axis(axis):
-    if(axis.x <= -0.8):
-        axis_x = -1
-    elif(axis.x <= 0.8):
-        axis_x = 0
-    else:
-        axis_x = 1
-    if(axis.y <= -0.8):
-        axis_y = 1
-    elif(axis.y <= 0.8):
-        axis_y = 0
-    else:
-        axis_y = -1
-        
-    if axis_x == 1 or axis_x == -1 or axis_y == 1 or axis_y == -1:
-        return True
-    return False
-
-axis_last = None
+axis_last = (0,0)
 def hat_axis_moved(axis):
     global axis_last
     # STRONG ARM HAND SERVO CONTROL
@@ -160,9 +136,7 @@ def xboxcontroller():
 if __name__ == "__main__":
     scheduler = client.Client("xboxcontroller")
     scheduler.handshake()
-    #try:
-    #except:
-    #   print("Scheduler handshake unsuccesful")
+
     while True:
         xboxcontroller_control()
         time.sleep(0.2)

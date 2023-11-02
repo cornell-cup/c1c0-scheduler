@@ -7,18 +7,19 @@ sys.path.append('/home/ccrt/c1c0-movement/c1c0-movement/Locomotion') #Might need
 import R2Protocol2 as r2p
 import serial_API
 
+motor_angles = [0,0,0,0,0,0,0]
+motor_index = 0
+
 def arm_msg(port, baud, data):
     try:
         data_array = decode_scheduler(data)
-        msg = r2p.encode(b"PRM", bytes(convert_16_to_8(data_array,6)))
+        msg = r2p.encode(b"PRM", bytes(convert_16_to_8(data_array,len(motor_angles))))
         ser = serial_API.serial_init()
         ser.write(msg)
         ser.flush()
     except KeyboardInterrupt:
         ser.close()
 
-motor_angles = [0,0,0,0,0,0]
-motor_index = 0
 def update_arm_msg(axis_x,axis_y):
     global motor_angles
     global motor_index
@@ -39,10 +40,10 @@ def update_arm_msg(axis_x,axis_y):
     elif(axis_x == -1 and axis_y == 0):
         motor_index -= 1
         if(motor_index == -1):
-            motor_index = 5
+            motor_index = len(motor_angles)-1
     elif(axis_x == 1 and axis_y == 0):
         motor_index += 1
-        if(motor_index == 6):
+        if(motor_index == len(motor_angles)):
             motor_index = 0
     for index,angle in enumerate(motor_angles):
         if(angle < 0):
