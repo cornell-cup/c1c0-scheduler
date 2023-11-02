@@ -176,30 +176,30 @@ def threaded_client(connection):
                 #print(data)
                 #print(data.decode('utf-8')[6:])
                 reply = "xboxcontroller signal: " + data.decode('utf-8')[6:] + " sent to arduino"
-                Locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')[6:]) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                Locomotion_API.locomotion_msg(data.decode('utf-8')[6:]) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 connection.sendall(str.encode(reply))
             elif("head" in data.decode('utf-8')):
                 #print(data)
                 #print(data.decode('utf-8'))
                 reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
-                headrotation.head_msg('/dev/ttyTHS1', 115200, data.decode('utf-8')) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                headrotation.head_msg(data.decode('utf-8')) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 connection.sendall(str.encode(reply))
             elif("strong" in data.decode('utf-8')):
                 #print(data)
                 reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
-                strongarm.strong_msg('/dev/ttyTHS1', 9600, data.decode('utf-8'))
+                strongarm.strong_msg(data.decode('utf-8'))
                 connection.sendall(str.encode(reply))
             elif("precise" in data.decode('utf-8')):
                 #print(data)
                 reply = "xboxcontroller signal: " + data.decode('utf-8') + " sent to arduino"
-                precisearm.arm_msg('/dev/ttyTHS1', 9600, data.decode('utf-8'))
+                precisearm.arm_msg(data.decode('utf-8'))
                 connection.sendall(str.encode(reply))
                 
         elif (client == "path-planning"):
             if ("locomotion" in data.decode('utf-8')):
                 motor_power = data.decode('utf-8')[11:]
                 print(motor_power)
-                Locomotion_API.locomotion_msg('/dev/ttyTHS1', 115200, motor_power) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
+                Locomotion_API.locomotion_msg(motor_power) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 reply = "motor power command sent to locomotion"
                 connection.sendall(str.encode(reply))
             else:
@@ -210,7 +210,7 @@ def threaded_client(connection):
                 reply = ""
                 arm_angle = data.decode('utf-8')[4:]
                 print(arm_angle)
-                arm_API.arm_msg('/dev/ttyTHS1', 115200, arm_angle)
+                arm_API.arm_msg(arm_angle)
                 reply = "arm angle command sent to precision arm"
                 connection.sendall(str.encode(reply))
 

@@ -10,7 +10,7 @@ import serial_API
 motor_angles = [0,0,0,0,0,0,0]
 motor_index = 0
 
-def arm_msg(port, baud, data):
+def arm_msg(data):
     try:
         data_array = decode_scheduler(data)
         msg = r2p.encode(b"PRM", bytes(convert_16_to_8(data_array,len(motor_angles))))
@@ -51,6 +51,17 @@ def update_arm_msg(axis_x,axis_y):
             print(motor_angles[index])
     print(motor_angles)
     print("motor J" + str(motor_index+1))
+
+def example_arm_msg():
+    temp_motor_angles = motor_angles
+    motor_angles[0] = 10
+    motor_angles[1] = 10
+    motor_angles[2] = 10
+    motor_angles[3] = 10
+    motor_angles[4] = 10
+    motor_angles[5] = 10
+    return ('precise: '+ str(motor_angles))
+    motor_angles = temp_motor_angles
 
 def get_arm_msg():
     global motor_angles

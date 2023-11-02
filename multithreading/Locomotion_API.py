@@ -12,7 +12,7 @@ Locomotion API for use with path_planning.
 sys.path.append('/home/c1c0-main/c1c0-movement/c1c0-movement/Locomotion') #Might need to be resolved
 import R2Protocol2 as r2p
 
-def locomotion_msg(port, baud, motor_power):
+def locomotion_msg(motor_power):
     try:
         msg = r2p.encode(bytes('loco','utf-8'), bytearray(motor_power.encode()))
         ser = serial_API.serial_init()

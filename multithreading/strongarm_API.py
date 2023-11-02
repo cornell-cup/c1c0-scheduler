@@ -41,7 +41,7 @@ def move_shoulder(dir=0):
     return strong_scheduler(data)
     
 
-def strong_msg(port, baud, data):
+def strong_msg(data):
     try:
         data_array = decode_scheduler(data)
         msg = r2p.encode(b"STR", bytes(convert_16_to_8(data_array,4)))

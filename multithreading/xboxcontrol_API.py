@@ -95,6 +95,8 @@ def xboxcontroller_control():
         controller.button_select.when_pressed = lambda x: scheduler.communicate(hR.leftButton())
         controller.button_select.when_released = lambda x: scheduler.communicate(hR.zero())
 
+        controller.button_y.when_released = lambda x: scheduler.communicate(precise.example_arm_msg)
+
         controller.button_start.when_pressed = lambda x: scheduler.communicate(hR.rightButton())
         controller.button_start.when_released = lambda x: scheduler.communicate(hR.zero())
         

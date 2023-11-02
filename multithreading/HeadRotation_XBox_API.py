@@ -41,7 +41,7 @@ def headRotate(ang, negative, absolute):
   #ser.write(msg)
   return data
 
-def head_msg(port, baud, data):
+def head_msg(data):
     try:
         msg = r2p.encode(bytes("head","utf-8"), bytearray(data.encode()))
         #print(data.encode())
