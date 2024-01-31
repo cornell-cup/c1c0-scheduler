@@ -39,7 +39,10 @@ def move_shoulder(dir=0):
     elif dir == 2: data[3] = 2
     else: data[3] = 3
     return strong_scheduler(data)
-    
+
+def zero():
+    data = [3,3,3,3]
+    return strong_scheduler(data)
 
 def strong_msg(data):
     try:

@@ -53,6 +53,7 @@ def on_right_axis_moved(axis):
     if(axis):
         axis_x,axis_y = axis
         precise.update_arm_msg(axis_x,axis_y)
+        scheduler.communicate(precise.get_arm_msg())
     
 axis_last = (0,0)
 def hat_axis_moved(axis):
@@ -77,8 +78,19 @@ def hat_axis_moved(axis):
         scheduler.communicate(strong.move_spin(3))    
 
 # give function handlers to xbox controller package
+
+def stop_all():
+    """
+    kill switch for the robot (might not work right)
+    """
+    scheduler.communicate(precise.zero())
+    scheduler.communicate(strong.zero())
+    scheduler.communicate(loco.zero())
+    scheduler.communicate(hR.zero())
+
 def xboxcontroller_control():
   
+  print("xbox control")
   try:
     while(not Xbox360Controller.get_available()):
         print("Looking for Controller")
@@ -95,7 +107,8 @@ def xboxcontroller_control():
         controller.button_select.when_pressed = lambda x: scheduler.communicate(hR.leftButton())
         controller.button_select.when_released = lambda x: scheduler.communicate(hR.zero())
 
-        controller.button_y.when_released = lambda x: scheduler.communicate(precise.example_arm_msg)
+        controller.button_y.when_released = lambda x: scheduler.communicate(precise.example_arm_msg())
+        controller.button_x.when_pressed = lambda x: (stop_all())
 
         controller.button_start.when_pressed = lambda x: scheduler.communicate(hR.rightButton())
         controller.button_start.when_released = lambda x: scheduler.communicate(hR.zero())
@@ -114,7 +127,7 @@ def xboxcontroller_control():
         controller.axis_l.when_moved = on_left_axis_moved
         controller.axis_r.when_moved = on_right_axis_moved
 
-        controller.button_x.when_released = lambda x: scheduler.communicate(precise.get_arm_msg()) 
+        controller.button_thumb_r.when_released = lambda x: scheduler.communicate(precise.get_arm_msg()) 
 
         while True:
             continue
@@ -122,11 +135,16 @@ def xboxcontroller_control():
       
   except KeyboardInterrupt:
     pass
+  except Exception:
+    print("controller disconnected")
+    xboxcontroller.control()
 
 def xboxcontroller():
     global scheduler 
     scheduler = client.Client("xboxcontroller")
+    print("handshaking")
     scheduler.handshake()
+    print("xbox thread started")
     while True:
         xboxcontroller_control()
         time.sleep(0.2)

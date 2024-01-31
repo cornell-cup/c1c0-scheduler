@@ -14,6 +14,7 @@ import arm_API as precisearm
 from xboxcontrol_API import xboxcontroller
 import HeadRotation_XBox_API as headrotation
 import strongarm_API as strongarm
+import time
 
 # from dotenv import load_dotenv
 
@@ -172,9 +173,10 @@ def threaded_client(connection):
                 connection.sendall(str.encode(reply))
                 '''
         elif (client == "xboxcontroller"):
+            #print(data.decode('utf-8'))
             if ("xbox" in data.decode('utf-8')):
-                #print(data)
-                #print(data.decode('utf-8')[6:])
+                print(data)
+                print(data.decode('utf-8')[6:])
                 reply = "xboxcontroller signal: " + data.decode('utf-8')[6:] + " sent to arduino"
                 Locomotion_API.locomotion_msg(data.decode('utf-8')[6:]) # serial port: /dev/ttyTHS1 USB port: /dev/ttyACM0
                 connection.sendall(str.encode(reply))

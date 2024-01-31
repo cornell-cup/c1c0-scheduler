@@ -28,6 +28,8 @@ def update_arm_msg(axis_x,axis_y):
             motor_angles[motor_index] += 3
         elif(motor_index == 2):
             motor_angles[motor_index] += 5
+        elif(motor_index == 3):
+            motor_angles[motor_index] += 15
         else:
             motor_angles[motor_index] += 5
     elif(axis_x == 0 and axis_y == -1):
@@ -35,6 +37,8 @@ def update_arm_msg(axis_x,axis_y):
             motor_angles[motor_index] -= 3
         elif(motor_index == 2):
             motor_angles[motor_index] -= 5
+        elif(motor_index == 3):
+            motor_angles[motor_index] -= 15
         else:
             motor_angles[motor_index] -= 5
     elif(axis_x == -1 and axis_y == 0):
@@ -53,19 +57,27 @@ def update_arm_msg(axis_x,axis_y):
     print("motor J" + str(motor_index+1))
 
 def example_arm_msg():
-    temp_motor_angles = motor_angles
-    motor_angles[0] = 10
-    motor_angles[1] = 10
+    global motor_angles
+    motor_angles[0] = 30
+    motor_angles[1] = 15
     motor_angles[2] = 10
-    motor_angles[3] = 10
-    motor_angles[4] = 10
-    motor_angles[5] = 10
+    motor_angles[3] = 60
+    motor_angles[4] = 30
+    motor_angles[5] = 30
     return ('precise: '+ str(motor_angles))
-    motor_angles = temp_motor_angles
 
 def get_arm_msg():
     global motor_angles
     return 'precise: '+ str(motor_angles)
+def zero():
+    motor_angles[0] = 0
+    motor_angles[1] = 0
+    motor_angles[2] = 0
+    motor_angles[3] = 0
+    motor_angles[4] = 0
+    motor_angles[5] = 0
+    return 'precise: '+ str(motor_angles)
+
 def decode_scheduler(data):
     """
     Decodes scheduler string data in format 'strong: [1,2,3,3]' back into an array of four numbers as [1,2,3,3]
