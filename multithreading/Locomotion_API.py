@@ -16,7 +16,14 @@ def locomotion_msg(motor_power):
     try:
         msg = r2p.encode(bytes('loco','utf-8'), bytearray(motor_power.encode()))
         ser = serial_API.serial_init()
-        ser.write(msg)
+        ack_decoded = ""
+        # loop if acknowledgement not correct
+        while ack_decoded != "ack":
+            ser.write(msg)
+            ack = ser.read_until(expected = b'\xd2\xe2\xf2') #Tail bits of r2p encoded message, see r2protocol.encode() specification
+            ack_decoded = r2p.decode(ack)
+            print(ack_decoded)
+        # finish and say I just sent it
         ser.flush()
     except KeyboardInterrupt:
         ser.close()
