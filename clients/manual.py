@@ -1,8 +1,9 @@
-import sys; path: str = sys.argv[1]; sys.path.insert(0, path) # Modifying Python Path
+import sys # Default Python Libraries
+path: str = sys.argv[1]; sys.path.insert(0, path) # Modifying Python Path
 
 from scheduler.config import * # Configuration
 from scheduler.client import Client # Client
-from scheduler.util import Message # Utilities
+from scheduler.utils import Message # Utilities
 
 if __name__ == '__main__':
     # Initializing client

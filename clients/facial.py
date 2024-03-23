@@ -1,10 +1,11 @@
-import sys; path: str = sys.argv[1]; sys.path.insert(0, path) # Modifying Python Path
-import time
+import sys, time # Default Python Libraries
+path: str = sys.argv[1]; sys.path.insert(0, path) # Modifying Python Path
 
 from scheduler.config import * # Configuration
-from scheduler.client import Client as SClient # Client
-from scheduler.util import Message # Utilities
-from client.client import Client as FClient # Importing The Client/Task Manager
+from scheduler.client import Client as SClient # Scheduler Client
+from scheduler.utils import Message # Utilities
+
+from client.client import Client as FClient # Facial Client/Task Manager
 
 STALL: int = 3 # Time To Wait For New Task
 
@@ -23,6 +24,7 @@ if __name__ == '__main__':
         split: list[str] = response1.data.split(' ')
         command, args = split[0], split[1:]
         if (command == 'null'): continue
+        if (command == 'exit' or command == 'quit'): break
 
         # Running The Task
         try:

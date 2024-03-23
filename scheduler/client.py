@@ -1,7 +1,7 @@
 import zmq # Standard Python Imports
 
 from scheduler.config import * # Configurations
-from scheduler.util import Message # Utilities
+from scheduler.utils import Message # Utilities
 
 from typing import Optional # Type Hinting
 
