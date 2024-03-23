@@ -41,7 +41,8 @@ def move_shoulder(dir=0):
     return strong_scheduler(data)
 
 def zero():
-    data = [3,3,3,3]
+    global data
+    data = [3,3,3, 3]
     return strong_scheduler(data)
 
 def strong_msg(data):
