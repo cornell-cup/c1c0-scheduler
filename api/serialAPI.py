@@ -30,7 +30,7 @@ def serial_write(data):
 
     global ser
     if ser: ser.write(data)
-    printc(f'[{data}]', SNT_COLOR)
+    printc(f'[{data}]', INF_COLOR)
     ser.flush()
 
 def serial_close():

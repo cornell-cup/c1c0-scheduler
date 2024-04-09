@@ -1,4 +1,6 @@
 playsound
 pyserial
 pyzmq
+setuptools
+wheel
 xbox360controller

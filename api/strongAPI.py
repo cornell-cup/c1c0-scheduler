@@ -1,11 +1,13 @@
 from scheduler.config import * # Configurations
 
+from typing import List # Typing
+
 # data[elbow, spin, hand, shoulder]
 # Elbow:    3-stop,  1-in,    2-out
 # Spin:     3-stop,  1-CW,    2-CCW
 # Hand:     3-stop,  1-close, 2-open
 # Shoulder: 3-stop,  1-up,    2-down
-data: list[int] = [3, 3, 3, 3]
+data: List[int] = [3, 3, 3, 3]
 
 def move_elbow(dir: int = 0) -> str:
     """
@@ -70,7 +72,7 @@ def zero_strong() -> str:
     data = [3, 3, 3, 3]
     return strong_encode(data)
 
-def strong_encode(data: list[int]) -> str:
+def strong_encode(data: List[int]) -> str:
     """
     Encodes the given movements into a message to send to the scheduler.
 
@@ -80,7 +82,7 @@ def strong_encode(data: list[int]) -> str:
 
     return 'strong: ' + str(data)
 
-def strong_decode(msg: str) -> list[int]:
+def strong_decode(msg: str) -> List[int]:
     """
     Decodes the given message into a list of movements.
 

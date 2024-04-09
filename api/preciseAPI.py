@@ -1,5 +1,7 @@
 from scheduler.config import * # Configurations
 
+from typing import List # Typing
+
 motor_angles = [0,0,0,0,0,0,0]
 motor_index  = 0
 
@@ -68,7 +70,7 @@ def zero_precise() -> str:
     motor_angles = [0, 0, 0, 0, 0, 0, motor_angles[6]]
     return precise_encode(motor_angles)
 
-def precise_encode(motor_angles: list[float]) -> str:
+def precise_encode(motor_angles: List[int]) -> str:
     """
     Encodes the given motor angles into a message to send to the scheduler.
 
@@ -78,7 +80,7 @@ def precise_encode(motor_angles: list[float]) -> str:
 
     return 'precise: ' + str(motor_angles)
 
-def precise_decode(msg: str) -> list[int]:
+def precise_decode(msg: str) -> List[int]:
     """
     Decodes the given message into motor angles.
 

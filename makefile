@@ -25,16 +25,16 @@ all: venv
 	venv/bin/python scheduler.py
 
 facial:
-	cd $(FACIAL_DIR) && $(FACIAL_BIN)/python $(FACIAL_EXC) $(SCHEDULER_PATH)
+	cd $(FACIAL_DIR) && sudo $(FACIAL_BIN)/python $(FACIAL_EXC) $(SCHEDULER_PATH)
 
 manual:
-	cd $(MANUAL_DIR) && $(MANUAL_BIN)/python $(MANUAL_EXC) $(SCHEDULER_PATH)
+	cd $(MANUAL_DIR) && sudo $(MANUAL_BIN)/python $(MANUAL_EXC) $(SCHEDULER_PATH)
 
 movement:
-	cd $(MVMENT_DIR) && $(MVMENT_BIN)/python $(MVMENT_EXC) $(SCHEDULER_PATH)
+	cd $(MVMENT_DIR) && sudo $(MVMENT_BIN)/python $(MVMENT_EXC) $(SCHEDULER_PATH)
 
 controller:
-	cd $(CONTRL_DIR) && $(CONTRL_BIN)/python $(CONTRL_EXC) $(SCHEDULER_PATH)
+	cd $(CONTRL_DIR) && sudo $(CONTRL_BIN)/python $(CONTRL_EXC) $(SCHEDULER_PATH)
 
 build:
 	mkdir -p $(FACIAL_DIR) && cp $(FACIAL_PRV) $(FACIAL_DIR)/$(FACIAL_EXC)
@@ -52,4 +52,5 @@ clean:
 venv:
 	rm -rf venv/
 	python$(PYTHON_VER) -m venv venv/
+	venv/bin/pip install --upgrade pip
 	venv/bin/pip install -r requirements.txt

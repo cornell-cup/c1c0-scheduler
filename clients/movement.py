@@ -1,6 +1,8 @@
 import sys, time # Default Python Libraries
 path: str = sys.argv[1]; sys.path.insert(0, path) # Modifying Python Path
 
+from typing import List # Typing
+
 from scheduler.config import * # Configuration
 from scheduler.client import Client # Client
 from scheduler.utils import Message, printc # Utilities
@@ -15,7 +17,7 @@ import R2Protocol2 as r2p # Serial encoding/decoding protocol
 
 STALL: int = 1 # Time To Wait For New Task
 
-def convert_16_to_8(arr: str, length: int) -> list[int]:
+def convert_16_to_8(arr: str, length: int) -> List[int]:
     """
     Convert the given array from 16-bit to 8-bit format.
 
