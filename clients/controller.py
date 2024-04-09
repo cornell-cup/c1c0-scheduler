@@ -3,7 +3,7 @@ path: str = sys.argv[1]; sys.path.insert(0, path) # Modifying Python Path
 
 from xbox360controller import Xbox360Controller # Xbox Controller
 from playsound import playsound # Sound Player
-from typing import Optional # Typing
+from typing import Dict, List, Optional, Tuple # Typing
 
 from scheduler.config import * # Configuration
 from scheduler.client import Client # Client
@@ -14,11 +14,11 @@ from api.preciseAPI import * # Precise Utilities
 from api.strongAPI import * # Strong Utilities
 from api.rotateAPI import * # Rotate Utilities
 
-last_axis: dict[str, tuple] = {}
-strong_axis: tuple          = (0, 0)
+last_axis: Dict[str, Tuple] = {}
+strong_axis: Tuple          = (0, 0)
 threshold: float            = .5
 
-def on_axis_moved(axis: any) -> Optional[tuple[float, float]]:
+def on_axis_moved(axis: any) -> Optional[Tuple[float, float]]:
     """
     Converts controller values of an axis to a tuple of floats depending on a threshold.
 
@@ -63,7 +63,7 @@ def on_right_axis_moved(axis: any) -> None:
     @param axis: Axis values of the controller.
     """
 
-    axis_values: Optional[tuple[float, float]] = on_axis_moved(axis)
+    axis_values: Optional[Tuple[float, float]] = on_axis_moved(axis)
     if (axis_values is not None):
         axis_x, axis_y = axis_values
         update_precise(axis_x, axis_y)
@@ -152,8 +152,7 @@ if __name__ == '__main__':
     client.connect()
 
     # Obtaining R2D2 sounds
-    global sounds
-    sounds: list[str] = []
+    sounds: List[str] = []
     for i in range(1, 6): sounds.append('../assets/r2d2-'+str(i)+'.mp3')
 
     # Initializing Xbox Controller
