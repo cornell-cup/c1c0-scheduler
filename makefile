@@ -1,5 +1,5 @@
 SCHEDULER_PATH := $(shell pwd)
-PYTHON_VER     := 3.11
+PYTHON_VER     := 3.6
 
 FACIAL_BIN := ../r2-facial_recognition_client/venv/bin
 FACIAL_DIR := ../r2-facial_recognition_client
@@ -18,8 +18,8 @@ MVMENT_PRV := clients/movement.py
 
 CONTRL_BIN := $(SCHEDULER_PATH)/venv/bin
 CONTRL_DIR := temp
-CONTRL_EXC := control_comm.py
-CONTRL_PRV := clients/control.py
+CONTRL_EXC := controller_comm.py
+CONTRL_PRV := clients/controller.py
 
 all: venv
 	venv/bin/python scheduler.py
