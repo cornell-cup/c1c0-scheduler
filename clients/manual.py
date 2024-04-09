@@ -3,7 +3,7 @@ path: str = sys.argv[1]; sys.path.insert(0, path) # Modifying Python Path
 
 from scheduler.config import * # Configuration
 from scheduler.client import Client # Client
-from scheduler.utils import Message # Utilities
+from scheduler.utils import Message, printc # Utilities
 
 if __name__ == '__main__':
     # Initializing client
@@ -21,4 +21,4 @@ if __name__ == '__main__':
 
     # Closing client
     client.close()
-    print('Program terminated.')
+    printc('Program terminated.', INF_COLOR)

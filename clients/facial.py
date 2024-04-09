@@ -3,7 +3,7 @@ path: str = sys.argv[1]; sys.path.insert(0, path) # Modifying Python Path
 
 from scheduler.config import * # Configuration
 from scheduler.client import Client as SClient # Scheduler Client
-from scheduler.utils import Message # Utilities
+from scheduler.utils import Message, printc # Utilities
 
 from client.client import Client as FClient # Facial Client/Task Manager
 
@@ -23,7 +23,7 @@ if __name__ == '__main__':
         # Getting The Task
         split: list[str] = response1.data.split(' ')
         command, args = split[0], split[1:]
-        if (command == 'null'): continue
+        if (command == DEFAULT_RESP): continue
         if (command == 'exit' or command == 'quit'): break
 
         # Running The Task
@@ -35,3 +35,7 @@ if __name__ == '__main__':
 
         # Sending The Result Back To ZMQ
         response2: Message = scheduler_client.communicate('put', str(names))
+
+    # Closing client
+    scheduler_client.close()
+    printc('Program terminated.', INF_COLOR)

@@ -1,7 +1,7 @@
 import zmq # Standard Python Imports
 
 from scheduler.config import * # Configurations
-from scheduler.utils import Message, DataQueue # Utilities
+from scheduler.utils import Message, printc # Utilities
 
 from typing import Optional, Tuple # Type Hinting
 
@@ -23,7 +23,7 @@ class Server:
         self.status: bool = False
 
         # Debug printing
-        if (DEBUG): print(f'PORT: {self.port}')
+        if (DEBUG): printc(f'PORT: {self.port}', INF_COLOR)
 
     def start(self: any, port: Optional[int] = None) -> bool:
         """
@@ -45,7 +45,7 @@ class Server:
 
         except zmq.error.ZMQError as err:
             # Error occurred, returning false
-            if (DEBUG): print(f'ZMQ Error: {err}')
+            if (DEBUG): printc(f'ZMQ Error: {err}', ERR_COLOR)
             return False
 
     def stop(self: any) -> None:
@@ -65,7 +65,7 @@ class Server:
 
         # Receiving message from client
         message: Message = Message.decode(self.sock.recv_string())
-        if (DEBUG): print(f'RECEIVED: {message}')
+        if (DEBUG): printc(f'[{message}]', RCV_COLOR)
         return message
 
     def send(self: any, message: Message) -> None:
@@ -76,5 +76,5 @@ class Server:
         """
 
         # Sending message to client
-        if (DEBUG): print(f'SENT: {message}')
+        if (DEBUG): printc(f'[{message}]', SNT_COLOR)
         self.sock.send_string(str(message))

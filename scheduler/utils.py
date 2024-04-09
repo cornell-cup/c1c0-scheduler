@@ -115,3 +115,14 @@ class DataQueue:
 
         # Returning none if message not found
         return None
+
+def printc(msg: str, color: str) -> None:
+    """
+    Prints a message with the given color.
+
+    @param msg: A string representing the message to be printed.
+    @param color: A string representing the color to print the message in.
+    """
+
+    # Printing message with color
+    print(f'{color}{msg}{config.END_COLOR}')

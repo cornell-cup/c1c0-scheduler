@@ -3,7 +3,7 @@ from scheduler.utils import Message, DataQueue # Utilities
 
 from typing import Optional # Type Hinting
 
-def manual_check(queue: DataQueue, msg: Message) -> Message:
+def manual_check(_: DataQueue, msg: Message) -> Message:
     """
     Handler for manual_check messages.
     """

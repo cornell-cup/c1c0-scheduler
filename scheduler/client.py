@@ -1,7 +1,7 @@
 import zmq # Standard Python Imports
 
 from scheduler.config import * # Configurations
-from scheduler.utils import Message # Utilities
+from scheduler.utils import Message, printc # Utilities
 
 from typing import Optional # Type Hinting
 
@@ -27,7 +27,7 @@ class Client:
         self.connected: bool = False
 
         # Debug printing
-        if (DEBUG): print(f'NAME: {self.name}, HOST: {self.host}, PORT: {self.port}')
+        if (DEBUG): printc(f'NAME: {self.name}, HOST: {self.host}, PORT: {self.port}', INF_COLOR)
 
     def connect(self: any, host: Optional[str] = None, port: Optional[int] = None) -> bool:
         """
@@ -49,7 +49,7 @@ class Client:
             self.sock.connect(f'tcp://{self.host}:{self.port}')
 
         except zmq.error.ZMQError as err:
-            if (DEBUG): print(f'ZMQ Error: {err}')
+            if (DEBUG): printc(f'ZMQ Error: {err}', ERR_COLOR)
             return False
 
         # Checking connection
@@ -59,7 +59,7 @@ class Client:
             attempt += 1
 
         # Returning connection status
-        if (DEBUG): print(f'CONNECTED: {self.connected}, ATTEMPTS: {attempt}')
+        if (DEBUG): printc(f'CONNECTED: {self.connected}, ATTEMPTS: {attempt}', INF_COLOR)
         return self.connected
 
     def close(self: any) -> None:
@@ -70,7 +70,7 @@ class Client:
         # Sending disconnect message and closing connection
         sent: bool = self.check('disconnected')
         self.connected = False; self.sock.close()
-        if (DEBUG): print(f'CONNECTED: {self.connected}, SENT: {sent}')
+        if (DEBUG): printc(f'CONNECTED: {self.connected}, SENT: {sent}', INF_COLOR)
 
     def check(self: any, data: str) -> bool:
         """
@@ -84,11 +84,11 @@ class Client:
             # Sending message to server
             message: Message = Message(self.name, 'check', data)
             self.sock.send_string(str(message))
-            if (DEBUG): print(f'MESSAGE: {message}')
+            if (DEBUG): printc(f'[{message}]', SNT_COLOR)
 
             # Receiving response from server
             response: Message = Message.decode(self.sock.recv_string())
-            if (DEBUG): print(f'RESPONSE: {response}')
+            if (DEBUG): printc(f'[{response}]', RCV_COLOR)
             return response == message
 
         except:
@@ -108,11 +108,11 @@ class Client:
             # Sending message to server
             message: Message = Message(self.name, tag, data)
             self.sock.send_string(str(message))
-            if (DEBUG): print(f'MESSAGE: {message}')
+            if (DEBUG): printc(f'[{message}]', SNT_COLOR)
 
             # Receiving response from server
             response: Message = Message.decode(self.sock.recv_string())
-            if (DEBUG): print(f'RESPONSE: {response}')
+            if (DEBUG): printc(f'[{response}]', RCV_COLOR)
             return response
 
         except:

@@ -11,6 +11,11 @@ MANUAL_DIR := temp
 MANUAL_EXC := manual_comm.py
 MANUAL_PRV := clients/manual.py
 
+MVMENT_BIN := $(SCHEDULER_PATH)/venv/bin
+MVMENT_DIR := ../c1c0-movement/c1c0-movement/Locomotion
+MVMENT_EXC := movement_comm.py
+MVMENT_PRV := clients/movement.py
+
 all: venv
 	venv/bin/python scheduler.py
 
@@ -20,13 +25,18 @@ facial:
 manual:
 	cd $(MANUAL_DIR) && $(MANUAL_BIN)/python $(MANUAL_EXC) $(SCHEDULER_PATH)
 
+movement:
+	cd $(MVMENT_DIR) && $(MVMENT_BIN)/python $(MVMENT_EXC) $(SCHEDULER_PATH)
+
 build:
 	mkdir -p $(FACIAL_DIR) && cp $(FACIAL_PRV) $(FACIAL_DIR)/$(FACIAL_EXC)
 	mkdir -p $(MANUAL_DIR) && cp $(MANUAL_PRV) $(MANUAL_DIR)/$(MANUAL_EXC)
+	mkdir -p $(MVMENT_DIR) && cp $(MVMENT_PRV) $(MVMENT_DIR)/$(MVMENT_EXC)
 
 clean:
 	rm -f $(FACIAL_DIR)/$(FACIAL_EXC)
 	rm -f $(MANUAL_DIR)/$(MANUAL_EXC)
+	rm -f $(MVMENT_DIR)/$(MVMENT_EXC)
 	rm -rf */__pycache__/ temp/
 
 venv:
