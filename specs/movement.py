@@ -17,6 +17,6 @@ def movement_get(queue: DataQueue, msg: Message) -> Message:
     """
 
     # Finding next task in queue
-    item: Optional[Message] = queue.find(msg.name, msg.tag)
+    item: Optional[Message] = queue.find('xbox', 'put')
     if item is not None: return item
     return Message(msg.name, msg.tag, DEFAULT_RESP)

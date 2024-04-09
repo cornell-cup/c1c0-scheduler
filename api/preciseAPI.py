@@ -68,7 +68,7 @@ def zero_precise() -> str:
     motor_angles = [0, 0, 0, 0, 0, 0, motor_angles[6]]
     return precise_encode(motor_angles)
 
-def precise_encode(motor_angles) -> str:
+def precise_encode(motor_angles: list[float]) -> str:
     """
     Encodes the given motor angles into a message to send to the scheduler.
 
@@ -78,7 +78,7 @@ def precise_encode(motor_angles) -> str:
 
     return 'precise: ' + str(motor_angles)
 
-def precise_decode(msg) -> list[int]:
+def precise_decode(msg: str) -> list[int]:
     """
     Decodes the given message into motor angles.
 

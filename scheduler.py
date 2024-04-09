@@ -5,6 +5,7 @@ from scheduler.utils import Message, DataQueue # Utilities
 from specs.facial import facial_check, facial_put, facial_get # Facial Specifications
 from specs.manual import manual_check, manual_put, manual_get # Manual Specifications
 from specs.movement import movement_check, movement_get # Movement Specifications
+from specs.controller import controller_check, controller_put # Controller Specifications
 
 from typing import Callable, Dict # Type Hinting
 
@@ -25,6 +26,9 @@ if __name__ == '__main__':
 
         'movement_check': lambda msg: movement_check(queue, msg),
         'movement_get':   lambda msg: movement_get(queue, msg),
+
+        'controller_check': lambda msg: controller_check(queue, msg),
+        'controller_put':   lambda msg: controller_put(queue, msg)
     }
 
     # Attempting to start server

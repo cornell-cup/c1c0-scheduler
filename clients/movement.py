@@ -9,6 +9,7 @@ from api.serialAPI import serial_init, serial_write, serial_close # Serial Conne
 from api.locomotionAPI import locomotion_decode # Locomotion Decoding
 from api.preciseAPI import precise_decode # Precise Decoding
 from api.strongAPI import strong_decode # Strong Decoding
+from api.rotateAPI import rotate_decode # Rotate Decoding
 
 import R2Protocol2 as r2p # Serial encoding/decoding protocol
 
@@ -83,6 +84,24 @@ def strong_serial(data: str) -> None:
     except KeyboardInterrupt:
         serial_close()
 
+def rotate_serial(data: str) -> None:
+    """
+    Send the given data (encoded in rotate format) to the specified serial port.
+
+    @param data: The data (encoded in rotate format) to send.
+    """
+
+    try:
+        rotate = rotate_decode(data)
+        mtype: str =  bytes("head", "utf-8")
+        encode: str = bytearray(rotate.encode())
+        message: str = r2p.encode(mtype, encode)
+
+        serial_init()
+        serial_write(message)
+    except KeyboardInterrupt:
+        serial_close()
+
 if __name__ == '__main__':
     # Initializing client
     client: Client = Client('movement')
@@ -102,6 +121,7 @@ if __name__ == '__main__':
         if ('locomotion' in data): locomotion_serial(data)
         elif ('precise' in data):  precise_serial(data)
         elif ('strong' in data):   strong_serial(data)
+        elif ('rotate' in data):   rotate_serial(data)
         else: printc(f'Invalid command: {data}', ERR_COLOR)
 
     # Closing client
