@@ -42,9 +42,10 @@ def get_locomotion(axis_x, axis_y) -> str:
     elif (axis_x == 1 and axis_y == 0):
         lvalue = '+' + str(motor_val) + '0'
         rvalue = '-' + str(motor_val) + '0'
-    elif (axis_x == 0 and axis_y == 0):
+    else:
         lvalue = '+' + str(0.) + '0'
         rvalue = '+' + str(0.) + '0'
+
 
     return locomotion_encode(lvalue, rvalue)
 

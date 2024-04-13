@@ -13,7 +13,7 @@ def controller_check(_: DataQueue, msg: Message) -> Message:
 
 def controller_put(queue: DataQueue, msg: Message) -> Message:
     """
-    Handler for conroller_put messages.
+    Handler for controller_put messages.
     """
 
     # Adding data to queue

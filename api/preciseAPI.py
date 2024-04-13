@@ -48,15 +48,27 @@ def get_precise() -> str:
     global motor_angles
     return precise_encode(motor_angles)
 
+state = 0
 def example_precise() -> str:
     """
     Creates an example message with motor angles to send to scheduler.
 
     @return: The example message with motor angles.
     """
+    global state
+    state+=1
+    if(state == 4):
+        state = 0
 
     global motor_angles
-    motor_angles = [30, 15, 10, 60, 30, 30, motor_angles[6]]
+    if(state == 0):
+        motor_angles = [30, 75, 40, 80, 30, 5, motor_angles[6]]
+    elif(state == 1):
+        motor_angles = [60, 65, 10, 60, 90, 30, motor_angles[6]]
+    elif(state == 2):
+        motor_angles = [20, 55, 80, 10, 10, 50, motor_angles[6]]
+    else:
+        motor_angles = [30, 75, 0, 60, 30, 30, motor_angles[6]]
     return precise_encode(motor_angles)
 
 def zero_precise() -> str:

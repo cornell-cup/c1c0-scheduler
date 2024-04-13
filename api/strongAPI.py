@@ -90,6 +90,6 @@ def strong_decode(msg: str) -> List[int]:
     @return: The list of movements.
     """
 
-    data       = str(data)
+    data       = str(msg)
     a, b, c, d = int(data[9]), int(data[12]), int(data[15]), int(data[18])
     return [a, b, c, d]

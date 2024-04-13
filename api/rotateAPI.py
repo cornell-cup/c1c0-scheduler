@@ -39,7 +39,7 @@ def rotate_encode(angle: int, negative: bool, absolute: bool) -> str:
     @param absolute: 1 if the angle is an absolute angle, 0 if the angle is a change in angle.
     """
 
-    return 'rotate: ' + str(angle) + str(absolute) + str(negative)
+    return 'rotate: head rot: ' + str(angle) + str(absolute) + str(negative)
 
 def rotate_decode(msg: str) -> str:
     """
@@ -49,4 +49,4 @@ def rotate_decode(msg: str) -> str:
     @return: The head rotation values.
     """
 
-    return msg
+    return msg[8:]

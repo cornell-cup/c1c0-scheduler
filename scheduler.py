@@ -27,8 +27,8 @@ if __name__ == '__main__':
         'movement_check': lambda msg: movement_check(queue, msg),
         'movement_get':   lambda msg: movement_get(queue, msg),
 
-        'controller_check': lambda msg: controller_check(queue, msg),
-        'controller_put':   lambda msg: controller_put(queue, msg)
+        'xbox_check': lambda msg: controller_check(queue, msg),
+        'xbox_put':   lambda msg: controller_put(queue, msg)
     }
 
     # Attempting to start server

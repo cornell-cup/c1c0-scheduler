@@ -49,12 +49,10 @@ def on_left_axis_moved(axis: any) -> None:
 
     @param axis: Axis values of the controller.
     """
-
     axis_values: Optional[tuple[float, float]] = on_axis_moved(axis)
     if (axis_values is not None):
         axis_x, axis_y = axis_values
-        print(locomotion_encode(axis_x, axis_y))
-        client.communicate('put', locomotion_encode(axis_x, axis_y))
+        client.communicate('put', get_locomotion(axis_x, axis_y))
 
 def on_right_axis_moved(axis: any) -> None:
     """
@@ -67,7 +65,7 @@ def on_right_axis_moved(axis: any) -> None:
     if (axis_values is not None):
         axis_x, axis_y = axis_values
         update_precise(axis_x, axis_y)
-        client.communicate('put', precise_encode(axis_x, axis_y))
+        client.communicate('put', get_precise())
 
 def hat_axis_moved(axis):
     """
@@ -106,7 +104,7 @@ def xboxcontroller_init() -> None:
 
     while (not Xbox360Controller.get_available()):
         print("Looking For Controller")
-        time.sleep(.5)
+        time.sleep(1)
 
     controller: Xbox360Controller = Xbox360Controller(0)
     print("Controller Connected")

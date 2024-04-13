@@ -15,7 +15,7 @@ from api.rotateAPI import rotate_decode # Rotate Decoding
 
 import R2Protocol2 as r2p # Serial encoding/decoding protocol
 
-STALL: int = 1 # Time To Wait For New Task
+STALL: int = .01 # Time To Wait For New Task
 
 def convert_16_to_8(arr: str, length: int) -> List[int]:
     """

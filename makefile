@@ -22,21 +22,24 @@ CONTRL_EXC := controller_comm.py
 CONTRL_PRV := clients/controller.py
 
 all: venv
+	make -j 5 scheduler facial manual movement controller
+
+scheduler: venv
 	venv/bin/python scheduler.py
 
-facial:
-	cd $(FACIAL_DIR) && sudo $(FACIAL_BIN)/python $(FACIAL_EXC) $(SCHEDULER_PATH)
+facial: build
+	cd $(FACIAL_DIR) && $(FACIAL_BIN)/python $(FACIAL_EXC) $(SCHEDULER_PATH)
 
-manual:
-	cd $(MANUAL_DIR) && sudo $(MANUAL_BIN)/python $(MANUAL_EXC) $(SCHEDULER_PATH)
+manual: build
+	cd $(MANUAL_DIR) && $(MANUAL_BIN)/python $(MANUAL_EXC) $(SCHEDULER_PATH)
 
-movement:
-	cd $(MVMENT_DIR) && sudo $(MVMENT_BIN)/python $(MVMENT_EXC) $(SCHEDULER_PATH)
+movement: build
+	cd $(MVMENT_DIR) && $(MVMENT_BIN)/python $(MVMENT_EXC) $(SCHEDULER_PATH)
 
-controller:
-	cd $(CONTRL_DIR) && sudo $(CONTRL_BIN)/python $(CONTRL_EXC) $(SCHEDULER_PATH)
+controller: build
+	cd $(CONTRL_DIR) && $(CONTRL_BIN)/python $(CONTRL_EXC) $(SCHEDULER_PATH)
 
-build:
+build: venv
 	mkdir -p $(FACIAL_DIR) && cp $(FACIAL_PRV) $(FACIAL_DIR)/$(FACIAL_EXC)
 	mkdir -p $(MANUAL_DIR) && cp $(MANUAL_PRV) $(MANUAL_DIR)/$(MANUAL_EXC)
 	mkdir -p $(MVMENT_DIR) && cp $(MVMENT_PRV) $(MVMENT_DIR)/$(MVMENT_EXC)
@@ -47,10 +50,11 @@ clean:
 	rm -f $(MANUAL_DIR)/$(MANUAL_EXC)
 	rm -f $(MVMENT_DIR)/$(MVMENT_EXC)
 	rm -f $(CONTRL_DIR)/$(CONTRL_EXC)
-	rm -rf */__pycache__/ temp/
+	sudo rm -rf */__pycache__/ temp/
 
 venv:
 	rm -rf venv/
-	python$(PYTHON_VER) -m venv venv/
+	python$(PYTHON_VER) -m venv --system-site-packages venv/  
+    
 	venv/bin/pip install --upgrade pip
 	venv/bin/pip install -r requirements.txt

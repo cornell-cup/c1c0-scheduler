@@ -7,7 +7,7 @@ from scheduler.utils import Message, printc # Utilities
 
 from client.client import Client as FClient # Facial Client/Task Manager
 
-STALL: int = 3 # Time To Wait For New Task
+STALL: int = 1 # Time To Wait For New Task
 
 if __name__ == '__main__':
     # Creating clients
