@@ -54,7 +54,6 @@ clean:
 
 venv:
 	rm -rf venv/
-	python$(PYTHON_VER) -m venv --system-site-packages venv/  
-    
-	venv/bin/pip install --upgrade pip
+	python$(PYTHON_VER) -m venv --system-site-packages venv/      
+	venv/bin/pip install --upgrade pip setuptools wheel
 	venv/bin/pip install -r requirements.txt
