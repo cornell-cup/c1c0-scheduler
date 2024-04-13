@@ -1,0 +1,7 @@
+# Temporary Directories
+__pycache__/
+venv/
+temp/
+
+# Temporary Files
+.DS_Store
