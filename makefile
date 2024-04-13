@@ -22,7 +22,7 @@ CONTRL_EXC := controller_comm.py
 CONTRL_PRV := clients/controller.py
 
 all: venv
-	make -j 5 scheduler facial manual movement controller
+	make -j 4 scheduler facial movement controller
 
 scheduler: venv
 	venv/bin/python scheduler.py
