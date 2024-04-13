@@ -40,26 +40,30 @@ clients/ # Folder Containing Client Files
 |-- movement.py   # C1C0 Locomotion Client
 
 scheduler/ # Folder Containing Scheduler Files
-|-- __init__.py   # Make Scheduler A Package
-|-- client.py     # Client Template For Subsystems
-|-- config.py     # Configuration Variables
-|-- server.py     # Server Template For Scheduler
-|-- utils.py      # Utility Functions And Classes
+|-- __init__.py # Make Scheduler A Package
+|-- client.py   # Client Template For Subsystems
+|-- config.py   # Configuration Variables
+|-- server.py   # Server Template For Scheduler
+|-- utils.py    # Utility Functions And Classes
 
-specs/
+specs/ # Folder Containing Specification Files
 |-- __init__.py   # Make Specs A Package
 |-- controller.py # Xbox Controller Specification
 |-- facial.py     # Facial Recognition Specification
 |-- manual.py     # Manual Control Specification
 |-- movement.py   # C1C0 Locomotion Specification
 
-.gitignore        # Git Ignore Specifications
-makefile          # Build & Run Commands
-README.md         # Information File
-requirements.txt  # Required Python Packages
-scheduler.py      # Scheduler Server File
+.gitignore       # Git Ignore Specifications
+makefile         # Build & Run Commands
+README.md        # Information File
+requirements.txt # Required Python Packages
+scheduler.py     # Scheduler Server File
 ```
 
 ### Adding A Subsystem
 
-If you want to add a subsytem, follow these instructions to make your life easier. First figure out a specification file for the client, all the scheduler really is a massive data queue that you can `get` and `put` data. So make a specification file that can handle your requests to scheduler, and then add it to the mapping found in `scheduler.py`. Now create a client file within `clients` to send the requests and deal with the response that the server gives (based on earlier specification), if any extra utilities or assets are needed, you can put them within the `api` or `assets` folder respectively. Final step is to add a makefile command and then test your code before commiting. Once all these steps are done, you have added a subsystem to scheduler, yay! 
+If you want to add a subsytem, follow these instructions to make your life easier.
+
+1. Figure out a specification file for the client. All the scheduler really is a massive data queue that you can `get` and `put` data. So make a specification file that can handle your requests to scheduler, and then add it to the mapping found in `scheduler.py`.
+2. Now create a client file within `clients` to send the requests and deal with the response that the server gives (based on earlier specification), if any extra utilities or assets are needed, you can put them within the `api` or `assets` folder respectively.
+3. Final step is to add a makefile command and then test your code before commiting. Once all these steps are done, you have added a subsystem to scheduler, yay!
