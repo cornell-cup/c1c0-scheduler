@@ -142,7 +142,7 @@ def xboxcontroller_init() -> None:
         controller.button_thumb_l.when_released = lambda _: playsound(sounds[random.randint(0, 4)])
 
     except KeyboardInterrupt: pass
-    except OSError: print("controller disconnected")
+    except OSError: print("Controller Disconnected")
 
 if __name__ == '__main__':
     # Initializing client
