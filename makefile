@@ -1,25 +1,6 @@
 SCHEDULER_PATH := $(shell pwd)
-PYTHON_VER     := 3.6
-
-FACIAL_BIN := ../r2-facial_recognition_client/venv/bin
-FACIAL_DIR := ../r2-facial_recognition_client
-FACIAL_EXC := facial_comm.py
-FACIAL_PRV := clients/facial.py
-
-MANUAL_BIN := $(SCHEDULER_PATH)/venv/bin
-MANUAL_DIR := temp
-MANUAL_EXC := manual_comm.py
-MANUAL_PRV := clients/manual.py
-
-MVMENT_BIN := $(SCHEDULER_PATH)/venv/bin
-MVMENT_DIR := ../c1c0-movement/c1c0-movement/Locomotion
-MVMENT_EXC := movement_comm.py
-MVMENT_PRV := clients/movement.py
-
-CONTRL_BIN := $(SCHEDULER_PATH)/venv/bin
-CONTRL_DIR := temp
-CONTRL_EXC := controller_comm.py
-CONTRL_PRV := clients/controller.py
+PYTHON_VER     := 3.11
+.PHONY: all scheduler facial manual movement controller chatbot
 
 all: venv
 	make -j 4 scheduler facial movement controller
@@ -27,29 +8,59 @@ all: venv
 scheduler: venv
 	venv/bin/python scheduler.py
 
+FACIAL_BIN := ../c1c0-facial-recognition/venv/bin
+FACIAL_DIR := ../c1c0-facial-recognition
+FACIAL_EXC := facial_comm.py
+FACIAL_PRV := clients/facial.py
+
 facial: build
 	cd $(FACIAL_DIR) && $(FACIAL_BIN)/python $(FACIAL_EXC) $(SCHEDULER_PATH)
+
+MANUAL_BIN := $(SCHEDULER_PATH)/venv/bin
+MANUAL_DIR := temp
+MANUAL_EXC := manual_comm.py
+MANUAL_PRV := clients/manual.py
 
 manual: build
 	cd $(MANUAL_DIR) && $(MANUAL_BIN)/python $(MANUAL_EXC) $(SCHEDULER_PATH)
 
+MVMENT_BIN := $(SCHEDULER_PATH)/venv/bin
+MVMENT_DIR := ../c1c0-movement/c1c0-movement/Locomotion
+MVMENT_EXC := movement_comm.py
+MVMENT_PRV := clients/movement.py
+
 movement: build
 	cd $(MVMENT_DIR) && $(MVMENT_BIN)/python $(MVMENT_EXC) $(SCHEDULER_PATH)
 
+CONTRL_BIN := $(SCHEDULER_PATH)/venv/bin
+CONTRL_DIR := temp
+CONTRL_EXC := controller_comm.py
+CONTRL_PRV := clients/controller.py
+
 controller: build
 	cd $(CONTRL_DIR) && $(CONTRL_BIN)/python $(CONTRL_EXC) $(SCHEDULER_PATH)
+
+CHATBT_BIN := ../c1c0-chatbot/venv/bin
+CHATBT_DIR := ../c1c0-chatbot
+CHATBT_EXC := chatbot_comm.py
+CHATBT_PRV := clients/chatbot.py
+
+chatbot: build
+	cd $(CHATBT_DIR) && $(CHATBT_BIN)/python $(CHATBT_EXC) $(SCHEDULER_PATH)
 
 build: venv
 	mkdir -p $(FACIAL_DIR) && cp $(FACIAL_PRV) $(FACIAL_DIR)/$(FACIAL_EXC)
 	mkdir -p $(MANUAL_DIR) && cp $(MANUAL_PRV) $(MANUAL_DIR)/$(MANUAL_EXC)
 	mkdir -p $(MVMENT_DIR) && cp $(MVMENT_PRV) $(MVMENT_DIR)/$(MVMENT_EXC)
 	mkdir -p $(CONTRL_DIR) && cp $(CONTRL_PRV) $(CONTRL_DIR)/$(CONTRL_EXC)
+	mkdir -p $(CHATBT_DIR) && cp $(CHATBT_PRV) $(CHATBT_DIR)/$(CHATBT_EXC)
 
 clean:
 	rm -f $(FACIAL_DIR)/$(FACIAL_EXC)
 	rm -f $(MANUAL_DIR)/$(MANUAL_EXC)
 	rm -f $(MVMENT_DIR)/$(MVMENT_EXC)
 	rm -f $(CONTRL_DIR)/$(CONTRL_EXC)
+	rm -f $(CHATBT_DIR)/$(CHATBT_EXC)
 	sudo rm -rf */__pycache__/ temp/
 
 venv:

@@ -34,7 +34,7 @@ if __name__ == '__main__':
             names = []
 
         # Sending The Result Back To ZMQ
-        response2: Message = scheduler_client.communicate('put', str(names))
+        response2: Message = scheduler_client.communicate('put', str(list(names)))
 
     # Closing client
     scheduler_client.close()
