@@ -65,7 +65,7 @@ class Server:
 
         # Receiving message from client
         message: Message = Message.decode(self.sock.recv_string())
-        if (DEBUG): printc(f'[{message}]', RCV_COLOR)
+        if (DEBUG and message.show()): printc(f'[{message}]', RCV_COLOR)
         return message
 
     def send(self: any, message: Message) -> None:
@@ -76,5 +76,5 @@ class Server:
         """
 
         # Sending message to client
-        if (DEBUG): printc(f'[{message}]', SNT_COLOR)
+        if (DEBUG and message.show()): printc(f'[{message}]', SNT_COLOR)
         self.sock.send_string(str(message))

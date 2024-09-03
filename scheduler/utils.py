@@ -43,6 +43,15 @@ class Message:
         # Comparing message fields
         return (self.name == other.name and self.tag == other.tag and self.data == other.data)
 
+    def show(self: any) -> bool:
+        """
+        Returns whether or not the message should be shown.
+
+        @return: Whether or not the message should be shown.
+        """
+
+        return self.data != 'null' and self.data != ''
+
     @staticmethod
     def encode(self: any, msg: 'Message') -> str:
         """

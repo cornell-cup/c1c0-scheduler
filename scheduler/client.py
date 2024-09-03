@@ -84,11 +84,11 @@ class Client:
             # Sending message to server
             message: Message = Message(self.name, 'check', data)
             self.sock.send_string(str(message))
-            if (DEBUG): printc(f'[{message}]', SNT_COLOR)
+            if (DEBUG and message.show()): printc(f'[{message}]', SNT_COLOR)
 
             # Receiving response from server
             response: Message = Message.decode(self.sock.recv_string())
-            if (DEBUG): printc(f'[{response}]', RCV_COLOR)
+            if (DEBUG and message.show()): printc(f'[{response}]', RCV_COLOR)
             return response == message
 
         except:
@@ -108,11 +108,11 @@ class Client:
             # Sending message to server
             message: Message = Message(self.name, tag, data)
             self.sock.send_string(str(message))
-            if (DEBUG): printc(f'[{message}]', SNT_COLOR)
+            if (DEBUG and message.show()): printc(f'[{message}]', SNT_COLOR)
 
             # Receiving response from server
             response: Message = Message.decode(self.sock.recv_string())
-            if (DEBUG): printc(f'[{response}]', RCV_COLOR)
+            if (DEBUG and message.show()): printc(f'[{response}]', RCV_COLOR)
             return response
 
         except:
