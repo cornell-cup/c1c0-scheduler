@@ -11,7 +11,7 @@ STALL: int = 1 # Time To Wait For New Task
 
 if __name__ == '__main__':
     # Creating clients
-    facial_client: FClient = FClient(load=False, prnt=True)
+    facial_client: FClient = FClient(load=False, disp=False, prnt=True)
     scheduler_client: SClient = SClient('facial')
     scheduler_client.connect()
 
