@@ -5,9 +5,10 @@ HOST: str     = 'localhost' # Either '127.0.0.1' or '192.168.4.127'.
 PORT: int     = 5555 # Choose whatever you want, but make sure it's not in use.
 ENCODING: str = 'utf-8' # Encoding to use for all data sent/received.
 
-DATA_SEP: str     = ': ' # Separator between metadata and data.
-TAG_SEP: str      = '_' # Separator between name and tag.
-DEFAULT_RESP: str = 'null' # Default response to send if no response is found.
+DATA_SEP: str      = ': ' # Separator between metadata and data.
+TAG_SEP: str       = '_' # Separator between name and tag.
+DEFAULT_RESP: str  = 'null' # Default response to send if no response is found.
+TIMEOUT: int       = 15 # Timeout for data queue in seconds.
 
 SNT_COLOR: str = '\033[92m' # Green color for sent messages.
 RCV_COLOR: str = '\033[94m' # Blue color for received messages.

@@ -1,3 +1,5 @@
+import time
+
 from scheduler import config # Configurations
 
 from typing import Optional # Type Hinting
@@ -105,7 +107,7 @@ class DataQueue:
 
         # Adding message to queue
         print(str(message))
-        self.queue.append(message)
+        self.queue.append((message, time.time()))
 
     def find(self: any, name: str, tag: str) -> Optional[Message]:
         """
@@ -117,9 +119,13 @@ class DataQueue:
         """
 
         # Finding message in queue
-        for message in self.queue:
+        for message, timestamp in self.queue:
+            if (time.time() - timestamp > config.TIMEOUT):
+                self.queue.remove((message, timestamp))
+                continue
+
             if (message.name == name and message.tag == tag):
-                self.queue.remove(message)
+                self.queue.remove((message, timestamp))
                 return message
 
         # Returning none if message not found

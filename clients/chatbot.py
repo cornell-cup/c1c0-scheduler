@@ -5,12 +5,14 @@ from scheduler.config import * # Configuration
 from scheduler.client import Client as SClient # Scheduler Client
 from scheduler.utils import Message, printc # Utilities
 
+from client.audio import speech_to_text, recognize_C1C0  # Audio Interface
 from client.client import OpenAPI # Client Interface
+from client.config import LABEL_THRESHOLD  # Configuration
 
-from labels.error import handler as error_handler # Error Specifications
-from labels.general import desc as general_desc, handler as general_handler # General Specifications
-from labels.movement import desc as movement_desc, handler as movement_handler # Movement Specifications
-from labels.recognition import desc as recognition_desc, handler as recognition_handler # Recognition Specifications
+from labels.config import recognize as config_recognize, handler as config_handler  # Configuration Specifications
+from labels.general import recognize as general_recognize, handler as general_handler  # General Info Specifications
+from labels.movement import recognize as movement_recognize, handler as movement_handler  # Movement Specifications
+from labels.facial import recognize as facial_recognize, handler as facial_handler  # Facial Specifications
 
 from typing import Callable, Dict # Type Hinting
 
@@ -22,30 +24,22 @@ if __name__ == '__main__':
 
     # Initialzing response handlers and mapping
     mapping: Dict[str, Callable[[str], None]] = {
-        general_desc:     lambda msg: general_handler(chatbot_client, msg),
-        movement_desc:    lambda msg: movement_handler(chatbot_client, msg),
-        recognition_desc: lambda msg: recognition_handler(chatbot_client, msg)
+        config_recognize:   lambda msg: config_handler(chatbot_client, msg, scheduler_client),
+        general_recognize:  lambda msg: general_handler(chatbot_client, msg, scheduler_client),
+        movement_recognize: lambda msg: movement_handler(chatbot_client, msg, scheduler_client),
+        facial_recognize:   lambda msg: facial_handler(chatbot_client, msg, scheduler_client)
     }
 
     # Infinite loop for chatbot
     while True:
-        # Receiving message from user
-        msg: str = input('You: ')
-        if msg == 'exit' or msg == 'quit': break
+        # Receiving audio from user and checking for C1C0 name
+        msg: str = speech_to_text()
+        print(f"\033[32mUser: {msg}\033[0m")
+        if msg is None or not recognize_C1C0(msg):
+            print('C1C0 Command Not Recognized.')
+            continue
 
         # Finding and calling handler for message
-        label: str = chatbot_client.categorize(msg, list(mapping.keys()))
-        mapping.setdefault(label, lambda msg: error_handler(chatbot_client, msg))
-        data1, data2 = mapping[label](msg)
-
-        # Sending message to scheduler
-        response1: Message = scheduler_client.communicate('put', data1)
-        time.sleep(7)
-
-        # Receiving response from scheduler
-        response2: Message = scheduler_client.communicate('get', data2)
-        print(response2.data.strip('][\'').split(', ')[0])
-
-    # Closing client
-    scheduler_client.close()
-    printc('Program terminated.', INF_COLOR)
+        for (recognize, handler) in mapping.items():
+            if recognize(chatbot_client, msg):
+                handler(msg); break
