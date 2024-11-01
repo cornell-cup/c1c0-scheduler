@@ -13,7 +13,7 @@ FACIAL_DIR := ../c1c0-facial-recognition
 FACIAL_EXC := facial_comm.py
 FACIAL_PRV := clients/facial.py
 
-facial: build
+facial:
 	cd $(FACIAL_DIR) && $(FACIAL_BIN)/python $(FACIAL_EXC) $(SCHEDULER_PATH)
 
 MANUAL_BIN := $(SCHEDULER_PATH)/venv/bin
@@ -21,7 +21,7 @@ MANUAL_DIR := temp
 MANUAL_EXC := manual_comm.py
 MANUAL_PRV := clients/manual.py
 
-manual: build
+manual:
 	cd $(MANUAL_DIR) && $(MANUAL_BIN)/python $(MANUAL_EXC) $(SCHEDULER_PATH)
 
 MVMENT_BIN := $(SCHEDULER_PATH)/venv/bin
@@ -29,7 +29,7 @@ MVMENT_DIR := ../c1c0-movement/c1c0-movement/Locomotion
 MVMENT_EXC := movement_comm.py
 MVMENT_PRV := clients/movement.py
 
-movement: build
+movement:
 	cd $(MVMENT_DIR) && $(MVMENT_BIN)/python $(MVMENT_EXC) $(SCHEDULER_PATH)
 
 CONTRL_BIN := $(SCHEDULER_PATH)/venv/bin
@@ -37,7 +37,7 @@ CONTRL_DIR := temp
 CONTRL_EXC := controller_comm.py
 CONTRL_PRV := clients/controller.py
 
-controller: build
+controller:
 	cd $(CONTRL_DIR) && $(CONTRL_BIN)/python $(CONTRL_EXC) $(SCHEDULER_PATH)
 
 CHATBT_BIN := ../c1c0-chatbot/venv/bin
@@ -45,7 +45,7 @@ CHATBT_DIR := ../c1c0-chatbot
 CHATBT_EXC := chatbot_comm.py
 CHATBT_PRV := clients/chatbot.py
 
-chatbot: build
+chatbot:
 	cd $(CHATBT_DIR) && $(CHATBT_BIN)/python $(CHATBT_EXC) $(SCHEDULER_PATH)
 
 build: venv
