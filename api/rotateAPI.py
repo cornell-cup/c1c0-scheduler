@@ -1,7 +1,3 @@
-import time # Standard Python Imports
-
-from scheduler.config import * # Configurations
-
 def zero_rotate() -> str:
     """
     Call this method to return the head to 90 degrees.
