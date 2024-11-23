@@ -15,26 +15,27 @@ if __name__ == '__main__':
     scheduler_client: SClient = SClient('facial')
     scheduler_client.connect()
 
-    while True:
-        # Asking ZMQ For Next Task
-        time.sleep(STALL)
-        response1: Message = scheduler_client.communicate('get', 'null')
+    with facial_client.camera as cam:
+        while True:
+            # Asking ZMQ For Next Task
+            time.sleep(STALL)
+            response1: Message = scheduler_client.communicate('get', 'null')
 
-        # Getting The Task
-        split: list[str] = response1.data.split(' ')
-        command, args = split[0], split[1:]
-        if (command == DEFAULT_RESP): continue
-        if (command == 'exit' or command == 'quit'): break
+            # Getting The Task
+            split: list[str] = response1.data.split(' ')
+            command, args = split[0], split[1:]
+            if (command == DEFAULT_RESP): continue
+            if (command == 'exit' or command == 'quit'): break
 
-        # Running The Task
-        try:
-            task = facial_client.interpret_task(command)
-            names = task(args)
-        except:
-            names = []
+            # Running The Task
+            try:
+                task = facial_client.interpret_task(command)
+                names = task(args)
+            except:
+                names = []
 
-        # Sending The Result Back To ZMQ
-        response2: Message = scheduler_client.communicate('put', str(list(names)))
+            # Sending The Result Back To ZMQ
+            response2: Message = scheduler_client.communicate('put', str(list(names)))
 
     # Closing client
     scheduler_client.close()
