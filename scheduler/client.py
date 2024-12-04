@@ -1,4 +1,4 @@
-import zmq # Standard Python Imports
+import zmq, numpy as np # Standard Python Imports
 
 from scheduler.config import * # Configurations
 from scheduler.utils import Message, printc # Utilities
@@ -118,3 +118,25 @@ class Client:
         except:
             # Returning an empty string if an error occurred
             return ''
+
+    def image(self: any) -> np.ndarray:
+        """
+        Requests an image from the server.
+
+        @return: The image from the server as an np.ndarray.
+        """
+
+        try:
+            # Sending message to server
+            message: Message = Message('camera', 'get', 'image')
+            self.sock.send_string(str(message))
+            if (DEBUG and message.show()): printc(f'[{message}]', SNT_COLOR)
+
+            # Receiving response from server
+            img: np.ndarray = self.sock.recv_pyobj()
+            if (DEBUG): printc(f'[IMAGE: {img.shape}]', RCV_COLOR)
+            return img
+
+        except:
+            # Returning an empty array if an error occurred
+            return np.array([])

@@ -17,7 +17,7 @@ from api.rotateAPI import * # Rotate Utilities
 last_axis: Dict[str, Tuple] = {}
 strong_axis: Tuple          = (0, 0)
 threshold: float            = .5
-d_toggle = True #true is loco false is strong arm  
+d_toggle = True #true is loco false is strong arm
 
 def change_d_toggle():
     global d_toggle
@@ -100,7 +100,7 @@ def hat_axis_moved(axis):
         if (axis.y == 1):    loco_xy[1] = 1
         elif (axis.y == -1): loco_xy[1] = -1
         else:                loco_xy[1] = 0
-        
+
         # loco control ---> spin turn left, spin turn right
         if (axis.x == 1):    loco_xy[0] = 1
         elif (axis.x == -1):  loco_xy[0] = -1
@@ -120,7 +120,7 @@ def hat_axis_moved(axis):
         else:                client.communicate('put', move_spin(3))
 
 #def left_axis_moved(axis):
-    
+
 
 def stop_all() -> None:
     """
@@ -155,13 +155,13 @@ def xboxcontroller_init() -> None:
         # Trigger R and L events
         controller.trigger_l.when_moved = lambda _: left_trigger_move(controller.trigger_l.value)
         controller.trigger_r.when_moved = lambda _: right_trigger_move(controller.trigger_r.value)
-        
+
         # Select and start events
         controller.button_select.when_pressed  = lambda _: client.communicate('put', left_rotate())
         controller.button_select.when_released = lambda _: client.communicate('put', zero_rotate())
 
         #carriage
-        controller.button_b.when_pressed  = lambda _: client.communicate('put', trigger_carriage())     
+        controller.button_b.when_pressed  = lambda _: client.communicate('put', trigger_carriage())
         #
 
         controller.button_start.when_pressed  = lambda _: client.communicate('put', right_rotate())

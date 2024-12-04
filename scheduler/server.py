@@ -1,4 +1,4 @@
-import zmq # Standard Python Imports
+import zmq, numpy as np # Standard Python Imports
 
 from scheduler.config import * # Configurations
 from scheduler.utils import Message, printc # Utilities
@@ -78,3 +78,14 @@ class Server:
         # Sending message to client
         if (DEBUG and message.show()): printc(f'[{message}]', SNT_COLOR)
         self.sock.send_string(str(message))
+
+    def send_image(self: any, img: np.ndarray) -> None:
+        """
+        Sends an image to the client.
+
+        @param img: A numpy array representing the image to be sent.
+        """
+
+        # Sending image to client
+        if (DEBUG): printc(f'[IMAGE: {img.shape}]', SNT_COLOR)
+        self.sock.send_pyobj(img)

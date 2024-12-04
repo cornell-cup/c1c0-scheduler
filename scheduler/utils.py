@@ -106,7 +106,6 @@ class DataQueue:
         """
 
         # Adding message to queue
-        print(str(message))
         self.queue.append((message, time.time()))
 
     def find(self: any, name: str, tag: str) -> Optional[Message]:
@@ -118,12 +117,11 @@ class DataQueue:
         @return: The message, if found.
         """
 
+        # Removing old messages
+        self.queue = [(m, t) for m, t in self.queue if (time.time() - t <= config.TIMEOUT)]
+
         # Finding message in queue
         for message, timestamp in self.queue:
-            if (time.time() - timestamp > config.TIMEOUT):
-                self.queue.remove((message, timestamp))
-                continue
-
             if (message.name == name and message.tag == tag):
                 self.queue.remove((message, timestamp))
                 return message
