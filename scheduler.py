@@ -11,7 +11,7 @@ from specs.manual import manual_check, manual_put, manual_get # Manual Specifica
 from specs.movement import movement_check, movement_get # Movement Specifications
 from specs.controller import controller_check, controller_put # Controller Specifications
 
-from typing import Callable, Dict # Type Hinting
+from typing import Callable, Dict, Union # Type Hinting
 
 if __name__ == '__main__':
     # Initializing server and data queue
@@ -42,7 +42,7 @@ if __name__ == '__main__':
             'xbox_check': lambda msg: controller_check(queue, msg),
             'xbox_put':   lambda msg: controller_put(queue, msg),
 
-            'camera_get': lambda _: camera.adjust_read(),
+            'camera_get': lambda _: cam.adjust_read() if CAMERA_MODE else None,
         }
 
         # Attempting to start server
@@ -59,7 +59,7 @@ if __name__ == '__main__':
             # Finding and calling handler for message
             search: str = f'{msg.name}{TAG_SEP}{msg.tag}'
             mapping.setdefault(search, lambda msg: msg)
-            response: Message | np.ndarray = mapping[search](msg)
+            response: Union[Message, np.ndarray] = mapping[search](msg)
 
             # Sending response to client
             if isinstance(response, Message): scheduler.send(response)

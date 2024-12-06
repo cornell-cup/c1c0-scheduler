@@ -21,6 +21,13 @@ d_toggle = True #true is loco false is strong arm
 
 def change_d_toggle():
     global d_toggle
+    if d_toggle:
+        client.communicate('put', get_locomotion(0, 0))
+        print('Hand Toggle')
+    else:
+        client.communicate('put', move_hand(3))
+        client.communicate('put', move_spin(3))
+        print('Loco Toggle')
     d_toggle = not d_toggle
     print(d_toggle)
 

@@ -119,7 +119,7 @@ class Client:
             # Returning an empty string if an error occurred
             return ''
 
-    def image(self: any) -> np.ndarray:
+    def image(self: any) -> Optional[np.ndarray]:
         """
         Requests an image from the server.
 
@@ -134,9 +134,9 @@ class Client:
 
             # Receiving response from server
             img: np.ndarray = self.sock.recv_pyobj()
-            if (DEBUG): printc(f'[IMAGE: {img.shape}]', RCV_COLOR)
+            if (img is not None and DEBUG): printc(f'[IMAGE: {img.shape}]', RCV_COLOR)
             return img
 
         except:
-            # Returning an empty array if an error occurred
-            return np.array([])
+            # Returning None if an error occurred
+            return None

@@ -1,5 +1,7 @@
 import numpy as np, time, cv2 # Default Python Libraries
 
+from scheduler.config import * # Configuration
+
 from typing import List, Optional # Type Hinting
 
 class Camera:
@@ -25,8 +27,8 @@ class Camera:
         self.attempts: int               = attempts
         self.image: Optional[np.ndarray] = None
 
-        self.camera: str                 = self.find_camera() if camera is None else camera
-        self.device: cv2.VideoCapture    = cv2.VideoCapture(self.camera, cv2.CAP_GSTREAMER)
+        self.camera: str                 = self.find_camera() if (camera is None and CAMERA_MODE) else camera
+        self.device: cv2.VideoCapture    = cv2.VideoCapture(self.camera, cv2.CAP_GSTREAMER) if CAMERA_MODE else None
 
     def __enter__(self: any) -> None:
         """
@@ -35,7 +37,7 @@ class Camera:
         the camera is closed after use.
         """
 
-        if not self.device.isOpened():
+        if CAMERA_MODE and not self.device.isOpened():
             if not self.device.open(self.camera):
                 raise OSError(f'Unable to open device at index: {self.camera}')
         return self
@@ -54,7 +56,8 @@ class Camera:
         exc_tb   - The exception traceback.
         """
 
-        self.device.release()
+        if CAMERA_MODE and self.device.isOpened():
+            self.device.release()
 
     def adjust_read(self: any, sat_mod: int = -10, brightness_mod: int = 10, timeout: int = 10) -> np.ndarray:
         """
