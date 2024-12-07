@@ -119,7 +119,7 @@ class Client:
             # Returning an empty string if an error occurred
             return ''
 
-    def image(self: any) -> np.ndarray | None:
+    def image(self: any) -> Optional[np.ndarray]:
         """
         Requests an image from the server.
 
