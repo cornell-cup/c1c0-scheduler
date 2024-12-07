@@ -30,7 +30,8 @@ if __name__ == '__main__':
         try:
             task = facial_client.interpret_task(command)
             facial_client.image = scheduler_client.image()
-            names = task(args)
+            if (facial_client.image is None): names = []
+            else: names = task(args)
         except:
             names = []
 

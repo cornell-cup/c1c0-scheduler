@@ -87,5 +87,5 @@ class Server:
         """
 
         # Sending image to client
-        if (DEBUG): printc(f'[IMAGE: {img.shape}]', SNT_COLOR)
+        if (img is not None and DEBUG): printc(f'[IMAGE: {img.shape}]', SNT_COLOR)
         self.sock.send_pyobj(img)

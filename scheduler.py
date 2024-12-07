@@ -42,7 +42,7 @@ if __name__ == '__main__':
             'xbox_check': lambda msg: controller_check(queue, msg),
             'xbox_put':   lambda msg: controller_put(queue, msg),
 
-            'camera_get': lambda _: camera.adjust_read(),
+            'camera_get': lambda _: cam.adjust_read() if CAMERA_MODE else None,
         }
 
         # Attempting to start server

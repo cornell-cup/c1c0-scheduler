@@ -1,5 +1,7 @@
 import numpy as np, time, cv2 # Default Python Libraries
 
+from scheduler.config import * # Configuration
+
 from typing import List, Optional # Type Hinting
 
 class Camera:
@@ -35,7 +37,7 @@ class Camera:
         the camera is closed after use.
         """
 
-        if not self.device.isOpened():
+        if not self.device.isOpened() and CAMERA_MODE:
             if not self.device.open(self.camera):
                 raise OSError(f'Unable to open device at index: {self.camera}')
         return self
@@ -54,7 +56,8 @@ class Camera:
         exc_tb   - The exception traceback.
         """
 
-        self.device.release()
+        if self.device.isOpened():
+            self.device.release()
 
     def adjust_read(self: any, sat_mod: int = -10, brightness_mod: int = 10, timeout: int = 10) -> np.ndarray:
         """

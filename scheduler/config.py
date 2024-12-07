@@ -15,3 +15,5 @@ RCV_COLOR: str = '\033[94m' # Blue color for received messages.
 INF_COLOR: str = '\033[93m' # Yellow color for informational messages.
 ERR_COLOR: str = '\033[91m' # Red color for error messages.
 END_COLOR: str = '\033[0m' # End color for all messages.
+
+CAMERA_MODE: bool = True # Whether or not to use the camera.
