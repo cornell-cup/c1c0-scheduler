@@ -67,3 +67,6 @@ venv:
 	python$(PYTHON_VER) -m venv --system-site-packages venv/
 	venv/bin/pip install --upgrade pip setuptools wheel
 	venv/bin/pip install -r requirements.txt
+
+fix:
+	sed -i '' 's/abs(val) \> self.axis_threshold/True/g' venv/lib/python*/xbox360controller/controller.py

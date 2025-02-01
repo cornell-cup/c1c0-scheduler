@@ -67,3 +67,7 @@ If you want to add a subsytem, follow these instructions to make your life easie
 1. Figure out a specification file for the client. All the scheduler really is a massive data queue that you can `get` and `put` data. So make a specification file that can handle your requests to scheduler, and then add it to the mapping found in `scheduler.py`.
 2. Now create a client file within `clients` to send the requests and deal with the response that the server gives (based on earlier specification), if any extra utilities or assets are needed, you can put them within the `api` or `assets` folder respectively.
 3. Final step is to add a makefile command and then test your code before commiting. Once all these steps are done, you have added a subsystem to scheduler, yay!
+
+### Quick Bug Fixes
+
+1. If locomotion is not zeroing out after pressing and releasing a button, go to the `venv/lib/python3.*/xbox360controller/controller.py` file and find a function called `axis_callback` found around line 300, and remove the condition `abs(val) > self.axis_threshold` from the if statement. This should fix the issue, and it might be automatically done by the makefile command `make fix`, but if not do the manual solution above.

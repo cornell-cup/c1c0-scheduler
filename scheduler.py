@@ -22,7 +22,7 @@ if __name__ == '__main__':
     # Opening Camera
     with camera as cam:
 
-        # Initialzing response handlers and mapping
+        # Initializing response handlers and mapping
         mapping: Dict[str, Callable[[str], None]] = {
             'chatbot_check': lambda msg: chatbot_check(queue, msg),
             'chatbot_get':   lambda msg: chatbot_get(queue, msg),
