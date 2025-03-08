@@ -19,17 +19,24 @@ from specs.controller import controller_check, controller_put # Controller Speci
 
 from typing import Callable, Dict, Union # Type Hinting
 
+class CleanExit:
+    kill_now = False
+    kill_num = 50
 
-def clean_exit(sig, frame) -> None:
-    """
-    Function to perform a clean exit, when the program is interrupted.
-    """
-    global scheduler, queue, camera
-    queue.add(Message('xbox', 'put', zero_locomotion()))
-    queue.add(Message('xbox', 'put', zero_strong()))
-    queue.add(Message('xbox', 'put', zero_precise()))
-    queue.add(Message('xbox', 'put', zero_rotate()))
-    print("Performing Clean Exit Of Scheduler...")
+    def __init__(self, queue):
+        signal.signal(signal.SIGTERM, self.clean_exit)
+        self.queue = queue
+
+    def clean_exit(self, signum, frame) -> None:
+        """
+        Function to perform a clean exit, when the program is interrupted.
+        """
+        queue.add(Message('xbox', 'put', zero_locomotion()))
+        queue.add(Message('xbox', 'put', zero_strong()))
+        queue.add(Message('xbox', 'put', zero_precise()))
+        queue.add(Message('xbox', 'put', zero_rotate()))
+        print("Performing Clean Exit Of Scheduler...")
+        self.kill_now = True
 
 
 if __name__ == '__main__':
@@ -37,11 +44,7 @@ if __name__ == '__main__':
     scheduler: Server = Server()
     queue: DataQueue = DataQueue()
     camera: Camera = Camera()
-
-    # Setting up signal handler
-    signal.signal(signal.SIGTERM, clean_exit)
-    kill_now: bool = False
-    kill_num: int = 20
+    signal_handler = CleanExit(queue)
 
     # Opening Camera
     with camera as cam:
@@ -76,10 +79,11 @@ if __name__ == '__main__':
             attempt += 1
 
         # Infinite loop for server
-        while kill_num > 0:
+        while signal_handler.kill_num > 0:
             # Receiving message from client
             msg: Message = scheduler.receive()
-            if (kill_now): kill_num -= 1
+            if (signal_handler.kill_now):
+                signal_handler.kill_num -= 1
 
             # Finding and calling handler for message
             search: str = f'{msg.name}{TAG_SEP}{msg.tag}'
