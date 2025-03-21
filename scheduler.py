@@ -1,5 +1,4 @@
-import numpy as np # Standard Python Imports
-import signal, time
+import numpy as np, signal # Standard Python Imports
 
 from api.locomotionAPI import zero_locomotion # Locomotion Utilities
 from api.preciseAPI import zero_precise # Precise Utilities
@@ -20,10 +19,11 @@ from specs.controller import controller_check, controller_put # Controller Speci
 from typing import Callable, Dict, Union # Type Hinting
 
 
-class CleanExit:
+class CleanExit():
     kill_now = False
 
     def __init__(self, queue):
+        signal.signal(signal.SIGINT, self.clean_exit)
         signal.signal(signal.SIGTERM, self.clean_exit)
         self.queue = queue
 
@@ -31,13 +31,13 @@ class CleanExit:
         """
         Function to perform a clean exit, when the program is interrupted.
         """
-        queue.add(Message('xbox', 'put', zero_locomotion()))
-        queue.add(Message('xbox', 'put', zero_strong()))
-        queue.add(Message('xbox', 'put', zero_precise()))
-        queue.add(Message('xbox', 'put', zero_rotate()))
+        self.queue.add(Message('xbox', 'put', zero_locomotion()))
+        self.queue.add(Message('xbox', 'put', zero_strong()))
+        self.queue.add(Message('xbox', 'put', zero_precise()))
+        self.queue.add(Message('xbox', 'put', zero_rotate()))
 
         print("Performing Clean Exit Of Scheduler...")
-        queue.active = False
+        self.queue.active = False
         self.kill_now = True
 
 
@@ -95,5 +95,7 @@ if __name__ == '__main__':
             else: scheduler.send_image(response)
 
             # Checking for clean exit
-            print(f'Queue Size: {len(queue.queue)}')
             if signal_handler.kill_now and queue.is_empty(): break
+
+        # Cleaning up resources
+        scheduler.stop()

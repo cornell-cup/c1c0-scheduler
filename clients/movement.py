@@ -1,4 +1,4 @@
-import sys, time # Default Python Libraries
+import signal, sys, time # Default Python Libraries
 path: str = sys.argv[1]; sys.path.insert(0, path) # Modifying Python Path
 
 from typing import List # Typing
@@ -15,7 +15,9 @@ from api.rotateAPI import rotate_decode # Rotate Decoding
 
 import R2Protocol2 as r2p # Serial encoding/decoding protocol
 
+
 STALL: int = .01 # Time To Wait For New Task
+
 
 def convert_16_to_8(arr: str, length: int) -> List[int]:
     """
@@ -31,6 +33,7 @@ def convert_16_to_8(arr: str, length: int) -> List[int]:
         data.append((arr[i] >> 8) & 255)
         data.append(arr[i] & 255)
     return data
+
 
 def locomotion_serial(data: str) -> None:
     """
@@ -50,6 +53,7 @@ def locomotion_serial(data: str) -> None:
     except KeyboardInterrupt:
         serial_close()
 
+
 def precise_serial(data: str) -> None:
     """
     Send the given data (encoded in precise format) to the specified serial port.
@@ -67,6 +71,7 @@ def precise_serial(data: str) -> None:
         serial_write(message)
     except KeyboardInterrupt:
         serial_close()
+
 
 def strong_serial(data: str) -> None:
     """
@@ -86,6 +91,7 @@ def strong_serial(data: str) -> None:
     except KeyboardInterrupt:
         serial_close()
 
+
 def rotate_serial(data: str) -> None:
     """
     Send the given data (encoded in rotate format) to the specified serial port.
@@ -104,12 +110,26 @@ def rotate_serial(data: str) -> None:
     except KeyboardInterrupt:
         serial_close()
 
+
+class CleanExit:
+    kill_now = False
+
+    def __init__(self):
+        signal.signal(signal.SIGINT, self.clean_exit)
+        signal.signal(signal.SIGTERM, self.clean_exit)
+        self.buffer = 10
+
+    def clean_exit(self, signum, frame) -> None:
+        self.kill_now = True
+
+
 if __name__ == '__main__':
     # Initializing client
+    signal_handler = CleanExit()
     client: Client = Client('movement')
     client.connect()
 
-    while True:
+    while signal_handler.buffer > 0:
         # Asking ZMQ for next task
         time.sleep(STALL)
         response: Message = client.communicate('get', 'null')
@@ -125,6 +145,10 @@ if __name__ == '__main__':
         elif ('strong' in data):   strong_serial(data)
         elif ('rotate' in data):   rotate_serial(data)
         else: printc(f'Invalid command: {data}', ERR_COLOR)
+
+        # Decrementing buffer if exiting
+        if signal_handler.kill_now == True:
+            signal_handler.buffer -= 1
 
     # Closing client
     client.close()
