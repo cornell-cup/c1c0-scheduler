@@ -19,9 +19,9 @@ from specs.controller import controller_check, controller_put # Controller Speci
 
 from typing import Callable, Dict, Union # Type Hinting
 
+
 class CleanExit:
     kill_now = False
-    kill_num = 50
 
     def __init__(self, queue):
         signal.signal(signal.SIGTERM, self.clean_exit)
@@ -35,7 +35,9 @@ class CleanExit:
         queue.add(Message('xbox', 'put', zero_strong()))
         queue.add(Message('xbox', 'put', zero_precise()))
         queue.add(Message('xbox', 'put', zero_rotate()))
+
         print("Performing Clean Exit Of Scheduler...")
+        queue.active = False
         self.kill_now = True
 
 
@@ -79,11 +81,9 @@ if __name__ == '__main__':
             attempt += 1
 
         # Infinite loop for server
-        while signal_handler.kill_num > 0:
+        while True:
             # Receiving message from client
             msg: Message = scheduler.receive()
-            if (signal_handler.kill_now):
-                signal_handler.kill_num -= 1
 
             # Finding and calling handler for message
             search: str = f'{msg.name}{TAG_SEP}{msg.tag}'
@@ -93,3 +93,7 @@ if __name__ == '__main__':
             # Sending response to client
             if isinstance(response, Message): scheduler.send(response)
             else: scheduler.send_image(response)
+
+            # Checking for clean exit
+            print(f'Queue Size: {len(queue.queue)}')
+            if signal_handler.kill_now and queue.is_empty(): break
