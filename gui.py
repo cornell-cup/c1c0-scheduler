@@ -60,6 +60,7 @@ def initialize_gui():
     kill_button.pack(pady=10)
 
     # Run the GUI
+    stop_button.focus_set()
     root.mainloop()
 
 
