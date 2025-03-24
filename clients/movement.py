@@ -110,7 +110,6 @@ def rotate_serial(data: str) -> None:
     except KeyboardInterrupt:
         serial_close()
 
-
 class CleanExit:
     kill_now = False
 
@@ -147,8 +146,7 @@ if __name__ == '__main__':
         else: printc(f'Invalid command: {data}', ERR_COLOR)
 
         # Decrementing buffer if exiting
-        if signal_handler.kill_now == True:
-            signal_handler.buffer -= 1
+        if signal_handler.kill_now: signal_handler.buffer -= 1
 
     # Closing client
     client.close()

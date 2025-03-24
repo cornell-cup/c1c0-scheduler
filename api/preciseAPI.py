@@ -61,7 +61,7 @@ def example_precise() -> str:
     if (state == 0):   motor_angles = [15, 30, 40, 80, 30,  5, motor_angles[6]]
     elif (state == 1): motor_angles = [0, 0, 10, 60, 90, 30, motor_angles[6]]
     elif (state == 2): motor_angles = [0, -15, 80, 10, 10, 50, motor_angles[6]]
-    else:              motor_angles = [20, -30, 0, 60, 30, 30, motor_angles[6]]
+    else:              motor_angles = [-10, -30, 0, 60, 30, 30, motor_angles[6]]
 
     return precise_encode(motor_angles)
 

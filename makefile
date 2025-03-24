@@ -51,6 +51,9 @@ CHATBT_PRV := clients/chatbot.py
 chatbot:
 	cd $(CHATBT_DIR) && $(CHATBT_BIN)/python $(CHATBT_EXC) $(SCHEDULER_PATH)
 
+gui-wave:
+	cd $(CHATBT_DIR) && $(CHATBT_BIN)/python $(CHATBT_EXC) $(SCHEDULER_PATH) wave.wav
+
 build: venv
 	mkdir -p $(FACIAL_DIR) && cp $(FACIAL_PRV) $(FACIAL_DIR)/$(FACIAL_EXC)
 	mkdir -p $(MANUAL_DIR) && cp $(MANUAL_PRV) $(MANUAL_DIR)/$(MANUAL_EXC)

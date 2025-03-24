@@ -30,6 +30,9 @@ def stop_command():
 def kill_python():
     subprocess.run("killall python python3", shell=True)
 
+def gui_wave():
+    subprocess.run("cd ~/c1c0-main/c1c0-scheduler && make gui-wave", shell=True)
+
 
 # Ensure Tkinter runs in a virtual display (for headless environments)
 if "DISPLAY" not in os.environ:
@@ -45,9 +48,11 @@ def initialize_gui():
 
     cust_font = tkFont.Font(family='Helvetica', size=18, weight='bold')
 
-    # Create a frame to center buttons
+    # Create frames to align buttons
     button_frame = tk.Frame(root, bg="black")
     button_frame.pack(expand=True)  # Makes sure frame is centered
+    side_button_frame = tk.Frame(button_frame, bg="black")
+    side_button_frame.pack(side=tk.RIGHT, padx=20)
 
     # Create buttons
     run_button = tk.Button(button_frame, text="Run Scheduler", fg='white', bg='red', command=run_command, height=4, width=50, font=cust_font)
@@ -58,6 +63,17 @@ def initialize_gui():
     run_button.pack(pady=10)
     stop_button.pack(pady=10)
     kill_button.pack(pady=10)
+
+    # Place button in side frame
+    wave_button = tk.Button(side_button_frame, text="Wave Hello", fg='white', bg='blue', command=gui_wave, height=3, width=20, font=cust_font)
+    placeholder1 = tk.Button(side_button_frame, text="Button 2", fg='white', bg='gray', height=3, width=20, font=cust_font)
+    placeholder2 = tk.Button(side_button_frame, text="Button 3", fg='white', bg='gray', height=3, width=20, font=cust_font)
+    placeholder3 = tk.Button(side_button_frame, text="Button 4", fg='white', bg='gray', height=3, width=20, font=cust_font)
+
+    wave_button.pack(pady=5)
+    placeholder1.pack(pady=5)
+    placeholder2.pack(pady=5)
+    placeholder3.pack(pady=5)
 
     # Run the GUI
     stop_button.focus_set()

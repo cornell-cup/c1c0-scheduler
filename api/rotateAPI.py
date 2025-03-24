@@ -5,6 +5,13 @@ def zero_rotate() -> str:
 
     return rotate_encode(0, 0, 1)
 
+def auto_rotate() -> str:
+    """
+    Call this method when manual control is false
+    """
+
+    return 'rotate: '
+
 def left_rotate() -> str:
     """
     Call this method on left bumper to rotate head to the left at a predetermined rate.

@@ -33,7 +33,7 @@ class CleanExit():
         """
         self.queue.add(Message('xbox', 'put', zero_locomotion()))
         self.queue.add(Message('xbox', 'put', zero_strong()))
-        self.queue.add(Message('xbox', 'put', zero_precise()))
+        # self.queue.add(Message('xbox', 'put', zero_precise()))
         self.queue.add(Message('xbox', 'put', zero_rotate()))
 
         print("Performing Clean Exit Of Scheduler...")

@@ -7,7 +7,7 @@ from scheduler.utils import Message, printc # Utilities
 
 from client.audio import * # Audio Interface
 from client.client import OpenAPI # Client Interface
-from client.config import FILE_MODE # Configuration
+from client.config import FILE_MODE, MAC_MODE # Configuration
 
 from labels.config import recognize as config_recognize, handler as config_handler  # Configuration Specifications
 from labels.facial import recognize as facial_recognize, handler as facial_handler  # Facial Specifications
@@ -16,6 +16,7 @@ from labels.movement import recognize as movement_recognize, handler as movement
 from labels.question import recognize as question_recognize, handler as question_handler  # Question Specifications
 
 from typing import Callable, Dict # Type Hinting
+import argparse
 
 
 if __name__ == '__main__':
@@ -24,28 +25,35 @@ if __name__ == '__main__':
     scheduler_client: SClient = SClient('chatbot')
     scheduler_client.connect()
 
-    # Initialzing response handlers and mapping
+    # Initializing response handlers and mapping
+    def config_lambda(msg: str): return config_handler(chatbot_client, msg, scheduler_client)
+    def facial_lambda(msg: str): return facial_handler(chatbot_client, msg, scheduler_client)
+    def general_lambda(msg: str): return general_handler(chatbot_client, msg, scheduler_client)
+    def movement_lambda(msg: str): return movement_handler(chatbot_client, msg, scheduler_client)
+    def question_lambda(msg: str): return question_handler(chatbot_client, msg, scheduler_client)
+
     mapping: Dict[str, Callable[[str], None]] = {
-        config_recognize:   lambda msg: config_handler(chatbot_client, msg, scheduler_client),
-        facial_recognize:   lambda msg: facial_handler(chatbot_client, msg, scheduler_client),
-        general_recognize:  lambda msg: general_handler(chatbot_client, msg, scheduler_client),
-        movement_recognize: lambda msg: movement_handler(chatbot_client, msg, scheduler_client),
-        question_recognize: lambda msg: question_handler(chatbot_client, msg, scheduler_client),
+        config_recognize:   config_lambda,
+        facial_recognize:   facial_lambda,
+        general_recognize:  general_lambda,
+        movement_recognize: movement_lambda,
+        question_recognize: question_lambda,
     }
 
     # Initialize threshold for each task
     thresholds: Dict[str, int] = {
-        config_recognize: 0.8,
+        config_recognize: 0.6,
         facial_recognize: 0.5,
+        general_recognize: 0.3,
         movement_recognize: 0.4,
         question_recognize: 0.3,
-        general_recognize: 0.3,
     }
 
     # Infinite loop for chatbot
     while True:
         # Receiving audio from user or file
-        msg: str = file_to_text() if FILE_MODE else speech_to_text()
+        msg: str = file_to_text2(sys.argv[2]) if len(sys.argv) > 2 \
+            else (file_to_text() if FILE_MODE else speech_to_text())
         print(f"\033[32mUser: {msg}\033[0m")
 
         # Checking and converting STT message
@@ -61,16 +69,14 @@ if __name__ == '__main__':
 
         for recognize, handler in mapping.items():
             score = recognize(chatbot_client, msg)
-            if score-thresholds[recognize] > best_score:
-                best_handler, best_score = handler, score
+            if score - thresholds[recognize] > best_score:
+                best_handler, best_score = handler, score - thresholds[recognize]
+        print("Best Handler: ", best_handler if best_handler else "None")
 
-        play_random_sound()
-        if best_handler: text_to_speech(best_handler(msg))
-        else: text_to_speech("I did not understand the message. Please repeat it again or elaborate.")
-        play_random_sound()
-        text = best_handler(msg)
+        if (not MAC_MODE): play_random_sound()
+        text = best_handler(msg) if best_handler \
+            else "I did not understand the message. Please repeat it again or elaborate."
+        if (text is not None): text_to_speech(text)
 
-        # Storing previous messages
-        chatbot_client.previous.append(msg)
-        if len(chatbot_client.previous) > 5:
-            chatbot_client.previous.remove(0)
+        # if (not MAC_MODE): play_random_sound()
+        if len(sys.argv) > 2: break
