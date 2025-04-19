@@ -97,6 +97,7 @@ class DataQueue:
 
         # Initializing fields
         self.queue = []
+        self.active = True
 
     def add(self: any, message: Message) -> None:
         """
@@ -106,7 +107,8 @@ class DataQueue:
         """
 
         # Adding message to queue
-        self.queue.append((message, time.time()))
+        if (self.active):
+            self.queue.append((message, time.time()))
 
     def find(self: any, name: str, tag: str) -> Optional[Message]:
         """
@@ -128,6 +130,15 @@ class DataQueue:
 
         # Returning none if message not found
         return None
+
+    def is_empty(self: any) -> bool:
+        """
+        Returns whether or not the queue is empty.
+
+        @return: Whether or not the queue is empty.
+        """
+
+        return len(self.queue) == 0
 
 def printc(msg: str, color: str) -> None:
     """

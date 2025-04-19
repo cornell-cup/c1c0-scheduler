@@ -5,6 +5,9 @@ PYTHON_VER     := 3.11
 all: venv
 	make -j 4 scheduler facial movement controller
 
+gui: venv
+	venv/bin/python gui.py
+
 scheduler: venv
 	venv/bin/python scheduler.py
 
