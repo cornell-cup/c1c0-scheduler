@@ -10,6 +10,7 @@ from specs.facial import facial_check, facial_put, facial_get # Facial Specifica
 from specs.manual import manual_check, manual_put, manual_get # Manual Specifications
 from specs.movement import movement_check, movement_get # Movement Specifications
 from specs.controller import controller_check, controller_put # Controller Specifications
+from specs.object import object_check, object_put, object_get # Object Specifications
 
 from typing import Callable, Dict, Union # Type Hinting
 
@@ -21,7 +22,6 @@ if __name__ == '__main__':
 
     # Opening Camera
     with camera as cam:
-
         # Initializing response handlers and mapping
         mapping: Dict[str, Callable[[str], None]] = {
             'chatbot_check': lambda msg: chatbot_check(queue, msg),
@@ -41,6 +41,10 @@ if __name__ == '__main__':
 
             'xbox_check': lambda msg: controller_check(queue, msg),
             'xbox_put':   lambda msg: controller_put(queue, msg),
+
+            'object_check': lambda msg : object_check(queue, msg),
+            'object_put': lambda msg : object_put(queue, msg),
+            'object_get': lambda msg : object_get(queue, msg),
 
             'camera_get': lambda _: cam.adjust_read() if CAMERA_MODE else None,
         }

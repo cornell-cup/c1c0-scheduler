@@ -16,6 +16,14 @@ FACIAL_PRV := clients/facial.py
 facial:
 	cd $(FACIAL_DIR) && $(FACIAL_BIN)/python $(FACIAL_EXC) $(SCHEDULER_PATH)
 
+OBJECT_BIN := ../r2-object_detection/venv/bin
+OBJECT_DIR := ../r2-object_detection
+OBJECT_EXC := object_comm.py
+OBJECT_PRV := clients/object.py
+
+object:
+	cd $(OBJECT_DIR) && $(OBJECT_BIN)/python $(OBJECT_EXC) $(SCHEDULER_PATH)
+
 MANUAL_BIN := $(SCHEDULER_PATH)/venv/bin
 MANUAL_DIR := temp
 MANUAL_EXC := manual_comm.py
@@ -50,6 +58,7 @@ chatbot:
 
 build: venv
 	mkdir -p $(FACIAL_DIR) && cp $(FACIAL_PRV) $(FACIAL_DIR)/$(FACIAL_EXC)
+	mkdir -p $(OBJECT_DIR) && cp $(OBJECT_PRV) $(OBJECT_DIR)/$(OBJECT_EXC)
 	mkdir -p $(MANUAL_DIR) && cp $(MANUAL_PRV) $(MANUAL_DIR)/$(MANUAL_EXC)
 	mkdir -p $(MVMENT_DIR) && cp $(MVMENT_PRV) $(MVMENT_DIR)/$(MVMENT_EXC)
 	mkdir -p $(CONTRL_DIR) && cp $(CONTRL_PRV) $(CONTRL_DIR)/$(CONTRL_EXC)
