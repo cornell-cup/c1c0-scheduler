@@ -17,7 +17,7 @@ FACIAL_EXC := facial_comm.py
 FACIAL_PRV := clients/facial.py
 
 facial:
-	cd $(FACIAL_DIR) && $(FACIAL_BIN)/python $(FACIAL_EXC) $(SCHEDULER_PATH)
+	cd $(FACIAL_DIR) && sudo $(FACIAL_BIN)/python $(FACIAL_EXC) $(SCHEDULER_PATH)
 
 OBJECT_BIN := ../r2-object_detection/venv/bin
 OBJECT_DIR := ../r2-object_detection

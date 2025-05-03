@@ -24,7 +24,7 @@ class CleanExit():
     kill_now = False
 
     def __init__(self, queue):
-        signal.signal(signal.SIGINT, self.clean_exit)
+        # signal.signal(signal.SIGINT, self.clean_exit)
         signal.signal(signal.SIGTERM, self.clean_exit)
         self.queue = queue
 

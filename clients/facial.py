@@ -30,9 +30,12 @@ if __name__ == '__main__':
         try:
             task = facial_client.interpret_task(command)
             facial_client.image = scheduler_client.image()
-            if (facial_client.image is None): names = []
+            print("Good")
+            if (facial_client.image is None): 
+                names = []
             else: names = task(args)
         except:
+            print("Except")
             names = []
 
         # Sending The Result Back To ZMQ
