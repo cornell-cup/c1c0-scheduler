@@ -37,6 +37,7 @@ if __name__ == '__main__':
     mapping: Dict[str, Callable[[str], None]] = {
         config_recognize:   config_lambda,
         facial_recognize:   facial_lambda,
+        object_recognize:   object_lambda,
         general_recognize:  general_lambda,
         movement_recognize: movement_lambda,
         question_recognize: question_lambda,

@@ -62,6 +62,9 @@ chatbot:
 gui-wave:
 	cd $(CHATBT_DIR) && $(CHATBT_BIN)/python $(CHATBT_EXC) $(SCHEDULER_PATH) wave.wav
 
+gui-detect:
+	cd $(CHATBT_DIR) && $(CHATBT_BIN)/python $(CHATBT_EXC) $(SCHEDULER_PATH) object.wav
+
 build: venv
 	mkdir -p $(FACIAL_DIR) && cp $(FACIAL_PRV) $(FACIAL_DIR)/$(FACIAL_EXC)
 	mkdir -p $(OBJECT_DIR) && cp $(OBJECT_PRV) $(OBJECT_DIR)/$(OBJECT_EXC)
