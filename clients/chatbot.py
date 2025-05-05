@@ -11,6 +11,7 @@ from client.config import FILE_MODE, MAC_MODE # Configuration
 
 from labels.config import recognize as config_recognize, handler as config_handler  # Configuration Specifications
 from labels.facial import recognize as facial_recognize, handler as facial_handler  # Facial Specifications
+from labels.object import recognize as object_recognize, handler as object_handler # Object Specifications
 from labels.general import recognize as general_recognize, handler as general_handler # General Specifications
 from labels.movement import recognize as movement_recognize, handler as movement_handler  # Movement Specifications
 from labels.question import recognize as question_recognize, handler as question_handler  # Question Specifications
@@ -28,6 +29,7 @@ if __name__ == '__main__':
     # Initializing response handlers and mapping
     def config_lambda(msg: str): return config_handler(chatbot_client, msg, scheduler_client)
     def facial_lambda(msg: str): return facial_handler(chatbot_client, msg, scheduler_client)
+    def object_lambda(msg: str): return object_handler(chatbot_client, msg, scheduler_client)
     def general_lambda(msg: str): return general_handler(chatbot_client, msg, scheduler_client)
     def movement_lambda(msg: str): return movement_handler(chatbot_client, msg, scheduler_client)
     def question_lambda(msg: str): return question_handler(chatbot_client, msg, scheduler_client)
@@ -45,6 +47,7 @@ if __name__ == '__main__':
         config_recognize: 0.6,
         facial_recognize: 0.5,
         general_recognize: 0.3,
+        object_recognize: 0.5,
         movement_recognize: 0.4,
         question_recognize: 0.3,
     }
@@ -77,6 +80,6 @@ if __name__ == '__main__':
         text = best_handler(msg) if best_handler \
             else "I did not understand the message. Please repeat it again or elaborate."
         if (text is not None): text_to_speech(text)
+        if (not MAC_MODE): play_random_sound()
 
-        # if (not MAC_MODE): play_random_sound()
         if len(sys.argv) > 2: break

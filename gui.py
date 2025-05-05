@@ -11,6 +11,10 @@ process = None
 
 def run_command():
     global process
+    if process is not None:
+        print("A process is already running.")
+        return
+
     process = subprocess.Popen(
         "cd ~/c1c0-main/c1c0-scheduler && make",
         shell=True, preexec_fn=os.setsid  # This starts the process in a new session (group)
@@ -19,12 +23,13 @@ def run_command():
 
 def stop_command():
     global process
-    if process:
-        # Kill the whole process group, including all child processes
-        os.killpg(process.pid, signal.SIGTERM)
-        process = None  # Reset the process variable after stopping
-    else:
+    if process is None:
         print("No process is running.")
+        return
+
+    # Kill the whole process group, including all child processes
+    os.killpg(process.pid, signal.SIGTERM)
+    process = None  # Reset the process variable after stopping
 
 
 def kill_python():
