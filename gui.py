@@ -38,6 +38,9 @@ def kill_python():
 def gui_wave():
     subprocess.run("cd ~/c1c0-main/c1c0-scheduler && make gui-wave", shell=True)
 
+def gui_detect():
+    subprocess.run("cd ~/c1c0-main/c1c0-scheduler && make gui-detect", shell=True)
+
 
 # Ensure Tkinter runs in a virtual display (for headless environments)
 if "DISPLAY" not in os.environ:
@@ -71,12 +74,12 @@ def initialize_gui():
 
     # Place button in side frame
     wave_button = tk.Button(side_button_frame, text="Wave Hello", fg='white', bg='blue', command=gui_wave, height=3, width=20, font=cust_font)
-    placeholder1 = tk.Button(side_button_frame, text="Button 2", fg='white', bg='gray', height=3, width=20, font=cust_font)
+    object_button = tk.Button(side_button_frame, text="Detect Object", fg='white', bg='blue', command=gui_detect, height=3, width=20, font=cust_font)
     placeholder2 = tk.Button(side_button_frame, text="Button 3", fg='white', bg='gray', height=3, width=20, font=cust_font)
     placeholder3 = tk.Button(side_button_frame, text="Button 4", fg='white', bg='gray', height=3, width=20, font=cust_font)
 
     wave_button.pack(pady=5)
-    placeholder1.pack(pady=5)
+    object_button.pack(pady=5)
     placeholder2.pack(pady=5)
     placeholder3.pack(pady=5)
 
