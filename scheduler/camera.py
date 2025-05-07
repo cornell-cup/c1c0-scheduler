@@ -134,7 +134,7 @@ class Camera:
         int - The descriptor of the first working camera.
         """
 
-        camera:   int = 0
+        camera:   int = -1
         devices:  int = self.devices if devices is None else devices
         attempts: int = self.attempts if attempts is None else attempts
 

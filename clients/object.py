@@ -21,7 +21,7 @@ if __name__ == '__main__':
         response1: Message = scheduler_client.communicate('get', 'null')
 
         # Getting The Task
-        split: list[str] = response1.data.split(' ')
+        split = response1.data.split(' ')
         command, args = split[0], split[1:]
         if (command == DEFAULT_RESP): continue
         if (command == 'exit' or command == 'quit'): break
