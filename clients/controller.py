@@ -33,10 +33,28 @@ def change_d_toggle():
     d_toggle = not d_toggle
     #print(d_toggle)
 
-def manual_auto_head_control():
+def manual_toggle():
     global manual_head
     manual_head = not manual_head
+    if not manual_head:
+        client.communicate('put', auto_rotate())
+        print("auto")
+    else:
+        client.communicate('put', zero_rotate())
+        print("manual")
+
     print(manual_head)
+
+def manual_auto_head_control(L_R: int): #1 is left, 2 is right
+    global manual_head
+    if manual_head:
+        if (L_R == 0):
+            client.communicate('put', zero_rotate())
+        elif (L_R == 1):
+            client.communicate('put', left_rotate())
+        elif (L_R == 2):
+            client.communicate('put', right_rotate())
+        print("manual")
 
 def left_trigger_move(val: float):
     if (val == 0.0): client.communicate('put', move_shoulder(0))
@@ -179,21 +197,24 @@ def xboxcontroller_init() -> None:
         controller.button_x.when_pressed  = lambda _: change_d_toggle()
 
         # head manual vs auto control
-        controller.button_thumb_l.when_pressed = lambda _: manual_auto_head_control()
+        controller.button_thumb_l.when_pressed = lambda _: manual_toggle()
 
-        if manual_head:
-            # manual head rotation
-            controller.button_select.when_pressed  = lambda _: client.communicate('put', left_rotate())
-            controller.button_select.when_released = lambda _: client.communicate('put', zero_rotate())
+        controller.button_select.when_pressed  = lambda _: manual_auto_head_control(1)
+        controller.button_select.when_released = lambda _: manual_auto_head_control(0)
 
-            controller.button_start.when_pressed  = lambda _: client.communicate('put', right_rotate())
-            controller.button_start.when_released = lambda _: client.communicate('put', zero_rotate())
-        else:
-            controller.button_select.when_pressed  = lambda _:  client.communicate('put', auto_rotate())
-            controller.button_select.when_released = lambda _: client.communicate('put', auto_rotate())
+        controller.button_start.when_pressed  = lambda _: manual_auto_head_control(2)
+        controller.button_start.when_released = lambda _: manual_auto_head_control(0)
+        # controller.button_select.when_pressed  = lambda _: client.communicate('put', left_rotate())
+        # controller.button_select.when_released = lambda _: client.communicate('put', zero_rotate())
 
-            controller.button_start.when_pressed  = lambda _: client.communicate('put', auto_rotate())
-            controller.button_start.when_released = lambda _: client.communicate('put', auto_rotate())
+        # controller.button_start.when_pressed  = lambda _: client.communicate('put', right_rotate())
+        # controller.button_start.when_released = lambda _: client.communicate('put', zero_rotate())
+            
+       # else:
+        #print("auto")
+
+        #client.communicate('put', auto_rotate())
+            
 
         # Hat/DPAD movement event
         controller.hat.when_moved    = hat_axis_moved

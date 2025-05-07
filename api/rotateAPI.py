@@ -10,7 +10,7 @@ def auto_rotate() -> str:
     Call this method when manual control is false
     """
 
-    return 'rotate: '
+    return 'rotate: auto rot: 000'
 
 def left_rotate() -> str:
     """

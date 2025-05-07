@@ -3,7 +3,7 @@ PYTHON_VER     := 3.11
 .PHONY: all scheduler facial manual movement controller chatbot
 
 all: venv
-	make -j 4 scheduler facial movement controller
+	make -j 5 scheduler facial movement controller object
 
 gui: venv
 	venv/bin/python gui.py
